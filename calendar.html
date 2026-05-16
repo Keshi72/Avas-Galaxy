@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌿 The Garden Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --void: #07070f;
+  --deep: #0e0e1f;
+  --navy: #131328;
+  --card-bg: rgba(255,255,255,0.04);
+  --card-border: rgba(255,255,255,0.08);
+  --gold: #e8c87a;
+  --gold-dim: rgba(232,200,122,0.25);
+  --gold-pale: rgba(232,200,122,0.08);
+  --sage: #6a9070;
+  --sage-light: #9abea2;
+  --sage-pale: rgba(154,190,162,0.12);
+  --rose: #c97a9a;
+  --rose-light: #e8b8d0;
+  --plum: #9b6abf;
+  --plum-light: #c4a8d8;
+  --moon-silver: #c8d8f0;
+  --text: #f0eaf8;
+  --text-soft: #b0a8d0;
+  --text-muted: #6a6480;
+  --border: rgba(232,200,122,0.15);
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--void);
+  font-family: 'EB Garamond', serif;
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+#bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+.nebula { position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; }
+.nb1 { width:700px;height:500px;background:radial-gradient(ellipse,rgba(155,106,191,0.15) 0%,transparent 70%);top:-150px;left:-200px; }
+.nb2 { width:500px;height:600px;background:radial-gradient(ellipse,rgba(106,144,112,0.1) 0%,transparent 70%);bottom:0;right:-100px; }
+.nb3 { width:600px;height:300px;background:radial-gradient(ellipse,rgba(232,200,122,0.06) 0%,transparent 70%);top:40%;left:20%; }
+
+/* ── TOPBAR ── */
+#topbar {
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 28px;
+  background:rgba(7,7,15,0.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.topbar-logo { font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:var(--gold);text-decoration:none;letter-spacing:0.5px; }
+.topbar-logo span { color:var(--text-muted);font-weight:400;font-size:13px;margin-left:8px;font-family:'Cormorant Garamond',serif;font-style:italic; }
+.nav-tabs { display:flex;gap:6px; }
+.nav-tab {
+  background:transparent;border:1px solid var(--card-border);border-radius:20px;
+  padding:6px 16px;cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:13px;
+  color:var(--text-muted);transition:all 0.2s;
+}
+.nav-tab:hover,.nav-tab.active { background:var(--gold-pale);border-color:var(--gold-dim);color:var(--gold); }
+.tb-right { display:flex;gap:8px;align-items:center; }
+.tb-btn { background:transparent;border:1px solid var(--card-border);border-radius:20px;padding:6px 14px;font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--text-muted);cursor:pointer;transition:all 0.2s; }
+.tb-btn:hover { border-color:var(--gold-dim);color:var(--gold); }
+#save-indicator { font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--sage-light);opacity:0;transition:opacity 0.4s; }
+#save-indicator.visible { opacity:1; }
+
+/* ── VIEWS ── */
+.view { display:none;min-height:100vh;padding:72px 0 80px;position:relative;z-index:1; }
+.view.active { display:block; }
+.container { max-width:1100px;margin:0 auto;padding:0 32px; }
+
+/* ── CALENDAR ── */
+.cal-header {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 0 24px;
+}
+.cal-month-title {
+  font-family:'Cinzel',serif;font-size:28px;font-weight:600;
+  background:linear-gradient(135deg,var(--text) 0%,var(--gold) 60%,var(--moon-silver) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.cal-nav { display:flex;gap:8px;align-items:center; }
+.cal-nav-btn {
+  background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;
+  width:34px;height:34px;cursor:pointer;color:var(--text-muted);
+  display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-size:16px;
+}
+.cal-nav-btn:hover { border-color:var(--gold-dim);color:var(--gold); }
+.today-btn {
+  background:var(--gold-pale);border:1px solid var(--gold-dim);border-radius:8px;
+  padding:6px 14px;cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:13px;
+  color:var(--gold);transition:all 0.15s;
+}
+.today-btn:hover { background:rgba(232,200,122,0.15); }
+
+/* Calendar grid */
+.cal-grid-header {
+  display:grid;grid-template-columns:repeat(7,1fr);gap:2px;
+  margin-bottom:4px;
+}
+.cal-day-name {
+  text-align:center;font-family:'Cormorant Garamond',serif;font-size:11px;
+  letter-spacing:3px;text-transform:uppercase;color:var(--text-muted);padding:8px 0;
+}
+.cal-grid { display:grid;grid-template-columns:repeat(7,1fr);gap:2px; }
+.cal-day {
+  min-height:100px;background:var(--card-bg);border:1px solid rgba(255,255,255,0.04);
+  border-radius:6px;padding:8px;cursor:pointer;transition:all 0.15s;position:relative;
+  overflow:hidden;
+}
+.cal-day:hover { background:rgba(255,255,255,0.06);border-color:var(--gold-dim); }
+.cal-day.other-month { opacity:0.3; }
+.cal-day.today { border-color:rgba(232,200,122,0.4);background:rgba(232,200,122,0.06); }
+.cal-day.today .cal-day-num { color:var(--gold); }
+.cal-day.selected { border-color:var(--gold);background:var(--gold-pale); }
+.cal-day-num {
+  font-family:'Playfair Display',serif;font-size:15px;color:var(--text-soft);
+  display:block;margin-bottom:4px;
+}
+.cal-day-moon { font-size:13px;display:block;margin-bottom:4px;line-height:1; }
+.cal-day-dots { display:flex;flex-wrap:wrap;gap:3px;margin-top:4px; }
+.cal-dot { width:6px;height:6px;border-radius:50%; }
+.cal-day-preview {
+  font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;
+  color:var(--text-muted);line-height:1.4;margin-top:4px;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+}
+
+/* Day detail panel */
+.day-detail {
+  background:rgba(14,14,32,0.95);border:1px solid var(--gold-dim);
+  border-radius:12px;padding:0;overflow:hidden;
+  display:none;
+}
+.day-detail.open { display:block; }
+.day-detail-header {
+  padding:18px 22px;border-bottom:1px solid var(--card-border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.day-detail-title { font-family:'Cinzel',serif;font-size:18px;color:var(--gold); }
+.day-detail-close { background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;padding:4px;transition:color 0.15s; }
+.day-detail-close:hover { color:var(--text); }
+.day-detail-body { padding:20px 22px;display:flex;flex-direction:column;gap:16px; }
+
+.detail-section-label {
+  font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--gold);opacity:0.7;display:block;margin-bottom:8px;
+}
+.detail-textarea {
+  width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--card-border);
+  border-radius:6px;padding:10px 14px;font-family:'EB Garamond',serif;font-style:italic;
+  font-size:15px;color:var(--text-soft);line-height:1.7;resize:none;outline:none;
+  min-height:80px;transition:border-color 0.2s;
+}
+.detail-textarea:focus { border-color:var(--gold-dim); }
+.detail-textarea::placeholder { color:var(--text-muted); }
+.detail-input {
+  width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--card-border);
+  border-radius:6px;padding:9px 14px;font-family:'Cormorant Garamond',serif;font-size:15px;
+  color:var(--text);outline:none;transition:border-color 0.2s;
+}
+.detail-input:focus { border-color:var(--gold-dim); }
+.detail-input::placeholder { color:var(--text-muted);font-style:italic; }
+
+/* Event list */
+.event-list { display:flex;flex-direction:column;gap:8px; }
+.event-item {
+  display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);
+  border:1px solid var(--card-border);border-radius:6px;padding:8px 12px;
+}
+.event-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+.event-text { flex:1;font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--text-soft); }
+.event-remove { background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:12px;opacity:0.5;padding:0 2px;transition:opacity 0.15s; }
+.event-remove:hover { opacity:1;color:var(--rose); }
+.add-event-row { display:flex;gap:8px; }
+.event-color-pick { display:flex;gap:5px;align-items:center; }
+.event-color-swatch { width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 0.15s;flex-shrink:0; }
+.event-color-swatch.active,.event-color-swatch:hover { border-color:white;transform:scale(1.1); }
+
+/* Moon info strip */
+.moon-info-strip {
+  display:flex;align-items:center;gap:16px;
+  background:rgba(200,216,240,0.05);border:1px solid rgba(200,216,240,0.12);
+  border-radius:8px;padding:10px 16px;margin-bottom:8px;
+}
+.moon-strip-icon { font-size:22px; }
+.moon-strip-name { font-family:'Playfair Display',serif;font-size:15px;color:var(--moon-silver); }
+.moon-strip-desc { font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--text-muted); }
+
+/* ── HABITS VIEW ── */
+.habits-layout { display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start; }
+
+/* Habit manager */
+.habit-manager {
+  background:rgba(14,14,32,0.6);border:1px solid var(--card-border);
+  border-radius:12px;overflow:hidden;
+}
+.habit-manager-header {
+  padding:16px 20px;border-bottom:1px solid var(--card-border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.habit-manager-title { font-family:'Cinzel',serif;font-size:14px;letter-spacing:1.5px;color:var(--gold); }
+.habit-list { padding:12px; }
+.habit-item {
+  display:flex;align-items:center;gap:12px;padding:10px 12px;
+  border-radius:8px;border:1px solid transparent;transition:all 0.15s;
+  margin-bottom:6px;cursor:pointer;
+}
+.habit-item:hover { background:rgba(255,255,255,0.04);border-color:var(--card-border); }
+.habit-item.active-habit { background:var(--gold-pale);border-color:var(--gold-dim); }
+.habit-color-dot { width:10px;height:10px;border-radius:50%;flex-shrink:0; }
+.habit-name { flex:1;font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--text-soft); }
+.habit-item.active-habit .habit-name { color:var(--gold); }
+.habit-streak { font-family:'Cormorant Garamond',serif;font-size:12px;color:var(--text-muted); }
+
+/* Add habit form */
+.add-habit-form {
+  padding:16px;border-top:1px solid var(--card-border);
+}
+.add-habit-row { display:flex;gap:8px;margin-bottom:8px; }
+.habit-input {
+  flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--card-border);
+  border-radius:6px;padding:8px 12px;font-family:'Cormorant Garamond',serif;font-size:14px;
+  color:var(--text);outline:none;transition:border-color 0.2s;
+}
+.habit-input:focus { border-color:var(--gold-dim); }
+.habit-input::placeholder { color:var(--text-muted);font-style:italic; }
+.add-btn {
+  background:var(--gold-pale);border:1px solid var(--gold-dim);border-radius:6px;
+  padding:8px 16px;cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:13px;
+  color:var(--gold);transition:all 0.15s;white-space:nowrap;
+}
+.add-btn:hover { background:rgba(232,200,122,0.15); }
+.color-row { display:flex;gap:6px;align-items:center; }
+.color-opt { width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 0.15s; }
+.color-opt:hover,.color-opt.active { border-color:white;transform:scale(1.12); }
+
+/* Daily check-in */
+.daily-checkin {
+  background:rgba(14,14,32,0.6);border:1px solid var(--card-border);
+  border-radius:12px;overflow:hidden;position:sticky;top:72px;
+}
+.checkin-header {
+  padding:16px 20px;border-bottom:1px solid var(--card-border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.checkin-title { font-family:'Cinzel',serif;font-size:14px;letter-spacing:1.5px;color:var(--gold); }
+.checkin-date { font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--text-muted); }
+.checkin-list { padding:12px;display:flex;flex-direction:column;gap:8px; }
+.checkin-item {
+  display:flex;align-items:center;gap:12px;padding:12px 14px;
+  background:rgba(255,255,255,0.03);border:1px solid var(--card-border);
+  border-radius:8px;cursor:pointer;transition:all 0.2s;user-select:none;
+}
+.checkin-item:hover { background:rgba(255,255,255,0.05); }
+.checkin-item.done { background:rgba(255,255,255,0.05); }
+.checkin-check {
+  width:22px;height:22px;border-radius:50%;border:1.5px solid var(--card-border);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+}
+.checkin-item.done .checkin-check { border-color:transparent; }
+.checkin-label { font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--text-soft);flex:1; }
+.checkin-item.done .checkin-label { color:var(--text-muted); }
+.checkin-note {
+  font-size:10px;font-family:'Cormorant Garamond',serif;
+  font-style:italic;color:var(--text-muted);white-space:nowrap;
+}
+.checkin-empty { text-align:center;padding:24px;font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--text-muted);font-size:14px;line-height:1.7; }
+.checkin-footer { padding:12px 16px;border-top:1px solid var(--card-border); }
+.checkin-reflection {
+  width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--card-border);
+  border-radius:6px;padding:10px 12px;font-family:'EB Garamond',serif;font-style:italic;
+  font-size:14px;color:var(--text-soft);outline:none;resize:none;min-height:60px;
+  line-height:1.7;transition:border-color 0.2s;
+}
+.checkin-reflection:focus { border-color:var(--gold-dim); }
+.checkin-reflection::placeholder { color:var(--text-muted); }
+
+/* ── TREE RINGS ── */
+.rings-section { margin-top:28px; }
+.rings-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px; }
+.rings-title { font-family:'Cinzel',serif;font-size:14px;letter-spacing:1.5px;color:var(--gold); }
+.rings-month-nav { display:flex;gap:8px;align-items:center; }
+.rings-month-label { font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);min-width:110px;text-align:center; }
+.rings-nav-btn { background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;width:28px;height:28px;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-size:13px; }
+.rings-nav-btn:hover { border-color:var(--gold-dim);color:var(--gold); }
+.rings-canvas-wrap { display:flex;gap:28px;align-items:flex-start; }
+#rings-canvas { border-radius:50%;cursor:pointer;flex-shrink:0; }
+.rings-legend { flex:1; }
+.ring-legend-item { display:flex;align-items:center;gap:10px;margin-bottom:10px; }
+.ring-legend-color { width:14px;height:14px;border-radius:50%;flex-shrink:0; }
+.ring-legend-name { font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--text-soft); }
+.ring-legend-count { font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--text-muted);margin-left:auto; }
+.rings-summary { margin-top:16px;padding:14px 16px;background:rgba(255,255,255,0.03);border:1px solid var(--card-border);border-radius:8px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--text-muted);line-height:1.7; }
+
+/* ── MOON LEGEND ── */
+.moon-legend { display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;padding:12px 16px;background:rgba(200,216,240,0.04);border:1px solid rgba(200,216,240,0.1);border-radius:8px; }
+.moon-legend-item { display:flex;align-items:center;gap:6px;font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--text-muted); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+textarea::placeholder,input::placeholder { color:var(--text-muted);font-style:italic; }
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(232,200,122,0.2);border-radius:4px; }
+@media(max-width:800px) {
+  .habits-layout{grid-template-columns:1fr}
+  .rings-canvas-wrap{flex-direction:column}
+  .container{padding:0 16px}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="nebula nb1"></div>
+<div class="nebula nb2"></div>
+<div class="nebula nb3"></div>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <a class="topbar-logo" href="index.html">✦ Ava's Galaxy <span>/ The Garden Calendar</span></a>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('calendar',this)">🌕 Calendar</button>
+    <button class="nav-tab" onclick="showView('habits',this)">🌱 Habits</button>
+  </div>
+  <div class="tb-right">
+    <button class="tb-btn" onclick="exportData()">⬇ Export</button>
+    <button class="tb-btn" onclick="document.getElementById('import-file').click()">⬆ Import</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+    <div id="save-indicator">Saved ✓</div>
+  </div>
+</div>
+
+<!-- ══════════════ CALENDAR VIEW ══════════════ -->
+<div class="view active" id="view-calendar">
+  <div class="container">
+
+    <div class="cal-header">
+      <div class="cal-month-title" id="cal-month-title">April 2026</div>
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+        <button class="today-btn" onclick="goToToday()">Today</button>
+        <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+      </div>
+    </div>
+
+    <!-- Moon legend -->
+    <div class="moon-legend">
+      <span class="moon-legend-item">🌑 New Moon</span>
+      <span class="moon-legend-item">🌓 First Quarter</span>
+      <span class="moon-legend-item">🌕 Full Moon</span>
+      <span class="moon-legend-item">🌗 Last Quarter</span>
+      <span class="moon-legend-item" style="margin-left:auto;font-size:12px;">Click any day to add events, intentions, or notes</span>
+    </div>
+
+    <div class="cal-grid-header" id="cal-grid-header"></div>
+    <div class="cal-grid" id="cal-grid"></div>
+
+    <!-- Day detail panel -->
+    <div class="day-detail" id="day-detail" style="margin-top:20px;">
+      <div class="day-detail-header">
+        <div class="day-detail-title" id="detail-title">Monday, 1 April</div>
+        <button class="day-detail-close" onclick="closeDetail()">✕</button>
+      </div>
+      <div class="day-detail-body">
+        <div id="detail-moon-strip"></div>
+        <div>
+          <span class="detail-section-label">Events</span>
+          <div class="event-list" id="event-list"></div>
+          <div class="add-event-row" style="margin-top:10px;">
+            <input class="detail-input" id="new-event-text" type="text" placeholder="Add an event..." style="flex:1;">
+            <div class="event-color-pick" id="event-colors"></div>
+            <button class="add-btn" onclick="addEvent()">+ Add</button>
+          </div>
+        </div>
+        <div>
+          <span class="detail-section-label">Intention for this day</span>
+          <textarea class="detail-textarea" id="detail-intention" placeholder="What do you want to call in or focus on today?"></textarea>
+        </div>
+        <div>
+          <span class="detail-section-label">Notes</span>
+          <textarea class="detail-textarea" id="detail-notes" placeholder="Anything to remember about this day..."></textarea>
+        </div>
+        <button class="add-btn" style="align-self:flex-start;" onclick="saveDay()">✦ Save</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════ HABITS VIEW ══════════════ -->
+<div class="view" id="view-habits">
+  <div class="container">
+    <div style="padding:20px 0 24px;">
+      <div style="font-family:'Cinzel',serif;font-size:22px;color:var(--gold);margin-bottom:6px;text-shadow:0 0 30px rgba(232,200,122,0.2);">Your Garden of Habits</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:var(--text-muted);">Small seeds, tended with patience, grow into something beautiful. 🌿</div>
+    </div>
+
+    <div class="habits-layout">
+      <div>
+        <!-- Habit manager -->
+        <div class="habit-manager" style="margin-bottom:24px;">
+          <div class="habit-manager-header">
+            <span class="habit-manager-title">My Habits</span>
+            <span style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--text-muted);" id="habit-month-label"></span>
+          </div>
+          <div class="habit-list" id="habit-list">
+            <div style="padding:20px;text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--text-muted);font-size:14px;">Add your first habit below. 🌱</div>
+          </div>
+          <div class="add-habit-form">
+            <div class="add-habit-row">
+              <input class="habit-input" id="new-habit-name" type="text" placeholder="New habit...">
+              <button class="add-btn" onclick="addHabit()">+ Add</button>
+            </div>
+            <div class="color-row">
+              <span style="font-family:'Cormorant Garamond',serif;font-size:12px;color:var(--text-muted);margin-right:4px;">Colour:</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tree rings -->
+        <div class="rings-section">
+          <div class="rings-header">
+            <span class="rings-title">Monthly Tree Rings</span>
+            <div class="rings-month-nav">
+              <button class="rings-nav-btn" onclick="changeRingsMonth(-1)">‹</button>
+              <span class="rings-month-label" id="rings-month-label">April 2026</span>
+              <button class="rings-nav-btn" onclick="changeRingsMonth(1)">›</button>
+            </div>
+          </div>
+          <div style="background:rgba(14,14,32,0.6);border:1px solid var(--card-border);border-radius:12px;padding:24px;">
+            <div class="rings-canvas-wrap">
+              <canvas id="rings-canvas" width="280" height="280"></canvas>
+              <div>
+                <div class="rings-legend" id="rings-legend"></div>
+                <div class="rings-summary" id="rings-summary">Complete today's habits to see your rings grow. 🌿</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily check-in -->
+      <div class="daily-checkin">
+        <div class="checkin-header">
+          <span class="checkin-title">Today's Check-In</span>
+          <span class="checkin-date" id="checkin-date"></span>
+        </div>
+        <div class="checkin-list" id="checkin-list">
+          <div class="checkin-empty">Add habits on the left to start checking in. 🌿</div>
+        </div>
+        <div class="checkin-footer">
+          <span style="font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);opacity:0.6;display:block;margin-bottom:8px;">How did today feel?</span>
+          <textarea class="checkin-reflection" id="checkin-reflection" placeholder="A small reflection on your day — what felt good, what was hard, what you're proud of..."></textarea>
+          <button class="add-btn" style="width:100%;margin-top:10px;text-align:center;" onclick="saveCheckin()">✦ Save Check-In</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// STAR FIELD
+// ══════════════════════════════════════════════════════
+const bgCanvas=document.getElementById('bg-canvas'),bgCtx=bgCanvas.getContext('2d');
+const STARS=[],SHOOTERS=[];
+function resizeBg(){bgCanvas.width=window.innerWidth;bgCanvas.height=window.innerHeight;}
+resizeBg();window.addEventListener('resize',()=>{resizeBg();initStars();});
+function initStars(){STARS.length=0;const n=Math.floor(bgCanvas.width*bgCanvas.height/3500);for(let i=0;i<n;i++)STARS.push({x:Math.random()*bgCanvas.width,y:Math.random()*bgCanvas.height,r:Math.random()*1.2+0.2,o:Math.random()*0.5+0.1,ts:Math.random()*0.02+0.004,to:Math.random()*Math.PI*2,c:['255,255,255','220,200,255','196,200,255'][Math.floor(Math.random()*3)]});}
+let tick=0;
+function animBg(){bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);tick+=0.016;STARS.forEach(s=>{const tw=Math.sin(tick*s.ts*60+s.to)*0.3+0.7;bgCtx.beginPath();bgCtx.arc(s.x,s.y,s.r,0,Math.PI*2);bgCtx.fillStyle=`rgba(${s.c},${s.o*tw})`;bgCtx.fill();});for(let i=SHOOTERS.length-1;i>=0;i--){const s=SHOOTERS[i];const sp=Math.hypot(s.vx,s.vy);const tx=s.x-(s.vx/sp)*s.len*s.life,ty=s.y-(s.vy/sp)*s.len*s.life;const g=bgCtx.createLinearGradient(tx,ty,s.x,s.y);g.addColorStop(0,`rgba(255,255,255,0)`);g.addColorStop(0.6,`rgba(255,255,255,${s.life*0.3})`);g.addColorStop(1,`rgba(255,255,255,${s.life})`);bgCtx.beginPath();bgCtx.moveTo(tx,ty);bgCtx.lineTo(s.x,s.y);bgCtx.strokeStyle=g;bgCtx.lineWidth=s.life*1.5;bgCtx.lineCap='round';bgCtx.stroke();s.x+=s.vx;s.y+=s.vy;s.life-=s.decay;if(s.life<=0)SHOOTERS.splice(i,1);}requestAnimationFrame(animBg);}
+function spawnShooter(){SHOOTERS.push({x:Math.random()*bgCanvas.width*0.7,y:Math.random()*bgCanvas.height*0.35,vx:Math.random()*7+5,vy:Math.random()*4+2,len:Math.random()*100+70,life:1,decay:Math.random()*0.018+0.01});}
+initStars();animBg();
+setTimeout(()=>spawnShooter(),1200);
+function schedShoot(){setTimeout(()=>{spawnShooter();schedShoot();},Math.random()*6000+3000);}schedShoot();
+
+// ══════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════
+let DB = { days:{}, habits:[], checkins:{} };
+
+function saveDB(){try{localStorage.setItem('calendar_db',JSON.stringify(DB));}catch(e){}flashSaved();}
+function loadDB(){try{const r=localStorage.getItem('calendar_db');if(r)DB=JSON.parse(r);}catch(e){}}
+let saveTimer=null;
+function schedSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveDB,800);}
+function flashSaved(){const el=document.getElementById('save-indicator');el.classList.add('visible');setTimeout(()=>el.classList.remove('visible'),1800);}
+
+// ══════════════════════════════════════════════════════
+// MOON PHASE CALCULATION
+// ══════════════════════════════════════════════════════
+function getMoonPhase(date) {
+  // Julian date calculation for moon phase
+  const year=date.getFullYear(),month=date.getMonth()+1,day=date.getDate();
+  let y=year,m=month;
+  if(m<=2){y--;m+=12;}
+  const A=Math.floor(y/100),B=2-A+Math.floor(A/4);
+  const jd=Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+day+B-1524.5;
+  const daysSinceNew=(jd-2451549.5)/29.53058853;
+  const phase=((daysSinceNew%1)+1)%1;
+  if(phase<0.03||phase>0.97) return{icon:'🌑',name:'New Moon',phase};
+  if(phase<0.22) return{icon:'🌒',name:'Waxing Crescent',phase};
+  if(phase<0.28) return{icon:'🌓',name:'First Quarter',phase};
+  if(phase<0.47) return{icon:'🌔',name:'Waxing Gibbous',phase};
+  if(phase<0.53) return{icon:'🌕',name:'Full Moon',phase};
+  if(phase<0.72) return{icon:'🌖',name:'Waning Gibbous',phase};
+  if(phase<0.78) return{icon:'🌗',name:'Last Quarter',phase};
+  return{icon:'🌘',name:'Waning Crescent',phase};
+}
+
+function isSignificantMoon(phase){
+  return phase.icon==='🌑'||phase.icon==='🌓'||phase.icon==='🌕'||phase.icon==='🌗';
+}
+
+const MOON_WORKINGS={
+  '🌑':'Set intentions, new beginnings, cleansing',
+  '🌓':'Overcome obstacles, push forward',
+  '🌕':'Most powerful workings, full manifestation',
+  '🌗':'Release, banish, let go',
+};
+
+// ══════════════════════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════════════════════
+const today=new Date();
+let calYear=today.getFullYear(), calMonth=today.getMonth();
+let selectedDate=null, selectedDateStr=null;
+let selectedEventColor='#9b6abf';
+
+const MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const EVENT_COLORS=['#9b6abf','#c97a9a','#6a9070','#e8c87a','#6888cc','#c87a20','#c8d8f0'];
+
+function dateStr(y,m,d){return`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+function todayStr(){return dateStr(today.getFullYear(),today.getMonth(),today.getDate());}
+
+function buildCalHeader(){
+  const header=document.getElementById('cal-grid-header');
+  header.innerHTML='';
+  DAY_NAMES.forEach(d=>{const el=document.createElement('div');el.className='cal-day-name';el.textContent=d;header.appendChild(el);});
+}
+
+function buildEventColors(){
+  const wrap=document.getElementById('event-colors');
+  wrap.innerHTML='';
+  EVENT_COLORS.forEach(c=>{
+    const sw=document.createElement('div');
+    sw.className='event-color-swatch'+(c===selectedEventColor?' active':'');
+    sw.style.background=c;
+    sw.onclick=()=>{selectedEventColor=c;buildEventColors();};
+    wrap.appendChild(sw);
+  });
+}
+
+function buildCalGrid(){
+  document.getElementById('cal-month-title').textContent=`${MONTH_NAMES[calMonth]} ${calYear}`;
+  const grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const daysInPrev=new Date(calYear,calMonth,0).getDate();
+  // Prev month fill
+  for(let i=0;i<firstDay;i++){
+    const d=daysInPrev-firstDay+1+i;
+    const cell=createDayCell(calYear,calMonth-1,d,true);
+    grid.appendChild(cell);
+  }
+  // Current month
+  for(let d=1;d<=daysInMonth;d++){
+    const cell=createDayCell(calYear,calMonth,d,false);
+    grid.appendChild(cell);
+  }
+  // Next month fill
+  const total=firstDay+daysInMonth;
+  const remaining=(7-total%7)%7;
+  for(let d=1;d<=remaining;d++){
+    const cell=createDayCell(calYear,calMonth+1,d,true);
+    grid.appendChild(cell);
+  }
+}
+
+function createDayCell(y,m,d,other){
+  const actualM=(m+12)%12;
+  const actualY=m<0?y-1:(m>11?y+1:y);
+  const ds=dateStr(actualY,actualM,d);
+  const isToday=ds===todayStr();
+  const isSelected=ds===selectedDateStr;
+  const date=new Date(actualY,actualM,d);
+  const moon=getMoonPhase(date);
+  const dayData=DB.days[ds]||{};
+  const cell=document.createElement('div');
+  cell.className='cal-day'+(other?' other-month':'')+(isToday?' today':'')+(isSelected?' selected':'');
+  let html=`<span class="cal-day-num">${d}</span>`;
+  if(isSignificantMoon(moon)) html+=`<span class="cal-day-moon">${moon.icon}</span>`;
+  if(dayData.events?.length){
+    html+='<div class="cal-day-dots">';
+    dayData.events.slice(0,4).forEach(e=>{html+=`<div class="cal-dot" style="background:${e.color||'#9b6abf'}"></div>`;});
+    html+='</div>';
+    const first=dayData.events[0];
+    html+=`<div class="cal-day-preview">${first.text}</div>`;
+  } else if(dayData.intention) {
+    html+=`<div class="cal-day-preview">${dayData.intention}</div>`;
+  }
+  cell.innerHTML=html;
+  cell.addEventListener('click',()=>openDay(ds,date,moon));
+  return cell;
+}
+
+function openDay(ds,date,moon){
+  selectedDateStr=ds;
+  selectedDate=date;
+  buildCalGrid(); // re-render to show selected
+  const detail=document.getElementById('day-detail');
+  detail.classList.add('open');
+  document.getElementById('detail-title').textContent=date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  // Moon strip
+  const strip=document.getElementById('detail-moon-strip');
+  if(isSignificantMoon(moon)){
+    strip.innerHTML=`<div class="moon-info-strip"><span class="moon-strip-icon">${moon.icon}</span><div><div class="moon-strip-name">${moon.name}</div><div class="moon-strip-desc">${MOON_WORKINGS[moon.icon]||''}</div></div></div>`;
+  } else {
+    strip.innerHTML=`<div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);padding:4px 0;">${moon.icon} ${moon.name}</div>`;
+  }
+  const data=DB.days[ds]||{};
+  renderEventList(ds);
+  document.getElementById('detail-intention').value=data.intention||'';
+  document.getElementById('detail-notes').value=data.notes||'';
+  buildEventColors();
+  detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function closeDetail(){
+  document.getElementById('day-detail').classList.remove('open');
+  selectedDateStr=null;
+  buildCalGrid();
+}
+
+function renderEventList(ds){
+  const data=DB.days[ds]||{};
+  const list=document.getElementById('event-list');
+  list.innerHTML='';
+  (data.events||[]).forEach((e,i)=>{
+    const item=document.createElement('div');
+    item.className='event-item';
+    item.innerHTML=`<div class="event-dot" style="background:${e.color||'#9b6abf'}"></div><span class="event-text">${e.text}</span><button class="event-remove" onclick="removeEvent('${ds}',${i})">✕</button>`;
+    list.appendChild(item);
+  });
+}
+
+function addEvent(){
+  const text=document.getElementById('new-event-text').value.trim();
+  if(!text||!selectedDateStr)return;
+  if(!DB.days[selectedDateStr])DB.days[selectedDateStr]={};
+  if(!DB.days[selectedDateStr].events)DB.days[selectedDateStr].events=[];
+  DB.days[selectedDateStr].events.push({text,color:selectedEventColor});
+  document.getElementById('new-event-text').value='';
+  renderEventList(selectedDateStr);
+  buildCalGrid();
+  schedSave();
+}
+
+function removeEvent(ds,idx){
+  if(!DB.days[ds]?.events)return;
+  DB.days[ds].events.splice(idx,1);
+  renderEventList(ds);
+  buildCalGrid();
+  schedSave();
+}
+
+function saveDay(){
+  if(!selectedDateStr)return;
+  if(!DB.days[selectedDateStr])DB.days[selectedDateStr]={};
+  DB.days[selectedDateStr].intention=document.getElementById('detail-intention').value;
+  DB.days[selectedDateStr].notes=document.getElementById('detail-notes').value;
+  buildCalGrid();
+  saveDB();
+}
+
+function changeMonth(dir){calMonth+=dir;if(calMonth>11){calMonth=0;calYear++;}else if(calMonth<0){calMonth=11;calYear--;}buildCalGrid();}
+function goToToday(){calYear=today.getFullYear();calMonth=today.getMonth();buildCalGrid();}
+
+document.getElementById('new-event-text').addEventListener('keydown',e=>{if(e.key==='Enter')addEvent();});
+document.querySelectorAll('.detail-textarea').forEach(ta=>{ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';});});
+
+// ══════════════════════════════════════════════════════
+// HABITS
+// ══════════════════════════════════════════════════════
+const HABIT_COLORS=['#9b6abf','#c97a9a','#6a9070','#e8c87a','#6888cc','#c87a20','#9abea2','#c4a8d8'];
+let newHabitColor=HABIT_COLORS[0];
+
+function buildColorPicker(){
+  const row=document.querySelector('.color-row');
+  HABIT_COLORS.forEach(c=>{
+    const dot=document.createElement('div');
+    dot.className='color-opt'+(c===newHabitColor?' active':'');
+    dot.style.background=c;
+    dot.onclick=()=>{newHabitColor=c;buildColorPicker();};
+    row.appendChild(dot);
+  });
+}
+buildColorPicker();
+
+function addHabit(){
+  const name=document.getElementById('new-habit-name').value.trim();
+  if(!name)return;
+  DB.habits.push({id:'h'+Date.now(),name,color:newHabitColor,createdAt:new Date().toISOString()});
+  document.getElementById('new-habit-name').value='';
+  saveDB();renderHabitList();renderCheckin();drawRings();
+}
+
+function renderHabitList(){
+  const list=document.getElementById('habit-list');
+  if(!DB.habits.length){list.innerHTML='<div style="padding:20px;text-align:center;font-family:\'Cormorant Garamond\',serif;font-style:italic;color:var(--text-muted);font-size:14px;">Add your first habit below. 🌱</div>';return;}
+  list.innerHTML='';
+  const todayCheckin=DB.checkins[todayStr()]||{};
+  DB.habits.forEach(h=>{
+    const done=todayCheckin.habits?.includes(h.id);
+    const streak=calcStreak(h.id);
+    const item=document.createElement('div');
+    item.className='habit-item';
+    item.innerHTML=`<div class="habit-color-dot" style="background:${h.color}"></div><span class="habit-name">${h.name}</span><span class="habit-streak">${streak>0?streak+'d 🔥':''}</span><button style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:12px;opacity:0.4;padding:2px 6px;transition:opacity 0.15s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.4" onclick="deleteHabit('${h.id}')">✕</button>`;
+    list.appendChild(item);
+  });
+  document.getElementById('habit-month-label').textContent=MONTH_NAMES[ringsMonth]+' '+ringsYear;
+}
+
+function deleteHabit(id){
+  if(!confirm('Remove this habit?'))return;
+  DB.habits=DB.habits.filter(h=>h.id!==id);
+  saveDB();renderHabitList();renderCheckin();drawRings();
+}
+
+function calcStreak(habitId){
+  let streak=0,d=new Date(today);
+  while(true){
+    const ds=dateStr(d.getFullYear(),d.getMonth(),d.getDate());
+    const checkin=DB.checkins[ds]||{};
+    if(checkin.habits?.includes(habitId)){streak++;d.setDate(d.getDate()-1);}
+    else break;
+  }
+  return streak;
+}
+
+// ── DAILY CHECK-IN ──
+function renderCheckin(){
+  const list=document.getElementById('checkin-list');
+  document.getElementById('checkin-date').textContent=today.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  if(!DB.habits.length){list.innerHTML='<div class="checkin-empty">Add habits on the left to start checking in. 🌿</div>';return;}
+  list.innerHTML='';
+  const todayData=DB.checkins[todayStr()]||{};
+  DB.habits.forEach(h=>{
+    const done=(todayData.habits||[]).includes(h.id);
+    const item=document.createElement('div');
+    item.className='checkin-item'+(done?' done':'');
+    const checkmark=done?`<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>`:'';
+    item.innerHTML=`<div class="checkin-check" style="${done?`background:${h.color};border-color:${h.color};`:''}">${checkmark}</div><span class="checkin-label">${h.name}</span>`;
+    item.addEventListener('click',()=>toggleCheckin(h.id,item,h.color));
+    list.appendChild(item);
+  });
+  document.getElementById('checkin-reflection').value=todayData.reflection||'';
+}
+
+function toggleCheckin(habitId,item,color){
+  if(!DB.checkins[todayStr()])DB.checkins[todayStr()]={habits:[],reflection:''};
+  const habits=DB.checkins[todayStr()].habits;
+  const idx=habits.indexOf(habitId);
+  if(idx>-1){habits.splice(idx,1);item.classList.remove('done');}
+  else{habits.push(habitId);item.classList.add('done');}
+  const check=item.querySelector('.checkin-check');
+  const done=item.classList.contains('done');
+  check.style.background=done?color:'';
+  check.style.borderColor=done?color:'';
+  check.innerHTML=done?`<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>`:'';
+  schedSave();renderHabitList();drawRings();
+}
+
+function saveCheckin(){
+  if(!DB.checkins[todayStr()])DB.checkins[todayStr()]={habits:[],reflection:''};
+  DB.checkins[todayStr()].reflection=document.getElementById('checkin-reflection').value;
+  saveDB();
+}
+
+// ── TREE RINGS ──
+let ringsYear=today.getFullYear(), ringsMonth=today.getMonth();
+
+function changeRingsMonth(dir){
+  ringsMonth+=dir;
+  if(ringsMonth>11){ringsMonth=0;ringsYear++;}
+  else if(ringsMonth<0){ringsMonth=11;ringsYear--;}
+  document.getElementById('rings-month-label').textContent=MONTH_NAMES[ringsMonth]+' '+ringsYear;
+  drawRings();
+}
+
+function drawRings(){
+  const canvas=document.getElementById('rings-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
+  ctx.clearRect(0,0,W,H);
+
+  const daysInMonth=new Date(ringsYear,ringsMonth+1,0).getDate();
+  const habits=DB.habits;
+  if(!habits.length){
+    ctx.font='italic 14px "Cormorant Garamond"';
+    ctx.fillStyle='rgba(255,255,255,0.2)';
+    ctx.textAlign='center';
+    ctx.fillText('Add habits to see rings',cx,cy);
+    return;
+  }
+
+  // Background
+  const bgGrad=ctx.createRadialGradient(cx,cy,0,cx,cy,W/2);
+  bgGrad.addColorStop(0,'rgba(20,20,40,0.9)');
+  bgGrad.addColorStop(1,'rgba(7,7,15,0.95)');
+  ctx.beginPath();ctx.arc(cx,cy,W/2-2,0,Math.PI*2);ctx.fillStyle=bgGrad;ctx.fill();
+
+  const maxRings=habits.length;
+  const minR=22, maxR=W/2-16;
+  const ringSpacing=(maxR-minR)/Math.max(maxRings,1);
+
+  habits.forEach((h,hi)=>{
+    const r=minR+hi*ringSpacing+ringSpacing*0.5;
+    const ringW=Math.max(4,ringSpacing*0.55);
+
+    // Background track
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=ringW;ctx.stroke();
+
+    // Count completions this month
+    let completedDays=0;
+    for(let d=1;d<=daysInMonth;d++){
+      const ds=dateStr(ringsYear,ringsMonth,d);
+      const checkin=DB.checkins[ds]||{};
+      if((checkin.habits||[]).includes(h.id)) completedDays++;
+    }
+
+    // Only draw up to today if current month
+    const isCurrentMonth=ringsYear===today.getFullYear()&&ringsMonth===today.getMonth();
+    const daysToCount=isCurrentMonth?today.getDate():daysInMonth;
+    const fillFraction=daysToCount>0?completedDays/daysToCount:0;
+
+    if(fillFraction>0){
+      const startAngle=-Math.PI/2;
+      const endAngle=startAngle+(Math.PI*2*fillFraction);
+      // Glow
+      ctx.shadowColor=h.color;ctx.shadowBlur=ringW*1.2;
+      ctx.beginPath();ctx.arc(cx,cy,r,startAngle,endAngle);
+      ctx.strokeStyle=h.color+'cc';ctx.lineWidth=ringW;
+      ctx.lineCap='round';ctx.stroke();
+      ctx.shadowBlur=0;
+      // Bright end cap dot
+      if(fillFraction>0.02){
+        const ex=cx+r*Math.cos(endAngle),ey=cy+r*Math.sin(endAngle);
+        ctx.beginPath();ctx.arc(ex,ey,ringW/2,0,Math.PI*2);
+        ctx.fillStyle=h.color;ctx.fill();
+      }
+    }
+
+    // Day tick marks
+    for(let d=1;d<=daysInMonth;d++){
+      const angle=-Math.PI/2+(Math.PI*2*(d-1)/daysInMonth);
+      const x1=cx+(r-ringW/2-2)*Math.cos(angle),y1=cy+(r-ringW/2-2)*Math.sin(angle);
+      const x2=cx+(r+ringW/2+2)*Math.cos(angle),y2=cy+(r+ringW/2+2)*Math.sin(angle);
+      ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
+      ctx.strokeStyle='rgba(7,7,15,0.6)';ctx.lineWidth=1;ctx.stroke();
+    }
+  });
+
+  // Centre moon
+  const monthMoon=getMoonPhase(new Date(ringsYear,ringsMonth,15));
+  ctx.font='22px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(monthMoon.icon,cx,cy);
+
+  // Update legend
+  const legend=document.getElementById('rings-legend');
+  legend.innerHTML='';
+  let totalDone=0;
+  habits.forEach(h=>{
+    let count=0;
+    for(let d=1;d<=daysInMonth;d++){const ds=dateStr(ringsYear,ringsMonth,d);if((DB.checkins[ds]?.habits||[]).includes(h.id))count++;}
+    totalDone+=count;
+    const item=document.createElement('div');item.className='ring-legend-item';
+    item.innerHTML=`<div class="ring-legend-color" style="background:${h.color}"></div><span class="ring-legend-name">${h.name}</span><span class="ring-legend-count">${count}/${daysInMonth} days</span>`;
+    legend.appendChild(item);
+  });
+
+  // Summary
+  const totalPossible=habits.length*daysInMonth;
+  const pct=totalPossible>0?Math.round(totalDone/totalPossible*100):0;
+  const summaries=['Every ring tells a story. Keep going. 🌿','You showed up. That\'s what matters most. 🌱','Beautiful growth is happening here. ✨','Each mark is a small act of love for yourself. 🌸','You are building something, day by day. 🌳'];
+  document.getElementById('rings-summary').textContent=`${pct}% of possible completions this month. `+summaries[Math.floor(pct/25)%summaries.length];
+}
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+function showView(name,btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ══════════════════════════════════════════════════════
+function exportData(){
+  const data={calendar_db:JSON.stringify(DB)};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='calendar-backup-'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();URL.revokeObjectURL(a.href);
+}
+function importData(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{const data=JSON.parse(e.target.result);if(data.calendar_db){DB=JSON.parse(data.calendar_db);localStorage.setItem('calendar_db',data.calendar_db);initAll();alert('Calendar imported successfully 🌿');}}
+    catch(err){alert('Something went wrong reading that file.');}
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+function initAll(){
+  buildCalHeader();buildCalGrid();buildEventColors();
+  renderHabitList();renderCheckin();
+  document.getElementById('rings-month-label').textContent=MONTH_NAMES[ringsMonth]+' '+ringsYear;
+  document.getElementById('checkin-date').textContent=today.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  drawRings();
+}
+
+loadDB();
+initAll();
+</script>
+</body>
+</html>

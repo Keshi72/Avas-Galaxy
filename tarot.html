@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌙 The Moon Garden · Tarot</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --void: #07070f;
+  --deep: #0e0e1f;
+  --navy: #131328;
+  --midnight: #1a1a35;
+  --card-bg: rgba(255,255,255,0.04);
+  --card-border: rgba(255,255,255,0.09);
+  --moon-gold: #e8c87a;
+  --moon-silver: #c8d8f0;
+  --moon-cream: #f5f0e0;
+  --nebula-purple: #9b6abf;
+  --nebula-rose: #c97aaa;
+  --nebula-blue: #6888cc;
+  --sage: #6a9070;
+  --sage-light: #9abea2;
+  --text: #f0eaf8;
+  --text-soft: #b0a8d0;
+  --text-muted: #6a6480;
+  --gold: #e8c87a;
+  --gold-dim: rgba(232,200,122,0.3);
+  --border-glow: rgba(232,200,122,0.2);
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--void);
+  font-family: 'EB Garamond', serif;
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='3' fill='%23e8c87a' opacity='0.8'/%3E%3C/svg%3E") 10 10, auto;
+}
+
+/* ── CANVAS ── */
+#bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+/* ── NEBULA ── */
+.nebula { position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; }
+.nb1 { width:700px;height:500px;background:radial-gradient(ellipse,rgba(155,106,191,0.2) 0%,transparent 70%);top:-150px;left:-200px; }
+.nb2 { width:500px;height:600px;background:radial-gradient(ellipse,rgba(201,122,170,0.14) 0%,transparent 70%);top:30%;right:-150px; }
+.nb3 { width:600px;height:300px;background:radial-gradient(ellipse,rgba(104,136,204,0.12) 0%,transparent 70%);bottom:5%;left:10%; }
+.nb4 { width:400px;height:400px;background:radial-gradient(ellipse,rgba(232,200,122,0.07) 0%,transparent 70%);bottom:-100px;right:5%; }
+
+/* ── TOPBAR ── */
+#topbar {
+  position:fixed; top:0;left:0;right:0;z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 28px;
+  background:rgba(7,7,15,0.85); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border-glow);
+}
+.topbar-logo {
+  font-family:'Cinzel',serif; font-size:16px; font-weight:600;
+  background:linear-gradient(135deg,var(--moon-gold),var(--moon-silver));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  text-decoration:none;
+}
+.nav-pills { display:flex; gap:6px; }
+.nav-pill {
+  background:transparent; border:1px solid var(--card-border);
+  border-radius:20px; padding:6px 16px; cursor:pointer;
+  font-family:'Cormorant Garamond',serif; font-size:13px;
+  color:var(--text-muted); transition:all 0.2s; white-space:nowrap;
+}
+.nav-pill:hover, .nav-pill.active {
+  background:rgba(232,200,122,0.1); border-color:var(--gold-dim);
+  color:var(--moon-gold);
+}
+.tb-right { display:flex; gap:8px; align-items:center; }
+.tb-btn {
+  background:transparent; border:1px solid var(--card-border); border-radius:20px;
+  padding:6px 14px; font-family:'Cormorant Garamond',serif; font-size:13px;
+  color:var(--text-muted); cursor:pointer; transition:all 0.2s;
+}
+.tb-btn:hover { border-color:var(--gold-dim); color:var(--moon-gold); }
+#save-indicator { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:13px; color:var(--sage-light); opacity:0; transition:opacity 0.4s; }
+#save-indicator.visible { opacity:1; }
+
+/* ── SECTIONS ── */
+.section { display:none; min-height:100vh; padding:80px 0 100px; position:relative; z-index:1; }
+.section.active { display:block; }
+.container { max-width:980px; margin:0 auto; padding:0 40px; }
+
+/* ── SECTION HEADER ── */
+.section-hero { text-align:center; margin-bottom:60px; opacity:0; animation:fadeUp 1s ease 0.1s forwards; }
+.section-eyebrow { font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:5px; text-transform:uppercase; color:var(--moon-gold); opacity:0.7; display:block; margin-bottom:12px; }
+.section-title {
+  font-family:'Cinzel',serif; font-size:clamp(32px,5vw,52px); font-weight:600;
+  background:linear-gradient(135deg,var(--moon-cream) 0%,var(--moon-gold) 50%,var(--moon-silver) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  line-height:1.2; margin-bottom:14px;
+}
+.section-sub { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:18px; color:var(--text-muted); }
+.moon-divider { display:flex; align-items:center; justify-content:center; gap:16px; margin:20px 0 0; }
+.moon-divider::before,.moon-divider::after { content:''; width:80px; height:1px; background:linear-gradient(to right,transparent,rgba(232,200,122,0.4)); }
+.moon-divider::after { background:linear-gradient(to left,transparent,rgba(232,200,122,0.4)); }
+
+/* ── MOON SVG ── */
+.moon-ornament { display:flex; justify-content:center; margin-bottom:20px; }
+
+/* ── ═══════════════════════════ ── */
+/* ── SECTION 1: READING ── */
+/* ── ═══════════════════════════ ── */
+
+.spread-picker { margin-bottom:40px; opacity:0; animation:fadeUp 0.9s ease 0.3s forwards; }
+.spread-picker h3 { font-family:'Cinzel',serif; font-size:13px; letter-spacing:3px; text-transform:uppercase; color:var(--moon-gold); opacity:0.7; margin-bottom:16px; text-align:center; }
+.spread-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+.spread-btn {
+  background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px;
+  padding:16px 10px; cursor:pointer; text-align:center; transition:all 0.2s;
+  font-family:'Cormorant Garamond',serif;
+}
+.spread-btn:hover, .spread-btn.selected {
+  border-color:var(--gold-dim); background:rgba(232,200,122,0.07);
+}
+.spread-btn.selected { box-shadow:0 0 20px rgba(232,200,122,0.1); }
+.spread-icon { font-size:22px; display:block; margin-bottom:8px; }
+.spread-name { font-size:13px; color:var(--text-soft); display:block; }
+.spread-count { font-size:11px; color:var(--text-muted); letter-spacing:1px; display:block; margin-top:3px; }
+
+.reading-stage {
+  display:none; opacity:0; animation:fadeUp 0.8s ease forwards;
+}
+.reading-stage.active { display:block; }
+
+.card-stage {
+  display:flex; flex-wrap:wrap; justify-content:center; gap:20px;
+  margin:30px 0 40px; min-height:240px; align-items:flex-start;
+}
+
+/* Tarot card */
+.tarot-slot {
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+}
+.tarot-slot-label {
+  font-family:'Cormorant Garamond',serif; font-size:12px; letter-spacing:2px;
+  text-transform:uppercase; color:var(--text-muted); text-align:center;
+}
+.tarot-card {
+  width:110px; height:186px; border-radius:8px; border:1.5px solid var(--card-border);
+  background:var(--deep); cursor:pointer; position:relative; overflow:hidden;
+  transition:transform 0.4s ease, box-shadow 0.3s ease;
+  display:flex; align-items:center; justify-content:center;
+}
+.tarot-card:hover { transform:translateY(-4px) scale(1.02); box-shadow:0 12px 40px rgba(155,106,191,0.3); }
+.tarot-card.reversed { transform:rotate(180deg); }
+.tarot-card.reversed:hover { transform:rotate(180deg) translateY(-4px) scale(1.02); }
+.tarot-card.flipped .card-back { display:none; }
+.tarot-card.flipped .card-face { display:flex; }
+.card-back {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(145deg,#1a1a35,#0e0e20);
+}
+.card-face {
+  position:absolute; inset:0; display:none; flex-direction:column;
+  align-items:center; justify-content:center; padding:10px;
+  background:linear-gradient(145deg,#1c1030,#0e1428);
+  text-align:center;
+}
+.card-face-symbol { font-size:32px; margin-bottom:6px; }
+.card-face-name { font-family:'Cinzel',serif; font-size:10px; font-weight:600; color:var(--moon-gold); letter-spacing:1px; line-height:1.3; }
+.card-face-num { font-family:'Cormorant Garamond',serif; font-size:11px; color:var(--text-muted); margin-top:4px; }
+.reversed-tag {
+  position:absolute; bottom:6px; left:50%; transform:translateX(-50%);
+  background:rgba(201,122,170,0.3); border:1px solid rgba(201,122,170,0.4);
+  border-radius:10px; padding:2px 8px;
+  font-family:'Cormorant Garamond',serif; font-size:10px; color:#e8aad0; letter-spacing:1px;
+  white-space:nowrap;
+}
+
+.draw-btn {
+  display:block; margin:0 auto 30px; padding:14px 40px;
+  background:linear-gradient(135deg,rgba(155,106,191,0.2),rgba(232,200,122,0.15));
+  border:1px solid var(--gold-dim); border-radius:30px;
+  font-family:'Cinzel',serif; font-size:14px; letter-spacing:2px;
+  color:var(--moon-gold); cursor:pointer; transition:all 0.3s;
+}
+.draw-btn:hover { background:linear-gradient(135deg,rgba(155,106,191,0.35),rgba(232,200,122,0.25)); box-shadow:0 0 30px rgba(232,200,122,0.15); }
+
+/* Card meaning popup */
+.card-meaning-panel {
+  background:rgba(14,14,32,0.95); border:1px solid var(--gold-dim);
+  border-radius:12px; padding:28px 30px; margin-bottom:30px;
+  display:none; animation:fadeUp 0.5s ease forwards;
+  backdrop-filter:blur(10px);
+}
+.card-meaning-panel.visible { display:block; }
+.meaning-header { display:flex; align-items:center; gap:20px; margin-bottom:20px; }
+.meaning-card-thumb {
+  width:60px; height:100px; border-radius:6px; flex-shrink:0;
+  background:linear-gradient(145deg,#1c1030,#0e1428);
+  border:1px solid var(--gold-dim); display:flex; align-items:center; justify-content:center;
+  font-size:22px;
+}
+.meaning-card-info { flex:1; }
+.meaning-card-name { font-family:'Cinzel',serif; font-size:18px; color:var(--moon-gold); margin-bottom:4px; }
+.meaning-card-suite { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px; color:var(--text-muted); }
+.meaning-orientation { display:inline-block; padding:3px 12px; border-radius:14px; font-family:'Cormorant Garamond',serif; font-size:12px; letter-spacing:1px; margin-top:6px; }
+.meaning-orientation.upright { background:rgba(154,190,162,0.15); color:var(--sage-light); border:1px solid rgba(154,190,162,0.2); }
+.meaning-orientation.reversed { background:rgba(201,122,170,0.15); color:#e8aad0; border:1px solid rgba(201,122,170,0.2); }
+.meaning-keywords { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+.keyword { background:rgba(232,200,122,0.1); border:1px solid var(--border-glow); border-radius:16px; padding:4px 12px; font-family:'Cormorant Garamond',serif; font-size:13px; color:var(--moon-gold); }
+.meaning-desc { font-family:'EB Garamond',serif; font-style:italic; font-size:16px; color:var(--text-soft); line-height:1.8; }
+
+/* ── ═══════════════════════════ ── */
+/* ── SECTION 2: JOURNAL ── */
+/* ── ═══════════════════════════ ── */
+
+.journal-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:30px; }
+.journal-topbar h3 { font-family:'Cinzel',serif; font-size:14px; letter-spacing:2px; color:var(--moon-gold); }
+.journal-actions { display:flex; gap:10px; }
+.j-btn {
+  background:transparent; border:1px solid var(--card-border); border-radius:20px;
+  padding:7px 18px; font-family:'Cormorant Garamond',serif; font-size:13px;
+  color:var(--text-muted); cursor:pointer; transition:all 0.2s;
+}
+.j-btn:hover { border-color:var(--gold-dim); color:var(--moon-gold); }
+.j-btn.primary { background:rgba(232,200,122,0.1); border-color:var(--gold-dim); color:var(--moon-gold); }
+
+.journal-grid { display:grid; grid-template-columns:280px 1fr; gap:28px; }
+
+/* Journal list */
+.journal-list-panel {
+  background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px;
+  overflow:hidden; height:fit-content; max-height:75vh; display:flex; flex-direction:column;
+}
+.jlist-header { padding:16px 18px; border-bottom:1px solid var(--card-border); font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--text-muted); }
+.jlist-items { overflow-y:auto; flex:1; }
+.jlist-item {
+  padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.04);
+  cursor:pointer; transition:background 0.15s; border-left:3px solid transparent;
+}
+.jlist-item:hover { background:rgba(232,200,122,0.05); }
+.jlist-item.active { border-left-color:var(--moon-gold); background:rgba(232,200,122,0.07); }
+.jlist-date { font-family:'Cinzel',serif; font-size:12px; color:var(--text-soft); margin-bottom:3px; }
+.jlist-spread { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:13px; color:var(--text-muted); }
+.jlist-empty { padding:30px 18px; text-align:center; font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--text-muted); font-size:14px; line-height:1.6; }
+
+/* Journal form */
+.journal-form { display:flex; flex-direction:column; gap:22px; }
+
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.form-field { display:flex; flex-direction:column; gap:6px; }
+.form-label { font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--moon-gold); opacity:0.7; }
+.form-input {
+  background:rgba(255,255,255,0.04); border:1px solid var(--card-border); border-radius:8px;
+  padding:10px 14px; font-family:'Cormorant Garamond',serif; font-size:15px;
+  color:var(--text); outline:none; transition:border-color 0.2s;
+}
+.form-input:focus { border-color:var(--gold-dim); }
+.form-input::placeholder { color:var(--text-muted); font-style:italic; }
+.form-textarea {
+  background:rgba(255,255,255,0.04); border:1px solid var(--card-border); border-radius:8px;
+  padding:14px 16px; font-family:'EB Garamond',serif; font-size:16px; font-style:italic;
+  color:var(--text-soft); outline:none; resize:none; line-height:1.8; min-height:100px;
+  transition:border-color 0.2s; width:100%;
+}
+.form-textarea:focus { border-color:var(--gold-dim); }
+.form-textarea::placeholder { color:var(--text-muted); }
+
+/* Layout builder */
+.layout-builder {
+  background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px;
+  padding:20px;
+}
+.layout-builder-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.layout-builder-title { font-family:'Cinzel',serif; font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--moon-gold); opacity:0.7; }
+.layout-presets { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.preset-btn {
+  background:transparent; border:1px solid var(--card-border); border-radius:16px;
+  padding:5px 14px; font-family:'Cormorant Garamond',serif; font-size:12px;
+  color:var(--text-muted); cursor:pointer; transition:all 0.15s;
+}
+.preset-btn:hover, .preset-btn.active { border-color:var(--gold-dim); color:var(--moon-gold); background:rgba(232,200,122,0.07); }
+.layout-canvas {
+  min-height:180px; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:flex-start; justify-content:center; padding:10px;
+}
+.layout-card-slot {
+  display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;
+}
+.layout-mini-card {
+  width:56px; height:94px; border-radius:5px; border:1px solid var(--card-border);
+  background:linear-gradient(145deg,rgba(155,106,191,0.15),rgba(104,136,204,0.1));
+  display:flex; align-items:center; justify-content:center; font-size:16px;
+  position:relative; transition:all 0.2s;
+}
+.layout-mini-card:hover { border-color:var(--gold-dim); }
+.layout-mini-card.reversed-mini { transform:rotate(180deg); }
+.layout-slot-name { font-family:'Cormorant Garamond',serif; font-size:10px; letter-spacing:1px; color:var(--text-muted); text-align:center; max-width:70px; }
+.layout-add {
+  width:56px; height:94px; border-radius:5px; border:1px dashed rgba(232,200,122,0.25);
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  color:rgba(232,200,122,0.3); font-size:20px; transition:all 0.2s;
+}
+.layout-add:hover { border-color:var(--gold-dim); color:var(--moon-gold); background:rgba(232,200,122,0.05); }
+
+/* Card entries in journal */
+.journal-cards { display:flex; flex-direction:column; gap:14px; }
+.jcard-entry {
+  background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px;
+  padding:16px 18px; display:grid; grid-template-columns:auto 1fr; gap:16px; align-items:start;
+}
+.jcard-thumb {
+  width:44px; height:74px; border-radius:4px; flex-shrink:0;
+  background:linear-gradient(145deg,#1c1030,#0e1428); border:1px solid var(--gold-dim);
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+.jcard-body { flex:1; }
+.jcard-name { font-family:'Cinzel',serif; font-size:13px; color:var(--moon-gold); margin-bottom:4px; }
+.jcard-pos { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:12px; color:var(--text-muted); margin-bottom:8px; }
+
+/* ── ═══════════════════════════ ── */
+/* ── SECTION 3: REFERENCE ── */
+/* ── ═══════════════════════════ ── */
+
+.ref-filter { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:30px; justify-content:center; opacity:0; animation:fadeUp 0.8s ease 0.3s forwards; }
+.ref-filter-btn {
+  background:transparent; border:1px solid var(--card-border); border-radius:20px;
+  padding:7px 18px; font-family:'Cormorant Garamond',serif; font-size:14px;
+  color:var(--text-muted); cursor:pointer; transition:all 0.2s;
+}
+.ref-filter-btn.active, .ref-filter-btn:hover {
+  background:rgba(232,200,122,0.08); border-color:var(--gold-dim); color:var(--moon-gold);
+}
+
+.ref-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; }
+.ref-card {
+  background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px;
+  padding:0; cursor:pointer; transition:all 0.2s; overflow:hidden;
+  opacity:0; animation:fadeIn 0.4s ease forwards;
+}
+.ref-card:hover { transform:translateY(-4px); border-color:var(--gold-dim); box-shadow:0 12px 30px rgba(155,106,191,0.2); }
+.ref-card-art {
+  height:110px; display:flex; align-items:center; justify-content:center;
+  font-size:36px; position:relative; overflow:hidden;
+}
+.ref-card-art::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(to bottom,transparent 40%,rgba(14,14,32,0.8));
+}
+.ref-card-body { padding:12px 12px 14px; }
+.ref-card-name { font-family:'Cinzel',serif; font-size:12px; font-weight:600; color:var(--moon-gold); margin-bottom:3px; letter-spacing:0.5px; }
+.ref-card-suite { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:11px; color:var(--text-muted); }
+
+/* Ref modal */
+.ref-modal-overlay {
+  display:none; position:fixed; inset:0; background:rgba(7,7,15,0.85);
+  z-index:500; backdrop-filter:blur(6px); align-items:center; justify-content:center;
+}
+.ref-modal-overlay.open { display:flex; }
+.ref-modal {
+  background:var(--deep); border:1px solid var(--gold-dim); border-radius:16px;
+  padding:36px 40px; max-width:680px; width:90%; max-height:85vh;
+  overflow-y:auto; position:relative; animation:fadeUp 0.3s ease forwards;
+}
+.ref-modal-close {
+  position:absolute; top:16px; right:16px; background:rgba(255,255,255,0.07);
+  border:none; color:var(--text-muted); width:32px; height:32px; border-radius:50%;
+  cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;
+  transition:all 0.15s;
+}
+.ref-modal-close:hover { background:rgba(255,255,255,0.12); color:var(--text); }
+.modal-top { display:flex; gap:28px; align-items:flex-start; margin-bottom:28px; }
+.modal-card-art {
+  width:90px; height:150px; border-radius:8px; flex-shrink:0;
+  background:linear-gradient(145deg,#1c1030,#0e1428); border:1px solid var(--gold-dim);
+  display:flex; align-items:center; justify-content:center; font-size:40px;
+}
+.modal-card-info h2 { font-family:'Cinzel',serif; font-size:24px; color:var(--moon-gold); margin-bottom:6px; }
+.modal-suite-tag { display:inline-block; padding:4px 14px; border-radius:16px; font-family:'Cormorant Garamond',serif; font-size:13px; letter-spacing:1px; margin-bottom:12px; }
+.modal-number { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:15px; color:var(--text-muted); }
+.modal-section { margin-bottom:22px; }
+.modal-section-title { font-family:'Cinzel',serif; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--moon-gold); opacity:0.6; margin-bottom:10px; }
+.modal-keywords { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.modal-text { font-family:'EB Garamond',serif; font-size:16px; color:var(--text-soft); line-height:1.8; font-style:italic; }
+.modal-divider { height:1px; background:linear-gradient(to right,transparent,var(--gold-dim),transparent); margin:20px 0; }
+
+/* ── GENERAL ── */
+.glow-text { text-shadow:0 0 20px rgba(232,200,122,0.3); }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes cardFlip { 0%{transform:rotateY(90deg)} 100%{transform:rotateY(0deg)} }
+.card-flip-anim { animation:cardFlip 0.4s ease forwards; }
+
+textarea::placeholder, input::placeholder { color:var(--text-muted); }
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(232,200,122,0.2); border-radius:4px; }
+
+@media(max-width:700px) {
+  .spread-grid{grid-template-columns:repeat(3,1fr)}
+  .ref-grid{grid-template-columns:repeat(3,1fr)}
+  .journal-grid{grid-template-columns:1fr}
+  .container{padding:0 20px}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="nebula nb1"></div><div class="nebula nb2"></div>
+<div class="nebula nb3"></div><div class="nebula nb4"></div>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <a class="topbar-logo" href="index.html">✦ Ava's Galaxy</a>
+  <div class="nav-pills">
+    <button class="nav-pill active" onclick="showSection('reading',this)">🔮 Reading</button>
+    <button class="nav-pill" onclick="showSection('journal',this)">📜 Journal</button>
+    <button class="nav-pill" onclick="showSection('reference',this)">🌙 Reference</button>
+  </div>
+  <div class="tb-right">
+    <button class="tb-btn" onclick="exportData()">⬇ Export</button>
+    <button class="tb-btn" onclick="document.getElementById('import-file').click()">⬆ Import</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+    <div id="save-indicator">Saved ✓</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SECTION: READING -->
+<!-- ══════════════════════════════════════ -->
+<div class="section active" id="section-reading">
+  <div class="container">
+    <div class="section-hero">
+      <div class="moon-ornament">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="36" stroke="rgba(232,200,122,0.2)" stroke-width="1"/>
+          <circle cx="40" cy="40" r="26" stroke="rgba(232,200,122,0.15)" stroke-width="0.8"/>
+          <path d="M40 8 C22 8 8 22 8 40 C8 56 20 68 36 71 C20 65 14 50 20 36 C26 22 40 14 56 16 C50 10 45 8 40 8Z" fill="rgba(232,200,122,0.15)"/>
+          <circle cx="40" cy="40" r="3" fill="rgba(232,200,122,0.6)"/>
+          <circle cx="28" cy="28" r="1.5" fill="rgba(232,200,122,0.3)"/>
+          <circle cx="54" cy="52" r="1.5" fill="rgba(232,200,122,0.3)"/>
+          <circle cx="52" cy="30" r="1" fill="rgba(200,168,255,0.4)"/>
+          <circle cx="26" cy="50" r="1" fill="rgba(200,168,255,0.4)"/>
+        </svg>
+      </div>
+      <span class="section-eyebrow">Draw your cards</span>
+      <h1 class="section-title">The Reading</h1>
+      <p class="section-sub">Let the cards speak.</p>
+      <div class="moon-divider">✦</div>
+    </div>
+
+    <!-- Spread picker -->
+    <div class="spread-picker">
+      <h3>Choose a Spread</h3>
+      <div class="spread-grid">
+        <button class="spread-btn selected" data-spread="single" onclick="selectSpread(this)">
+          <span class="spread-icon">🌙</span>
+          <span class="spread-name">Single Card</span>
+          <span class="spread-count">1 card</span>
+        </button>
+        <button class="spread-btn" data-spread="three" onclick="selectSpread(this)">
+          <span class="spread-icon">✦</span>
+          <span class="spread-name">Past · Present · Future</span>
+          <span class="spread-count">3 cards</span>
+        </button>
+        <button class="spread-btn" data-spread="five" onclick="selectSpread(this)">
+          <span class="spread-icon">⭐</span>
+          <span class="spread-name">Five Card Cross</span>
+          <span class="spread-count">5 cards</span>
+        </button>
+        <button class="spread-btn" data-spread="celtic" onclick="selectSpread(this)">
+          <span class="spread-icon">🌿</span>
+          <span class="spread-name">Celtic Cross</span>
+          <span class="spread-count">10 cards</span>
+        </button>
+        <button class="spread-btn" data-spread="yearahead" onclick="selectSpread(this)">
+          <span class="spread-icon">🌒</span>
+          <span class="spread-name">Year Ahead</span>
+          <span class="spread-count">12 cards</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Reading stage -->
+    <div class="reading-stage active" id="reading-stage">
+      <button class="draw-btn" id="draw-btn" onclick="drawReading()">✦ Draw Cards ✦</button>
+      <div class="card-stage" id="card-stage"></div>
+      <div class="card-meaning-panel" id="meaning-panel"></div>
+      <div style="text-align:center;margin-top:10px;" id="save-reading-wrap" style="display:none;">
+        <button class="j-btn primary" onclick="saveReadingToJournal()" id="save-reading-btn" style="display:none;">📜 Save to Journal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SECTION: JOURNAL -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="section-journal">
+  <div class="container">
+    <div class="section-hero">
+      <div class="moon-ornament">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <path d="M20 15 Q40 8 60 15 L65 60 Q40 68 15 60 Z" stroke="rgba(232,200,122,0.2)" stroke-width="1" fill="rgba(232,200,122,0.04)"/>
+          <line x1="25" y1="28" x2="55" y2="28" stroke="rgba(232,200,122,0.2)" stroke-width="0.8"/>
+          <line x1="25" y1="36" x2="55" y2="36" stroke="rgba(232,200,122,0.15)" stroke-width="0.8"/>
+          <line x1="25" y1="44" x2="50" y2="44" stroke="rgba(232,200,122,0.15)" stroke-width="0.8"/>
+          <circle cx="40" cy="20" r="4" fill="rgba(232,200,122,0.3)"/>
+        </svg>
+      </div>
+      <span class="section-eyebrow">Your readings, remembered</span>
+      <h1 class="section-title">The Journal</h1>
+      <p class="section-sub">Record, reflect, and revisit the cards' wisdom</p>
+      <div class="moon-divider">✦</div>
+    </div>
+
+    <div class="journal-topbar">
+      <h3>Reading Journal</h3>
+      <div class="journal-actions">
+        <button class="j-btn primary" onclick="newJournalEntry()">+ New Entry</button>
+      </div>
+    </div>
+
+    <div class="journal-grid">
+      <!-- List -->
+      <div class="journal-list-panel">
+        <div class="jlist-header">Past Readings</div>
+        <div class="jlist-items" id="jlist-items">
+          <div class="jlist-empty">Your readings will appear here.<br>🌙</div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="journal-form" id="journal-form">
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label">Date</label>
+            <input class="form-input" id="j-date" type="text" placeholder="Month DD, YYYY">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Spread Used</label>
+            <input class="form-input" id="j-spread" type="text" placeholder="e.g. Past / Present / Future">
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Intention / Question</label>
+          <input class="form-input" id="j-question" type="text" placeholder="What were you asking the cards?">
+        </div>
+
+        <!-- Layout builder -->
+        <div class="layout-builder">
+          <div class="layout-builder-header">
+            <span class="layout-builder-title">Card Layout</span>
+          </div>
+          <div class="layout-presets">
+            <button class="preset-btn" onclick="applyPreset('single')">Single</button>
+            <button class="preset-btn" onclick="applyPreset('three')">Past · Present · Future</button>
+            <button class="preset-btn" onclick="applyPreset('five')">Five Cross</button>
+            <button class="preset-btn" onclick="applyPreset('horseshoe')">Horseshoe</button>
+            <button class="preset-btn" onclick="applyPreset('custom')">+ Custom</button>
+          </div>
+          <div class="layout-canvas" id="layout-canvas"></div>
+        </div>
+
+        <!-- Card notes -->
+        <div class="form-field">
+          <label class="form-label">Card Notes</label>
+          <div class="journal-cards" id="journal-cards"></div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Overall Reflections</label>
+          <textarea class="form-textarea" id="j-reflections" style="min-height:130px;" placeholder="What themes emerged? What surprised you? What felt true?"></textarea>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Mood &amp; Energy</label>
+          <input class="form-input" id="j-mood" type="text" placeholder="How were you feeling going into this reading?">
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">One Thing to Remember</label>
+          <textarea class="form-textarea" id="j-remember" style="min-height:70px;" placeholder="What will you carry with you from this reading?"></textarea>
+        </div>
+
+        <button class="draw-btn" onclick="saveJournalEntry()" style="margin:0;">✦ Save Reading ✦</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SECTION: REFERENCE -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="section-reference">
+  <div class="container">
+    <div class="section-hero">
+      <div class="moon-ornament">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="20" stroke="rgba(232,200,122,0.25)" stroke-width="1"/>
+          <path d="M40 20 L40 60 M20 40 L60 40" stroke="rgba(232,200,122,0.15)" stroke-width="0.8"/>
+          <path d="M40 20 L60 40 L40 60 L20 40 Z" stroke="rgba(232,200,122,0.2)" stroke-width="0.8" fill="none"/>
+          <circle cx="40" cy="40" r="5" fill="rgba(232,200,122,0.4)"/>
+          <circle cx="40" cy="20" r="2.5" fill="rgba(196,168,216,0.6)"/>
+          <circle cx="60" cy="40" r="2.5" fill="rgba(196,168,216,0.6)"/>
+          <circle cx="40" cy="60" r="2.5" fill="rgba(196,168,216,0.6)"/>
+          <circle cx="20" cy="40" r="2.5" fill="rgba(196,168,216,0.6)"/>
+        </svg>
+      </div>
+      <span class="section-eyebrow">78 cards, infinite meanings</span>
+      <h1 class="section-title">The Reference</h1>
+      <p class="section-sub">Every card, every symbol, every whisper</p>
+      <div class="moon-divider">✦</div>
+    </div>
+
+    <div class="ref-filter">
+      <button class="ref-filter-btn active" onclick="filterRef('all',this)">All Cards</button>
+      <button class="ref-filter-btn" onclick="filterRef('major',this)">Major Arcana</button>
+      <button class="ref-filter-btn" onclick="filterRef('wands',this)">Wands 🔥</button>
+      <button class="ref-filter-btn" onclick="filterRef('cups',this)">Cups 💧</button>
+      <button class="ref-filter-btn" onclick="filterRef('swords',this)">Swords 💨</button>
+      <button class="ref-filter-btn" onclick="filterRef('pentacles',this)">Pentacles 🌿</button>
+    </div>
+
+    <div class="ref-grid" id="ref-grid"></div>
+  </div>
+</div>
+
+<!-- REF MODAL -->
+<div class="ref-modal-overlay" id="ref-modal-overlay" onclick="closeRefModal(event)">
+  <div class="ref-modal" id="ref-modal">
+    <button class="ref-modal-close" onclick="closeRefModal()">✕</button>
+    <div class="modal-top">
+      <div class="modal-card-art" id="modal-art"></div>
+      <div class="modal-card-info">
+        <h2 id="modal-name"></h2>
+        <div class="modal-suite-tag" id="modal-suite-tag"></div>
+        <div class="modal-number" id="modal-number"></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Keywords — Upright</div>
+      <div class="modal-keywords" id="modal-keywords-up"></div>
+      <div class="modal-text" id="modal-meaning-up"></div>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-section">
+      <div class="modal-section-title">Keywords — Reversed</div>
+      <div class="modal-keywords" id="modal-keywords-rev"></div>
+      <div class="modal-text" id="modal-meaning-rev"></div>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-section">
+      <div class="modal-section-title">Symbols &amp; Imagery</div>
+      <div class="modal-text" id="modal-symbols"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// STAR FIELD
+// ══════════════════════════════════════════════════════
+const bgCanvas = document.getElementById('bg-canvas');
+const bgCtx = bgCanvas.getContext('2d');
+const STARS = [], SHOOTERS = [];
+function resizeBg() { bgCanvas.width=window.innerWidth; bgCanvas.height=window.innerHeight; }
+resizeBg(); window.addEventListener('resize',()=>{resizeBg();initStars();});
+function initStars() {
+  STARS.length=0;
+  const n=Math.floor(bgCanvas.width*bgCanvas.height/3200);
+  for(let i=0;i<n;i++) STARS.push({x:Math.random()*bgCanvas.width,y:Math.random()*bgCanvas.height,r:Math.random()*1.3+0.2,o:Math.random()*0.6+0.1,ts:Math.random()*0.02+0.004,to:Math.random()*Math.PI*2,c:['255,255,255','220,200,255','196,200,255','255,230,180'][Math.floor(Math.random()*4)]});
+}
+let tick=0;
+function animBg() {
+  bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height); tick+=0.016;
+  STARS.forEach(s=>{const tw=Math.sin(tick*s.ts*60+s.to)*0.3+0.7;bgCtx.beginPath();bgCtx.arc(s.x,s.y,s.r,0,Math.PI*2);bgCtx.fillStyle=`rgba(${s.c},${s.o*tw})`;bgCtx.fill();});
+  for(let i=SHOOTERS.length-1;i>=0;i--){
+    const s=SHOOTERS[i]; const sp=Math.hypot(s.vx,s.vy);
+    const tx=s.x-(s.vx/sp)*s.len*s.life, ty=s.y-(s.vy/sp)*s.len*s.life;
+    const g=bgCtx.createLinearGradient(tx,ty,s.x,s.y);
+    g.addColorStop(0,`rgba(${s.c},0)`); g.addColorStop(0.6,`rgba(${s.c},${s.life*0.4})`); g.addColorStop(1,`rgba(${s.c},${s.life})`);
+    bgCtx.beginPath(); bgCtx.moveTo(tx,ty); bgCtx.lineTo(s.x,s.y); bgCtx.strokeStyle=g; bgCtx.lineWidth=s.life*2; bgCtx.lineCap='round'; bgCtx.stroke();
+    const rg=bgCtx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.life*5);
+    rg.addColorStop(0,`rgba(${s.c},${s.life})`); rg.addColorStop(1,`rgba(${s.c},0)`);
+    bgCtx.beginPath(); bgCtx.arc(s.x,s.y,s.life*4,0,Math.PI*2); bgCtx.fillStyle=rg; bgCtx.fill();
+    s.x+=s.vx; s.y+=s.vy; s.life-=s.decay; if(s.life<=0) SHOOTERS.splice(i,1);
+  }
+  requestAnimationFrame(animBg);
+}
+function spawnShooter() { SHOOTERS.push({x:Math.random()*bgCanvas.width*0.65+bgCanvas.width*0.05,y:Math.random()*bgCanvas.height*0.45,vx:Math.random()*7+5,vy:Math.random()*4+2,len:Math.random()*100+70,life:1,decay:Math.random()*0.016+0.01,c:['255,255,255','220,200,255','255,230,200'][Math.floor(Math.random()*3)]}); }
+initStars(); animBg();
+setTimeout(()=>spawnShooter(),1000); setTimeout(()=>spawnShooter(),2800);
+function schedShoot(){setTimeout(()=>{spawnShooter();schedShoot();},Math.random()*6000+2500);} schedShoot();
+
+// ══════════════════════════════════════════════════════
+// TAROT CARD DATA (78 cards)
+// ══════════════════════════════════════════════════════
+const TAROT = [
+  // MAJOR ARCANA
+  {id:0,name:'The Fool',suite:'major',num:'0',symbol:'🌼',art:'bg:linear-gradient(145deg,#1a1535,#0d1520)',
+   upright:['Beginnings','Spontaneity','Innocence','Adventure','Freedom'],
+   reversed:['Recklessness','Risk-taking','Foolishness','Naivety'],
+   meaning_up:'A fresh beginning calls you forward. The Fool invites you to leap with joyful trust into the unknown — not from ignorance, but from the kind of openness that only comes when you release what you think you know. Something new is ready to begin.',
+   meaning_rev:'Recklessness masquerading as freedom. Look before you leap — are you running toward something, or simply away? The reversed Fool asks you to ground your enthusiasm with a little wisdom before you take the next step.',
+   symbols:'The white rose represents purity of intention. The cliff edge is not a threat but an invitation. The small bag holds only what truly matters.'},
+  {id:1,name:'The Magician',suite:'major',num:'I',symbol:'✨',art:'bg:linear-gradient(145deg,#1a1020,#0e1a10)',
+   upright:['Willpower','Skill','Manifestation','Resourcefulness','Confidence'],
+   reversed:['Manipulation','Untapped talent','Deceit','Wasted potential'],
+   meaning_up:'All the tools you need are already in your hands. The Magician reminds you that your will, focus, and skill are enough to create what you desire. This is a time to act with intention and channel your energy purposefully.',
+   meaning_rev:'Gifts lying dormant or used for the wrong ends. Are you manipulating outcomes rather than creating them honestly? Reconnect with your authentic power.',
+   symbols:'The infinity symbol above his head. One hand raised, one pointing down — as above, so below. The four tools representing the four suits.'},
+  {id:2,name:'The High Priestess',suite:'major',num:'II',symbol:'🌙',art:'bg:linear-gradient(145deg,#0d1525,#1a0d25)',
+   upright:['Intuition','Mystery','Inner knowledge','The unconscious','Patience'],
+   reversed:['Hidden agendas','Repressed feelings','Disconnection from intuition'],
+   meaning_up:'Your intuition is speaking. The High Priestess asks you to be still, to listen beneath the surface of what is visible. Not all answers come from logic — this is a time to trust what you feel in your body, your dreams, your quiet knowing.',
+   meaning_rev:'You may be ignoring your intuition or allowing others to drown it out. Reconnect with your inner voice. What do you already know that you are afraid to acknowledge?',
+   symbols:'The crescent moon at her feet. The pomegranate veil concealing the sacred garden. The scroll of Tora — hidden knowledge waiting to be revealed.'},
+  {id:3,name:'The Empress',suite:'major',num:'III',symbol:'🌸',art:'bg:linear-gradient(145deg,#1a1520,#200d15)',
+   upright:['Abundance','Fertility','Nature','Nurturing','Creativity'],
+   reversed:['Creative block','Dependence','Smothering','Neglect of self'],
+   meaning_up:'Life is blooming. The Empress embodies the creative force of nature — abundance, sensuality, and the quiet power of growth. You are being called to nurture something: a project, a relationship, yourself.',
+   meaning_rev:'Where has your creative energy stalled? The Empress reversed may signal burnout, over-giving, or a disconnection from your body and natural rhythms. Come back to what nourishes you.',
+   symbols:'The crown of twelve stars. The field of wheat — material abundance. The Venus symbol on her shield. The lush natural world around her.'},
+  {id:4,name:'The Emperor',suite:'major',num:'IV',symbol:'👑',art:'bg:linear-gradient(145deg,#200d0d,#1a1520)',
+   upright:['Authority','Structure','Stability','Leadership','Logic'],
+   reversed:['Rigidity','Tyranny','Domination','Inflexibility'],
+   meaning_up:'It is time to build with intention. The Emperor brings the energy of structure, discipline, and clear authority. Create the foundations that will allow your dreams to stand firm in the world.',
+   meaning_rev:'Where is control becoming rigidity? The reversed Emperor warns against domineering behavior — toward yourself or others. Structure that strangles is not strength.',
+   symbols:'The rams on his throne — Aries energy. The barren mountains — uncompromising terrain. The orb and scepter of worldly authority.'},
+  {id:5,name:'The Hierophant',suite:'major',num:'V',symbol:'🗝️',art:'bg:linear-gradient(145deg,#1a1520,#0d1a15)',
+   upright:['Tradition','Convention','Guidance','Spiritual wisdom','Community'],
+   reversed:['Rebellion','Subversiveness','New approaches','Breaking free'],
+   meaning_up:'Seek the wisdom of tradition or a trusted teacher. The Hierophant offers the comfort of established paths, ritual, and belonging to something larger than yourself.',
+   meaning_rev:'You are being called to question inherited beliefs. The reversed Hierophant invites you to forge your own spiritual or philosophical path, free from doctrine.',
+   symbols:'Two pillars represent law and liberty. The triple crown — three levels of consciousness. The crossed keys of heaven and earth.'},
+  {id:6,name:'The Lovers',suite:'major',num:'VI',symbol:'🌹',art:'bg:linear-gradient(145deg,#200d15,#1a1020)',
+   upright:['Love','Harmony','Relationships','Values alignment','Choices'],
+   reversed:['Disharmony','Imbalance','Misalignment','Poor choices'],
+   meaning_up:'A profound choice stands before you, one that touches your deepest values. The Lovers is not only about romance — it is about alignment, integrity, and choosing what is truly in harmony with who you are.',
+   meaning_rev:'Something is out of alignment. A relationship, a choice, or an inner conflict needs honest examination. What are you avoiding?',
+   symbols:'The angel above — divine blessing. The flame tree and apple tree — passion and knowledge. The mountain between — the challenge of unity.'},
+  {id:7,name:'The Chariot',suite:'major',num:'VII',symbol:'🐎',art:'bg:linear-gradient(145deg,#0d1525,#200d20)',
+   upright:['Control','Willpower','Victory','Determination','Success'],
+   reversed:['Aggression','Lack of control','Opposition','No direction'],
+   meaning_up:'Harness your opposing forces and move forward with determined focus. Victory is possible — but only through discipline and the willingness to keep both hands on the reins.',
+   meaning_rev:'Are opposing drives pulling you apart? The reversed Chariot suggests a loss of direction or control. Slow down and recalibrate before pushing forward.',
+   symbols:'Two sphinxes — opposing forces harnessed. No reins — controlled by will alone. The canopy of stars — celestial guidance.'},
+  {id:8,name:'Strength',suite:'major',num:'VIII',symbol:'🦁',art:'bg:linear-gradient(145deg,#1a1520,#20150d)',
+   upright:['Courage','Patience','Compassion','Inner strength','Confidence'],
+   reversed:['Self-doubt','Weakness','Insecurity','Raw emotion'],
+   meaning_up:'True strength is not force — it is the quiet confidence of a tamed heart. The Strength card calls you to approach challenges with patience, compassion, and the knowledge that gentleness is its own form of power.',
+   meaning_rev:'Doubting your own strength. The lion is not your enemy — it is the wild part of you that needs love, not suppression.',
+   symbols:'The infinity symbol — infinite inner power. The white robe — purity of intention. The lion — primal instinct gently mastered.'},
+  {id:9,name:'The Hermit',suite:'major',num:'IX',symbol:'🕯️',art:'bg:linear-gradient(145deg,#0d1020,#1a1525)',
+   upright:['Introspection','Solitude','Guidance','Inner wisdom','Soul-searching'],
+   reversed:['Isolation','Loneliness','Withdrawal','Lost your way'],
+   meaning_up:'This is a time for turning inward. The Hermit asks you to step away from the noise of the world and find your own light — the wisdom you carry, the truth only you can illuminate for yourself.',
+   meaning_rev:'Solitude has become isolation. Are you withdrawing from the world in a way that is hurting rather than healing? Consider reaching out.',
+   symbols:'The lantern holds a six-pointed star — the light of wisdom. The grey cloak of invisibility and experience. The mountain peak — spiritual attainment.'},
+  {id:10,name:'Wheel of Fortune',suite:'major',num:'X',symbol:'♾️',art:'bg:linear-gradient(145deg,#1a1020,#0d1a10)',
+   upright:['Good luck','Karma','Life cycles','Destiny','Turning point'],
+   reversed:['Bad luck','Resistance to change','Breaking cycles'],
+   meaning_up:'The wheel is turning. Cycles are shifting in your favour — embrace this moment of change as the natural movement of life rather than something to fear or force.',
+   meaning_rev:'Resisting inevitable change. Are you trying to hold the wheel still? What cycles need to be acknowledged and released?',
+   symbols:'The alchemical symbols around the wheel. The four fixed signs in the corners — stability within change. The sphinx at the top — mystery and wisdom.'},
+  {id:11,name:'Justice',suite:'major',num:'XI',symbol:'⚖️',art:'bg:linear-gradient(145deg,#200d0d,#0d1520)',
+   upright:['Fairness','Truth','Cause and effect','Law','Integrity'],
+   reversed:['Unfairness','Dishonesty','Injustice','Avoiding accountability'],
+   meaning_up:'Truth will prevail. Justice calls for honest reckoning — with yourself and the world. The consequences of past actions are coming into balance. Act with integrity now.',
+   meaning_rev:'Something is being swept under the rug. Dishonesty — in yourself or from others — is at play. Justice will come, but it requires facing what you would rather not see.',
+   symbols:'The sword of discernment. The scales of balance. The crown of clarity. The white shoe — pure judgment.'},
+  {id:12,name:'The Hanged Man',suite:'major',num:'XII',symbol:'🌀',art:'bg:linear-gradient(145deg,#0d1525,#151a0d)',
+   upright:['Pause','Surrender','Letting go','New perspective','Sacrifice'],
+   reversed:['Delays','Resistance','Stalling','Indecision'],
+   meaning_up:'Stop. Wait. Surrender. The Hanged Man is the sacred pause — the moment when letting go of control opens you to a perspective you could not have seen before. This is not defeat. This is wisdom.',
+   meaning_rev:'Refusing to pause or surrender is costing you more than the pause itself would. What are you clinging to that is keeping you stuck?',
+   symbols:'The halo — enlightenment through suspension. The serene face — peace within constraint. The tau cross — sacrifice and redemption.'},
+  {id:13,name:'Death',suite:'major',num:'XIII',symbol:'🌑',art:'bg:linear-gradient(145deg,#0a0a15,#1a0d1a)',
+   upright:['Endings','Transformation','Transition','Change','Letting go'],
+   reversed:['Resistance to change','Stagnation','Fear of endings'],
+   meaning_up:'Something is ending so that something new can begin. Death in tarot is not physical death — it is the necessary ending of what no longer serves you. Grieve what is passing, then turn toward what is being born.',
+   meaning_rev:'You are resisting the inevitable. Clinging to what has already ended only prolongs the pain of transition. What are you afraid to let go of?',
+   symbols:'The white rose — purity and transformation. The black flag — no attachment. The rising sun — dawn after the dark.'},
+  {id:14,name:'Temperance',suite:'major',num:'XIV',symbol:'🕊️',art:'bg:linear-gradient(145deg,#0d1520,#1a1020)',
+   upright:['Balance','Moderation','Patience','Purpose','Meaning'],
+   reversed:['Imbalance','Excess','Lack of long-term vision'],
+   meaning_up:'Find the middle path. Temperance calls for the patient blending of opposites — slow and steady, measured and meaningful. You are being guided toward what is truly harmonious.',
+   meaning_rev:'Excess in one area is pulling you off course. Where have you lost your equilibrium? Bring things back into gentle balance.',
+   symbols:'The cups pouring water — the flow between extremes. One foot on land, one in water — balance between realms. The triangle in the square — spirit within matter.'},
+  {id:15,name:'The Devil',suite:'major',num:'XV',symbol:'⛓️',art:'bg:linear-gradient(145deg,#1a0a0a,#0d0d1a)',
+   upright:['Shadow self','Attachment','Addiction','Restriction','Materialism'],
+   reversed:['Releasing limiting beliefs','Exploring dark thoughts','Detachment'],
+   meaning_up:'What chains you? The Devil invites you to look honestly at the patterns, addictions, or beliefs that keep you bound. The chains in this card are loose — you have more freedom than you believe.',
+   meaning_rev:'Liberation is at hand. You are beginning to see through the illusion that held you. Break free from what has kept you small.',
+   symbols:'The loose chains — bondage is chosen, not enforced. The inverted pentagram. The two figures — human capacity for both shadow and light.'},
+  {id:16,name:'The Tower',suite:'major',num:'XVI',symbol:'🌩️',art:'bg:linear-gradient(145deg,#1a0808,#0d0d1a)',
+   upright:['Sudden change','Upheaval','Chaos','Revelation','Awakening'],
+   reversed:['Fear of change','Averting disaster','Delaying the inevitable'],
+   meaning_up:'What was built on unstable foundations must fall. The Tower is dramatic, yes — but its destruction clears the way for something truer to be built in its place. The lightning is not punishment; it is illumination.',
+   meaning_rev:'You sense something crumbling and are trying to hold it together by force. Sometimes the kindest thing is to let the tower fall.',
+   symbols:'The lightning bolt of divine truth. The falling figures — ego surrendering. The crown at the top — false certainty being struck down.'},
+  {id:17,name:'The Star',suite:'major',num:'XVII',symbol:'⭐',art:'bg:linear-gradient(145deg,#0d1525,#0d0d1a)',
+   upright:['Hope','Faith','Renewal','Serenity','Inspiration'],
+   reversed:['Hopelessness','Despair','Disconnection','Lack of faith'],
+   meaning_up:'After the storm, the stars. The Star brings the quiet, certain hope that arrives after hardship — the knowing that you are held, that healing is happening, that there is still beauty ahead.',
+   meaning_rev:'Hope feels far away right now. Be gentle with yourself in this dimness. The stars have not gone out — sometimes clouds simply move in front of them.',
+   symbols:'The eight-pointed stars — Venus. Water poured onto land and into the pool — conscious and unconscious renewal. The bird in the tree — the soul at rest.'},
+  {id:18,name:'The Moon',suite:'major',num:'XVIII',symbol:'🌕',art:'bg:linear-gradient(145deg,#0d0d20,#1a0d1a)',
+   upright:['Illusion','Fear','Subconscious','Confusion','Complexity'],
+   reversed:['Release of fear','Repressed emotions','Inner confusion clearing'],
+   meaning_up:'You are moving through murky waters. The Moon rules the hidden, the mysterious, the things that cannot be seen clearly in daylight. Trust your instincts, but hold off on major decisions until the fog lifts.',
+   meaning_rev:'What has lived in shadow is beginning to surface. The fears and confusions that have haunted you are losing their power. The path is becoming clearer.',
+   symbols:'The moon face — the subconscious mind. The crayfish emerging from water — the unconscious rising. The twin towers — the threshold between worlds. The wolf and dog — wild and tamed natures.'},
+  {id:19,name:'The Sun',suite:'major',num:'XIX',symbol:'☀️',art:'bg:linear-gradient(145deg,#201508,#1a1a08)',
+   upright:['Positivity','Fun','Warmth','Success','Vitality'],
+   reversed:['Inner child','Overly optimistic','Pessimism blocked'],
+   meaning_up:'Joy, clarity, and radiant energy. The Sun is one of the most purely positive cards in the deck — a time of success, warmth, and the simple happiness of being alive. Let yourself shine.',
+   meaning_rev:'Your inner light is dimmed by pessimism or blocked joy. Find your way back to what makes you feel alive. The sun is always there behind the clouds.',
+   symbols:'The sunflowers — souls turning toward the light. The white horse — pure joyful power. The child — innocence, wonder, and freedom.'},
+  {id:20,name:'Judgement',suite:'major',num:'XX',symbol:'🎺',art:'bg:linear-gradient(145deg,#0d0d20,#1a0d0d)',
+   upright:['Reflection','Reckoning','Awakening','Absolution','Inner calling'],
+   reversed:['Self-doubt','Refusing the call','Ignoring a lesson'],
+   meaning_up:'A moment of profound reckoning. Judgement calls you to rise up and answer the deepest call of your soul. This is not judgment from outside — it is the moment you judge yourself fairly and choose to rise.',
+   meaning_rev:'You are not answering the call. Fear of judgment — from yourself or others — is keeping you small. What would you do if you knew you were already forgiven?',
+   symbols:'The angel Gabriel blowing the trumpet — the divine call. The rising figures — souls answering their awakening. The mountains of the impossible — transcended.'},
+  {id:21,name:'The World',suite:'major',num:'XXI',symbol:'🌍',art:'bg:linear-gradient(145deg,#0d1a10,#0d0d1a)',
+   upright:['Completion','Integration','Accomplishment','Travel','Wholeness'],
+   reversed:['Incompletion','Shortcuts','Delays','Not learning lessons'],
+   meaning_up:'You have arrived. The World marks the completion of a great cycle — wholeness, achievement, and the deep satisfaction of a journey fully lived. Celebrate this before the next cycle begins.',
+   meaning_rev:'Something is not yet complete, and you may be trying to move on before the lesson is fully learned. What final step is still needed?',
+   symbols:'The wreath of victory. The four fixed signs in the corners — mastery of all elements. The dancing figure — freedom within the cycle of completion.'},
+
+  // WANDS (using 🔥 theme)
+  {id:22,name:'Ace of Wands',suite:'wands',num:'Ace',symbol:'🔥',art:'bg:linear-gradient(145deg,#200d08,#1a1508)',upright:['Inspiration','New beginnings','Growth','Potential','Creation'],reversed:['Delays','Lack of motivation','Creative blocks'],meaning_up:'A spark of pure creative energy. Something new wants to be born — seize this moment of inspiration before it passes.',meaning_rev:'The spark is there but blocked. What is preventing you from beginning?',symbols:'The hand of God emerging from clouds. The budding wand — life force energy. The green shoots of new growth.'},
+  {id:23,name:'Two of Wands',suite:'wands',num:'2',symbol:'🗺️',art:'bg:linear-gradient(145deg,#1a1008,#200d10)',upright:['Future planning','Progress','Decisions','Discovery'],reversed:['Fear of unknown','Lack of planning','Playing safe'],meaning_up:'You stand at a crossroads with the whole world before you. Plan boldly.',meaning_rev:'Fear of committing to a direction is keeping you frozen at the threshold.',symbols:'The figure gazing at the globe — vision and possibility. Two wands flanking — support and choice.'},
+  {id:24,name:'Three of Wands',suite:'wands',num:'3',symbol:'⛵',art:'bg:linear-gradient(145deg,#200d08,#15200d)',upright:['Expansion','Foresight','Overseas opportunities','Looking ahead'],reversed:['Obstacles','Delays','Frustration'],meaning_up:'What you set in motion is now expanding beyond what you could see. Watch the ships come in.',meaning_rev:'Delays in what you hoped would have arrived by now. Be patient — it is on its way.',symbols:'The ships on the distant sea — ventures set in motion. The three wands — past choices bearing fruit.'},
+  {id:25,name:'Four of Wands',suite:'wands',num:'4',symbol:'🎉',art:'bg:linear-gradient(145deg,#1a1508,#200d10)',upright:['Celebration','Harmony','Marriage','Community','Home'],reversed:['Lack of support','Instability','Home conflict'],meaning_up:'Pause and celebrate. You have earned this moment of joy and belonging.',meaning_rev:'Where is the celebration being dampened? Something beneath the surface is unsettled at home or within a community.',symbols:'The garland of flowers — celebration and joy. The castle in the distance — security achieved. Figures raising bouquets.'},
+  {id:26,name:'Five of Wands',suite:'wands',num:'5',symbol:'⚔️',art:'bg:linear-gradient(145deg,#1a0d08,#200d15)',upright:['Conflict','Competition','Tension','Diversity','Struggle'],reversed:['Avoiding conflict','Respecting differences','Inner conflict'],meaning_up:'Competition and conflict are not always destructive — sometimes friction sharpens you. Engage with the struggle rather than retreating from it.',meaning_rev:'Are you avoiding a necessary confrontation? Or is the conflict actually within yourself?',symbols:'Five figures each with their own wand — no clear enemy, everyone fighting their own battle.'},
+  {id:27,name:'Six of Wands',suite:'wands',num:'6',symbol:'🏆',art:'bg:linear-gradient(145deg,#15200d,#1a1508)',upright:['Victory','Success','Public recognition','Progress','Self-confidence'],reversed:['Ego','Arrogance','Fleeting success','Falling from grace'],meaning_up:'You have succeeded and others see it. Accept this recognition with grace.',meaning_rev:'Victory becomes vanity. Success achieved at the expense of others, or fear that acclaim will not last.',symbols:'The wreath of victory. The triumphant rider. The crowd bearing wands of support.'},
+  {id:28,name:'Seven of Wands',suite:'wands',num:'7',symbol:'🛡️',art:'bg:linear-gradient(145deg,#200d08,#1a1508)',upright:['Challenge','Perseverance','Defense','Conviction','Resilience'],reversed:['Giving up','Overwhelmed','Yielding'],meaning_up:'Hold your ground. You have earned your position and it is worth defending.',meaning_rev:'Exhaustion from endless defending. Is this battle still worth fighting?',symbols:'The figure on higher ground — the advantage of position. Six wands attacking — formidable opposition.'},
+  {id:29,name:'Eight of Wands',suite:'wands',num:'8',symbol:'🌪️',art:'bg:linear-gradient(145deg,#1a1508,#0d1520)',upright:['Speed','Action','Air travel','Movement','Swift change'],reversed:['Delays','Frustration','Slowing down','Resisting change'],meaning_up:'Everything is moving quickly now. Act decisively and trust the momentum.',meaning_rev:'What is causing the delay? Something is holding back what wants to move forward.',symbols:'Eight wands in flight — rapid movement. No obstacles — clear path ahead.'},
+  {id:30,name:'Nine of Wands',suite:'wands',num:'9',symbol:'🩹',art:'bg:linear-gradient(145deg,#200d08,#150d20)',upright:['Resilience','Courage','Persistence','Test of faith','Boundaries'],reversed:['Paranoia','Excessive defensiveness','Stubbornness'],meaning_up:'You are battle-worn but not defeated. One last effort is all that stands between you and the finish line.',meaning_rev:'Your defenses have become walls. Wounds from the past are making you see threats where there are none.',symbols:'The bandaged head — scars earned. Eight wands behind — past battles survived. The ninth wand — still standing.'},
+  {id:31,name:'Ten of Wands',suite:'wands',num:'10',symbol:'🎋',art:'bg:linear-gradient(145deg,#1a1508,#200d08)',upright:['Burden','Responsibility','Hard work','Stress','Achievement'],reversed:['Doing it all yourself','Collapse','Taking on too much'],meaning_up:'You are carrying a heavy load. Acknowledge how much you are holding — and consider what you might be able to set down.',meaning_rev:'Carrying the weight of the world alone until it breaks you. Ask for help.',symbols:'The figure bent under the weight of ten wands — almost home, but exhausted.'},
+  {id:32,name:'Page of Wands',suite:'wands',num:'Page',symbol:'🌱',art:'bg:linear-gradient(145deg,#200d08,#1a1508)',upright:['Enthusiasm','Exploration','Discovery','Free spirit','New ideas'],reversed:['Lack of direction','Immaturity','Setbacks'],meaning_up:'An adventurous spirit ready to explore. Let curiosity lead the way.',meaning_rev:'Excitement without direction. Channel this energy into something concrete.',symbols:'The young figure holding a single wand. The salamanders on the tunic — fire energy.'},
+  {id:33,name:'Knight of Wands',suite:'wands',num:'Knight',symbol:'🐴',art:'bg:linear-gradient(145deg,#200d08,#1a0d20)',upright:['Energy','Passion','Inspired action','Adventure','Impulsiveness'],reversed:['Haste','Scattered energy','Delays','Frustration'],meaning_up:'Charge forward with passionate energy — just ensure you have a destination in mind.',meaning_rev:'Energy without direction creates chaos. Focus before you act.',symbols:'The rearing horse — barely contained energy. The dry desert — uncompromising terrain conquered by pure will.'},
+  {id:34,name:'Queen of Wands',suite:'wands',num:'Queen',symbol:'🌻',art:'bg:linear-gradient(145deg,#200d08,#20150d)',upright:['Courage','Confidence','Independence','Social butterfly','Determination'],reversed:['Demanding','Bossy','Selfishness','Jealousy'],meaning_up:'Stand in your magnetic power. You are bold, vibrant, and exactly who you need to be right now.',meaning_rev:'Confidence tipping into control. Are you leading with authentic power or an ego that needs to dominate?',symbols:'The black cat — independent feminine power. The sunflower throne — warmth and vitality.'},
+  {id:35,name:'King of Wands',suite:'wands',num:'King',symbol:'🔱',art:'bg:linear-gradient(145deg,#200d08,#1a1508)',upright:['Natural-born leader','Vision','Entrepreneur','Honour','Bold'],reversed:['Impulsive','Overbearing','Arrogance','Expectations'],meaning_up:'Lead with vision, boldness, and inspired purpose. Your fire can light the way for many.',meaning_rev:'Leadership becoming tyranny. Check your ego at the door.',symbols:'The salamander cloak — fire mastered. The miniature lion throne — king of fire.'},
+
+  // CUPS (using 💧 theme)
+  {id:36,name:'Ace of Cups',suite:'cups',num:'Ace',symbol:'💧',art:'bg:linear-gradient(145deg,#080d20,#0d1520)',upright:['Love','New feelings','Intuition','Spirituality','Overflow'],reversed:['Empty cup','Blocked emotions','Repressed feelings'],meaning_up:'A new wave of love and feeling is opening for you. Let it pour in.',meaning_rev:'What is blocking you from receiving love? The cup is there — learn to receive.',symbols:'The chalice overflowing — abundance of feeling. The dove with the wafer — spiritual blessing.'},
+  {id:37,name:'Two of Cups',suite:'cups',num:'2',symbol:'🌷',art:'bg:linear-gradient(145deg,#0d0820,#1a0820)',upright:['Unified love','Partnership','Mutual attraction','Relationships','Connection'],reversed:['Imbalance','Broken communication','Tension'],meaning_up:'A deep and equal connection. Whether romantic or not, this bond is built on true mutuality.',meaning_rev:'Imbalance in a relationship. One person giving more than the other, or a breakdown in communication.',symbols:'The caduceus of Hermes — exchange and balance. The lion-headed chimera — passion within the partnership.'},
+  {id:38,name:'Three of Cups',suite:'cups',num:'3',symbol:'🥂',art:'bg:linear-gradient(145deg,#0d0820,#200d15)',upright:['Friendship','Community','Celebrations','Reunions','Collaboration'],reversed:['Independence','Gossip','Overindulgence'],meaning_up:'Surround yourself with the people who truly celebrate you. Joy is multiplied in community.',meaning_rev:'Festivity hiding something hollow. Gossip circulating in the group, or indulgence masking something deeper.',symbols:'Three women dancing with raised cups — pure joy of connection and celebration.'},
+  {id:39,name:'Four of Cups',suite:'cups',num:'4',symbol:'🌫️',art:'bg:linear-gradient(145deg,#0d0d20,#0d1a0d)',upright:['Meditation','Contemplation','Apathy','Reevaluation','Discontent'],reversed:['Sudden awareness','Choosing happiness','Acceptance'],meaning_up:'You may be so caught up in what you do not have that you cannot see what is being offered. Look up.',meaning_rev:'A moment of sudden clarity — you can see now what was invisible to you in your apathy.',symbols:'The fourth cup offered from the cloud — the gift not yet seen. Three cups on the ground — what has already been given.'},
+  {id:40,name:'Five of Cups',suite:'cups',num:'5',symbol:'🥀',art:'bg:linear-gradient(145deg,#0d0820,#1a0d0d)',upright:['Regret','Failure','Disappointment','Pessimism','Grief'],reversed:['Acceptance','Moving on','Finding peace'],meaning_up:'Grieve what is lost — it deserves to be mourned. But when you are ready, turn around: two cups still stand.',meaning_rev:'You are beginning to find peace with what has passed and turning your eyes toward what remains.',symbols:'Three spilled cups — loss and grief. Two still standing — what remains. The dark cloak of mourning.'},
+  {id:41,name:'Six of Cups',suite:'cups',num:'6',symbol:'🌸',art:'bg:linear-gradient(145deg,#0d1520,#150d1a)',upright:['Revisiting the past','Childhood memories','Innocence','Nostalgia','Joy'],reversed:['Stuck in the past','Naivety','Unrealistic'],meaning_up:'Something from the past is returning — a memory, a person, a childlike feeling. Meet it with warmth.',meaning_rev:'Nostalgia has become a trap. The past cannot be returned to — only honoured.',symbols:'The children exchanging cups of flowers — innocence and generosity. The old village — the known and beloved past.'},
+  {id:42,name:'Seven of Cups',suite:'cups',num:'7',symbol:'🌙',art:'bg:linear-gradient(145deg,#0d0d20,#1a0820)',upright:['Fantasy','Illusion','Wishful thinking','Choices','Imagination'],reversed:['Alignment','Personal values','Overwhelmed by choices'],meaning_up:'So many possibilities shimmer before you — but not all are real. Discern carefully before choosing.',meaning_rev:'You are beginning to see through the fog of fantasy and choosing based on what truly matters.',symbols:'The seven cups filled with visions — each a temptation. The shadowy figure — unable to see clearly yet.'},
+  {id:43,name:'Eight of Cups',suite:'cups',num:'8',symbol:'🚶',art:'bg:linear-gradient(145deg,#0d0d1a,#0d0820)',upright:['Disappointment','Abandonment','Withdrawal','Escapism','Moving on'],reversed:['Hopelessness','Aimless drifting','Walking away'],meaning_up:'You are walking away from something that no longer fills you, even if it once did. This is not failure — it is wisdom.',meaning_rev:'Leaving but not knowing where you are going. Or staying when you know you should leave.',symbols:'The figure walking away from eight stacked cups. The gap in the stack — something missing despite apparent completeness. The moon eclipse — intuition lighting the way.'},
+  {id:44,name:'Nine of Cups',suite:'cups',num:'9',symbol:'🍷',art:'bg:linear-gradient(145deg,#150d20,#0d1520)',upright:['Contentment','Satisfaction','Gratitude','Wish fulfilled','Pleasure'],reversed:['Greed','Dissatisfaction','Materialism'],meaning_up:'The wish card. Something you have deeply desired is coming, or has already arrived. Allow yourself to enjoy it fully.',meaning_rev:'Have you got what you wanted but still feel empty? Outer fulfilment is seeking something inner.',symbols:'The figure with arms crossed — satisfaction and pride. Nine cups displayed — abundance on show.'},
+  {id:45,name:'Ten of Cups',suite:'cups',num:'10',symbol:'🏠',art:'bg:linear-gradient(145deg,#0d0820,#0d1520)',upright:['Divine love','Harmony','Marriage','Alignment','Happy endings'],reversed:['Disconnection','Misaligned values','Broken home'],meaning_up:'The family, the home, the love that endures. This is emotional fulfilment in its fullest form. Cherish it.',meaning_rev:'Something is fracturing in what should be a place of belonging. Address it before it breaks fully.',symbols:'The couple embracing — love and partnership. The children dancing — the joy of true belonging. The rainbow of cups — divine blessing over the scene.'},
+  {id:46,name:'Page of Cups',suite:'cups',num:'Page',symbol:'🐟',art:'bg:linear-gradient(145deg,#0d0820,#15200d)',upright:['Creative opportunities','Intuitive messages','Curiosity','Possibility'],reversed:['New ideas ignored','Emotional immaturity'],meaning_up:'Listen to the gentle, creative messages arising from your inner life — dreams, art, a sudden feeling.',meaning_rev:'Creative impulses being dismissed. Are you ignoring what your heart is quietly asking for?',symbols:'The fish emerging from the cup — the unconscious speaking. The flowery tunic — sensitivity and imagination.'},
+  {id:47,name:'Knight of Cups',suite:'cups',num:'Knight',symbol:'🦢',art:'bg:linear-gradient(145deg,#0d0820,#0d1520)',upright:['Romance','Charm','Imagination','Beauty','Following the heart'],reversed:['Unrealistic','Jealous','Moodiness'],meaning_up:'Follow your heart with grace and beauty. The knight of cups brings romance, poetry, and inspired vision.',meaning_rev:'The heart is leading somewhere illusory. Check that your romantic vision is grounded in reality.',symbols:'The winged helmet and boots — thought taking flight. The calm horse — emotion under gentle control. The river — the flow of feeling.'},
+  {id:48,name:'Queen of Cups',suite:'cups',num:'Queen',symbol:'🔮',art:'bg:linear-gradient(145deg,#0d0820,#1a0d1a)',upright:['Compassion','Calm','Comfort','Intuition','Healing'],reversed:['Inner feelings ignored','Codependency','Giving too much'],meaning_up:'Your deep empathy and emotional wisdom are your greatest gifts right now. Care — for others and for yourself.',meaning_rev:'Losing yourself in the emotions of others. Your sensitivity needs its own space to breathe.',symbols:'The ornate cup — the complex inner world. The sea throne — sovereignty over emotion. The angels and sea-children — intuition and depth.'},
+  {id:49,name:'King of Cups',suite:'cups',num:'King',symbol:'🌊',art:'bg:linear-gradient(145deg,#0d0820,#0d1520)',upright:['Emotional balance','Compassion','Diplomacy','Wisdom','Calmness'],reversed:['Emotional manipulation','Moodiness','Volatility'],meaning_up:'Mastery of emotion — wise, compassionate, and steady even in turbulent waters.',meaning_rev:'Emotions suppressed or wielded as manipulation. What feelings are not being acknowledged?',symbols:'The king on his throne amid churning water — emotional mastery. The fish amulet — the unconscious depth he commands.'},
+
+  // SWORDS (using 💨 theme)
+  {id:50,name:'Ace of Swords',suite:'swords',num:'Ace',symbol:'🗡️',art:'bg:linear-gradient(145deg,#0d1520,#1a1520)',upright:['Clarity','Breakthrough','New ideas','Truth','Mental force'],reversed:['Confusion','Brutality','Chaos'],meaning_up:'A blade of pure clarity cuts through the fog. Truth arrives, sometimes painfully, always helpfully.',meaning_rev:'Mental chaos or a truth being wielded without care or wisdom.',symbols:'The hand emerging from cloud — divine truth. The crown with laurel — victory of mind.'},
+  {id:51,name:'Two of Swords',suite:'swords',num:'2',symbol:'😶',art:'bg:linear-gradient(145deg,#0d0d20,#1a1520)',upright:['Difficult decisions','Blocked emotions','Avoidance','Stalemate'],reversed:['Indecision','Confusion','Information overload'],meaning_up:'You are avoiding a decision that needs to be made. The blindfold is of your own choosing — when you are ready, remove it.',meaning_rev:'Too much information, too little clarity. Step back and let your inner knowing surface.',symbols:'The blindfolded figure — chosen ignorance. The two crossed swords — balanced but immovable tension. The crescent moon — things unseen.'},
+  {id:52,name:'Three of Swords',suite:'swords',num:'3',symbol:'💔',art:'bg:linear-gradient(145deg,#1a0808,#0d0d20)',upright:['Heartbreak','Suffering','Grief','Sorrow','Hurt'],reversed:['Recovery','Forgiveness','Moving on'],meaning_up:'Pain is real and it needs to be felt. The three swords through the heart — do not bypass this grief.',meaning_rev:'Healing is beginning. The worst is past. Slowly, slowly, you are finding your way back.',symbols:'Three swords through a red heart. Storm clouds — the emotional weather of profound pain.'},
+  {id:53,name:'Four of Swords',suite:'swords',num:'4',symbol:'😴',art:'bg:linear-gradient(145deg,#0d0d20,#1a1520)',upright:['Rest','Restoration','Contemplation','Recuperation','Retreat'],reversed:['Exhaustion','Burn-out','Deep contemplation'],meaning_up:'Rest is not laziness — it is necessary. This is a time to be still before returning to the world.',meaning_rev:'Pushed past the point where rest is a choice. Complete recovery before re-engaging.',symbols:'The figure at rest in the church — sacred stillness. Three swords above, one below — the one remains in reserve.'},
+  {id:54,name:'Five of Swords',suite:'swords',num:'5',symbol:'😤',art:'bg:linear-gradient(145deg,#1a0808,#0d0d20)',upright:['Conflict','Defeat','Win at all costs','Tension','Loss'],reversed:['Reconciliation','Making amends','Moving past conflict'],meaning_up:'Even if you win this battle, at what cost? Consider whether the victory is worth the destruction.',meaning_rev:'Conflict beginning to resolve. Apology or reconciliation is possible now.',symbols:'The victorious figure with three swords. Two figures walking away — the cost of hollow victory.'},
+  {id:55,name:'Six of Swords',suite:'swords',num:'6',symbol:'🛶',art:'bg:linear-gradient(145deg,#0d0d20,#0d1520)',upright:['Transition','Change','Rite of passage','Moving on','Healing'],reversed:['Emotional baggage','Unfinished business','Resistance to transition'],meaning_up:'You are moving from turbulent waters toward calmer ones. The transition is not over, but the worst is behind you.',meaning_rev:'Carrying the weight of the past into the new. Put down what is not yours to carry.',symbols:'The six swords in the boat — burdens carried through transition. The hooded figure — grief of moving on. Rough water behind, calm ahead.'},
+  {id:56,name:'Seven of Swords',suite:'swords',num:'7',symbol:'🦊',art:'bg:linear-gradient(145deg,#0d0d20,#1a1508)',upright:['Betrayal','Deception','Getting away with something','Cunning','Strategy'],reversed:['Imposter syndrome','Self-deceit','Keeping secrets'],meaning_up:'Something is being done in secret. Whether it is your own strategy or someone else\'s deception, examine what is hidden.',meaning_rev:'The deception is primarily of yourself. What truth are you avoiding?',symbols:'The figure sneaking away with five swords. Two left behind — not everything taken. The smug look — cunning at play.'},
+  {id:57,name:'Eight of Swords',suite:'swords',num:'8',symbol:'🙈',art:'bg:linear-gradient(145deg,#0d0d1a,#1a0d1a)',upright:['Negative thoughts','Self-imposed restriction','Imprisonment','Victim mentality'],reversed:['Self-limiting beliefs releasing','New perspective','Freedom'],meaning_up:'You feel trapped — but look closely. The blindfold can be removed. The bonds are loose. The prison is in your mind.',meaning_rev:'You are beginning to see the way out. The chains of your own thinking are loosening.',symbols:'The blindfolded, bound figure. Eight swords surrounding but not touching — the cage is an illusion.'},
+  {id:58,name:'Nine of Swords',suite:'swords',num:'9',symbol:'😰',art:'bg:linear-gradient(145deg,#0a0a15,#1a0808)',upright:['Anxiety','Worry','Fear','Nightmares','Despair'],reversed:['Inner turmoil','Fear releasing','Coming to terms'],meaning_up:'The fears at 3am are loudest then — but they are thoughts, not facts. Be gentle with yourself through this darkness.',meaning_rev:'The worst of the anxiety is passing. What helped you through this night?',symbols:'The figure sitting up in bed, covering their face. Nine swords on the wall — the weight of accumulated worry.'},
+  {id:59,name:'Ten of Swords',suite:'swords',num:'10',symbol:'🌅',art:'bg:linear-gradient(145deg,#0a0a15,#1a1508)',upright:['Painful endings','Deep wounds','Betrayal','Loss','Crisis'],reversed:['Recovery','Regeneration','Inevitable end'],meaning_up:'This ending is complete and final. Painful as it is, you cannot go back. But see the horizon — dawn is coming.',meaning_rev:'You are resisting the end or it is arriving more slowly. The conclusion is inevitable; let it come.',symbols:'The figure with ten swords in the back — a definitive, dramatic end. The yellow horizon — dawn and rebirth following.'},
+  {id:60,name:'Page of Swords',suite:'swords',num:'Page',symbol:'🌬️',art:'bg:linear-gradient(145deg,#0d1520,#1a1508)',upright:['Curious','Restless','Alert','Witty','Communicative'],reversed:['Haste','Deception','Manipulation'],meaning_up:'Quick, alert, and curious — gather information before making judgments.',meaning_rev:'Using mental agility for deception. Think before you speak.',symbols:'The page with sword raised — readiness. The clouds and wind — the element of air.'},
+  {id:61,name:'Knight of Swords',suite:'swords',num:'Knight',symbol:'⚡',art:'bg:linear-gradient(145deg,#0d0d20,#1a1520)',upright:['Ambitious','Action-oriented','Driven','Fast-thinking','Assertive'],reversed:['No direction','Reckless','Bold but impractical'],meaning_up:'Charge forward with your mind as your weapon — but make sure there is a target.',meaning_rev:'Intellectual energy without wisdom or direction. Think before you charge.',symbols:'The galloping horse into the storm — determination regardless of consequence.'},
+  {id:62,name:'Queen of Swords',suite:'swords',num:'Queen',symbol:'🦅',art:'bg:linear-gradient(145deg,#0d0d20,#1a1520)',upright:['Independent','Unbiased judgement','Clear boundaries','Direct communication','Perceptive'],reversed:['Cold-hearted','Cruel','Bitterness'],meaning_up:'Clear-eyed and direct. Your greatest gift right now is honest, compassionate truth-telling.',meaning_rev:'Pain has hardened into coldness. Clarity without compassion cuts too deep.',symbols:'The stern but open expression. The butterfly crown — transformation. The angel carved on the throne — justice with heart.'},
+  {id:63,name:'King of Swords',suite:'swords',num:'King',symbol:'👁️',art:'bg:linear-gradient(145deg,#0d0d20,#1a1520)',upright:['Mental clarity','Intellectual power','Authority','Truth','Ethical'],reversed:['Manipulative','Cruel','Abuse of power'],meaning_up:'Reason, truth, and ethical authority. Lead with your mind and your principles.',meaning_rev:'Intellect without empathy becomes tyranny. Examine how your mind is being used.',symbols:'The double-edged sword — truth cuts both ways. The clear sky — pure, unobstructed thinking.'},
+
+  // PENTACLES (using 🌿 theme)
+  {id:64,name:'Ace of Pentacles',suite:'pentacles',num:'Ace',symbol:'🌿',art:'bg:linear-gradient(145deg,#0d1a08,#1a1508)',upright:['New financial opportunity','Manifestation','Abundance','Security','Potential'],reversed:['Lost opportunity','Lack of planning','Poor financial decisions'],meaning_up:'A seed of material abundance and security is being planted. Tend it carefully.',meaning_rev:'An opportunity is being missed or a foundation is too shaky to build on.',symbols:'The hand holding the pentacle — a gift from the divine. The garden gate — the threshold of material manifestation.'},
+  {id:65,name:'Two of Pentacles',suite:'pentacles',num:'2',symbol:'🤹',art:'bg:linear-gradient(145deg,#0d1a08,#0d0d20)',upright:['Multiple priorities','Time management','Adaptability','Balance'],reversed:['Disorganisation','Financial disarray','Overwhelmed'],meaning_up:'You are juggling many things — and doing it with more grace than you realise. Keep adapting.',meaning_rev:'Too many balls in the air. Something needs to be set down before it drops.',symbols:'The infinity loop connecting two pentacles — endless juggling. Ships on turbulent sea — the world in constant flux.'},
+  {id:66,name:'Three of Pentacles',suite:'pentacles',num:'3',symbol:'🏛️',art:'bg:linear-gradient(145deg,#0d1a08,#1a1508)',upright:['Teamwork','Collaboration','Building','Implementation','Skill'],reversed:['Lack of teamwork','Disorganisation','Conflict'],meaning_up:'Collaborate — your skills combined with others create something greater than any one person could alone.',meaning_rev:'Working at cross purposes. Something needs to be said for the team to function.',symbols:'The craftsman in the cathedral — skilled work being recognised. The monks with the plan — collaboration and respect.'},
+  {id:67,name:'Four of Pentacles',suite:'pentacles',num:'4',symbol:'💰',art:'bg:linear-gradient(145deg,#1a1508,#200d08)',upright:['Saving money','Security','Conservatism','Scarcity','Control'],reversed:['Over-spending','Greed','Self-protection'],meaning_up:'Security has its place — but are you holding on so tightly that nothing new can come in?',meaning_rev:'The grip is loosening — but toward generosity or toward recklessness?',symbols:'The figure clutching a pentacle — security or miserliness. Three more pentacles held to crown and feet — complete attachment to material security.'},
+  {id:68,name:'Five of Pentacles',suite:'pentacles',num:'5',symbol:'❄️',art:'bg:linear-gradient(145deg,#0d0d20,#1a1508)',upright:['Financial loss','Poverty','Lack mindset','Isolation','Worry'],reversed:['Recovery','Charity','Improvement'],meaning_up:'A hard time materially or spiritually — but notice the stained glass window above. Help exists. Ask for it.',meaning_rev:'The worst of the hardship is easing. Look up from the ground — something is offered.',symbols:'Two figures in the cold. The lit church window above — sanctuary and help so close.'},
+  {id:69,name:'Six of Pentacles',suite:'pentacles',num:'6',symbol:'🤲',art:'bg:linear-gradient(145deg,#0d1a08,#1a1508)',upright:['Generosity','Charity','Giving','Prosperity','Sharing wealth'],reversed:['Debt','Selfishness','Strings attached'],meaning_up:'Generosity flows both ways. Give freely, receive gracefully.',meaning_rev:'Charity with conditions attached. Examine the power dynamics in giving and receiving.',symbols:'The merchant with scales — measuring out fair distribution. Two figures receiving — the cycle of generosity.'},
+  {id:70,name:'Seven of Pentacles',suite:'pentacles',num:'7',symbol:'🌾',art:'bg:linear-gradient(145deg,#0d1a08,#1a1508)',upright:['Long-term view','Sustainable results','Perseverance','Investment','Milestone'],reversed:['Lack of long-term vision','Limited success'],meaning_up:'Pause and assess. The work is happening — are you growing in the direction you intended?',meaning_rev:'Working hard but not seeing the results. Is the effort aligned with the goal?',symbols:'The farmer resting on his hoe, looking at his crop — the slow patient work of growth.'},
+  {id:71,name:'Eight of Pentacles',suite:'pentacles',num:'8',symbol:'🔨',art:'bg:linear-gradient(145deg,#0d1a08,#1a1508)',upright:['Apprenticeship','Repetition','Mastery','Skill development','Education'],reversed:['Lack of focus','Mediocrity','No ambition'],meaning_up:'The devoted practice of craft. Show up every day and do the work — mastery is built in these small repeated acts.',meaning_rev:'Going through the motions without real engagement. What has taken the joy from the work?',symbols:'The craftsman carving pentacles — diligent practice. The row of completed works — evidence of commitment.'},
+  {id:72,name:'Nine of Pentacles',suite:'pentacles',num:'9',symbol:'🪷',art:'bg:linear-gradient(145deg,#0d1a08,#1a1508)',upright:['Abundance','Luxury','Self-sufficiency','Financial independence','Elegance'],reversed:['Self-worth','Over-investment in work','Hustling'],meaning_up:'You have built something beautiful and entirely your own. Enjoy the fruits of your independence.',meaning_rev:'Material success without inner fulfilment. What have you sacrificed for the abundance?',symbols:'The elegant woman in her garden — self-created luxury. The falcon — disciplined mastery. The snail — slow, patient achievement.'},
+  {id:73,name:'Ten of Pentacles',suite:'pentacles',num:'10',symbol:'🏡',art:'bg:linear-gradient(145deg,#0d1a08,#1a1508)',upright:['Wealth','Financial security','Family','Long-term success','Contribution'],reversed:['The dark side of wealth','Family disputes','Financial failure'],meaning_up:'Legacy, stability, and the deep satisfaction of having built something lasting. This is the abundance that extends beyond the self.',meaning_rev:'Wealth creating conflict rather than security. What is the real cost of this material success?',symbols:'The multigenerational scene — legacy spanning time. Ten pentacles in the kabbalistic tree — complete material manifestation.'},
+  {id:74,name:'Page of Pentacles',suite:'pentacles',num:'Page',symbol:'🌰',art:'bg:linear-gradient(145deg,#0d1a08,#1a1508)',upright:['Manifestation','Financial opportunity','Skill development','Studious'],reversed:['Lack of progress','Procrastination','Short-term focus'],meaning_up:'Study, plan, and tend carefully to what you are building. The foundation is everything.',meaning_rev:'Dreaming about what you want without doing the practical work to achieve it.',symbols:'The page gazing intently at the pentacle — total focus on the task of manifestation.'},
+  {id:75,name:'Knight of Pentacles',suite:'pentacles',num:'Knight',symbol:'🐢',art:'bg:linear-gradient(145deg,#0d1a08,#1a1508)',upright:['Hard work','Productivity','Routine','Conservatism','Methodical'],reversed:['Self-discipline','Boredom','Laziness'],meaning_up:'Slow and steady, thorough and reliable. This is how lasting things are built.',meaning_rev:'Stuck in routine to the point of stagnation. Or resisting the effort required.',symbols:'The still horse — careful deliberate progress. The ploughed field — preparation and readiness.'},
+  {id:76,name:'Queen of Pentacles',suite:'pentacles',num:'Queen',symbol:'🌺',art:'bg:linear-gradient(145deg,#0d1a08,#1a1508)',upright:['Nurturing','Practical','Providing financially','Working parent','Sensible'],reversed:['Financial dependence','Smothering','Neglect'],meaning_up:'Warmth, practicality, and the earthy magic of making a home and a life that truly sustains.',meaning_rev:'Giving so much that nothing is left for you — or confusing providing with controlling.',symbols:'The lush garden — abundance cultivated with care. The rabbit — fertility and hidden life.'},
+  {id:77,name:'King of Pentacles',suite:'pentacles',num:'King',symbol:'🏔️',art:'bg:linear-gradient(145deg,#0d1a08,#1a1508)',upright:['Abundance','Prosperity','Security','Ambition','Sensible'],reversed:['Financially inept','Obsessed with wealth','Stubborn'],meaning_up:'The master of material abundance. You have built well, and you know how to keep what you have built.',meaning_rev:'Wealth at the cost of everything else. The kingdom built but the soul neglected.',symbols:'The vine-covered throne — wealth rooted in nature. The castle — lasting security. The bull on the armour — Taurus, the master of the material.'},
+];
+
+// ══════════════════════════════════════════════════════
+// SPREAD DEFINITIONS
+// ══════════════════════════════════════════════════════
+const SPREADS = {
+  single: [{label:'Your Card'}],
+  three:  [{label:'Past'},{label:'Present'},{label:'Future'}],
+  five:   [{label:'Foundation'},{label:'Challenge'},{label:'You Now'},{label:'Guidance'},{label:'Outcome'}],
+  celtic: [{label:'Present'},{label:'Challenge'},{label:'Distant Past'},{label:'Recent Past'},{label:'Best Outcome'},{label:'Near Future'},{label:'Your Attitude'},{label:'External Forces'},{label:'Hopes & Fears'},{label:'Final Outcome'}],
+  yearahead: Array.from({length:12},(_,i)=>({label:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i]})),
+};
+
+let currentSpread = 'single';
+let drawnCards = [];
+let currentReadingForJournal = null;
+
+function selectSpread(btn) {
+  document.querySelectorAll('.spread-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  currentSpread = btn.dataset.spread;
+  document.getElementById('card-stage').innerHTML='';
+  document.getElementById('meaning-panel').classList.remove('visible');
+  document.getElementById('save-reading-btn').style.display='none';
+  drawnCards=[];
+}
+
+function drawReading() {
+  const positions = SPREADS[currentSpread];
+  const shuffled = [...TAROT].sort(()=>Math.random()-0.5);
+  drawnCards = positions.map((pos,i)=>({
+    card: shuffled[i % shuffled.length],
+    position: pos.label,
+    reversed: Math.random() < 0.35,
+  }));
+  renderCardStage();
+  document.getElementById('save-reading-btn').style.display='inline-block';
+}
+
+function renderCardStage() {
+  const stage = document.getElementById('card-stage');
+  stage.innerHTML='';
+  drawnCards.forEach((draw,i)=>{
+    const slot = document.createElement('div');
+    slot.className='tarot-slot';
+    slot.innerHTML=`
+      <div class="tarot-card${draw.revealed?' flipped':''}${draw.reversed?' reversed':''}" id="tcard-${i}" onclick="revealCard(${i})">
+        <div class="card-back">
+          <svg width="50" height="80" viewBox="0 0 50 80" fill="none">
+            <rect x="3" y="3" width="44" height="74" rx="4" stroke="rgba(232,200,122,0.3)" stroke-width="1"/>
+            <rect x="7" y="7" width="36" height="66" rx="3" stroke="rgba(232,200,122,0.2)" stroke-width="0.8"/>
+            <circle cx="25" cy="40" r="12" stroke="rgba(232,200,122,0.25)" stroke-width="0.8" fill="none"/>
+            <path d="M25 28 L25 52 M13 40 L37 40" stroke="rgba(232,200,122,0.15)" stroke-width="0.7"/>
+            <circle cx="25" cy="40" r="3" fill="rgba(232,200,122,0.4)"/>
+            <circle cx="25" cy="18" r="1.5" fill="rgba(196,168,216,0.4)"/>
+            <circle cx="25" cy="62" r="1.5" fill="rgba(196,168,216,0.4)"/>
+            <circle cx="13" cy="40" r="1.5" fill="rgba(196,168,216,0.4)"/>
+            <circle cx="37" cy="40" r="1.5" fill="rgba(196,168,216,0.4)"/>
+          </svg>
+        </div>
+        <div class="card-face">
+          <div class="card-face-symbol">${draw.card.symbol}</div>
+          <div class="card-face-name">${draw.card.name}</div>
+          <div class="card-face-num">${draw.card.suite==='major'?'Major · '+draw.card.num:draw.card.num+' of '+draw.card.suite.charAt(0).toUpperCase()+draw.card.suite.slice(1)}</div>
+          ${draw.reversed?'<div class="reversed-tag">↺ Reversed</div>':''}
+        </div>
+      </div>
+      <div class="tarot-slot-label">${draw.position}</div>`;
+    stage.appendChild(slot);
+  });
+}
+
+function revealCard(i) {
+  const draw = drawnCards[i];
+  if (!draw) return;
+  draw.revealed = true;
+  const cardEl = document.getElementById(`tcard-${i}`);
+  cardEl.classList.add('flipped','card-flip-anim');
+  showMeaning(draw);
+}
+
+function showMeaning(draw) {
+  const panel = document.getElementById('meaning-panel');
+  const card = draw.card;
+  const rev = draw.reversed;
+  const suite_map = {major:'Major Arcana',wands:'Suit of Wands',cups:'Suit of Cups',swords:'Suit of Swords',pentacles:'Suit of Pentacles'};
+  panel.innerHTML=`
+    <div class="meaning-header">
+      <div class="meaning-card-thumb">${card.symbol}</div>
+      <div class="meaning-card-info">
+        <div class="meaning-card-name">${card.name}</div>
+        <div class="meaning-card-suite">${suite_map[card.suite]} · ${card.num}</div>
+        <span class="meaning-orientation ${rev?'reversed':'upright'}">${rev?'↺ Reversed':'↑ Upright'}</span>
+      </div>
+    </div>
+    <div class="meaning-keywords">${(rev?card.reversed:card.upright).map(k=>`<span class="keyword">${k}</span>`).join('')}</div>
+    <div class="meaning-desc">${rev?card.meaning_rev:card.meaning_up}</div>`;
+  panel.classList.add('visible');
+}
+
+function saveReadingToJournal() {
+  showSection('journal', document.querySelector('[onclick*="journal"]'));
+  const today = new Date();
+  document.getElementById('j-date').value = today.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('j-spread').value = currentSpread.charAt(0).toUpperCase()+currentSpread.slice(1)+' spread';
+  applyPreset('custom');
+  const canvas = document.getElementById('layout-canvas');
+  canvas.innerHTML='';
+  drawnCards.forEach((draw,i)=>{
+    addLayoutCard(draw.card.symbol, draw.position, draw.reversed);
+  });
+  buildJournalCards(drawnCards);
+  currentReadingForJournal = drawnCards;
+}
+
+// ══════════════════════════════════════════════════════
+// JOURNAL
+// ══════════════════════════════════════════════════════
+let journalEntries = [];
+let currentJournalId = null;
+
+function newJournalEntry() {
+  currentJournalId = 'j'+Date.now();
+  clearJournalForm();
+  const today = new Date();
+  document.getElementById('j-date').value = today.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  applyPreset('three');
+}
+
+function clearJournalForm() {
+  ['j-date','j-spread','j-question','j-reflections','j-mood','j-remember'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('layout-canvas').innerHTML='';
+  document.getElementById('journal-cards').innerHTML='';
+  currentReadingForJournal=null;
+}
+
+const PRESETS = {
+  single:[{label:'Your Card'}],
+  three:[{label:'Past'},{label:'Present'},{label:'Future'}],
+  five:[{label:'Foundation'},{label:'Challenge'},{label:'You Now'},{label:'Guidance'},{label:'Outcome'}],
+  horseshoe:[{label:'Past'},{label:'Present'},{label:'Hidden Influences'},{label:'Obstacles'},{label:'External Influences'},{label:'Hope'},{label:'Outcome'}],
+};
+
+function applyPreset(name) {
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(name)||name==='custom'&&b.textContent.includes('Custom')));
+  const canvas = document.getElementById('layout-canvas');
+  canvas.innerHTML='';
+  if(name==='custom'){
+    addLayoutAddBtn();
+  } else {
+    (PRESETS[name]||[]).forEach(p=>addLayoutCard('🌙',p.label,false));
+    addLayoutAddBtn();
+  }
+  buildJournalCardsFromLayout();
+}
+
+function addLayoutCard(symbol='🌙', label='Position', reversed=false) {
+  const canvas = document.getElementById('layout-canvas');
+  const addBtn = canvas.querySelector('.layout-add');
+  const slot = document.createElement('div');
+  slot.className='layout-card-slot';
+  slot.innerHTML=`
+    <div class="layout-mini-card${reversed?' reversed-mini':''}" onclick="toggleReversedLayout(this)" title="Click to toggle reversed">
+      <span style="font-size:18px;pointer-events:none;">${symbol}</span>
+    </div>
+    <input type="text" value="${label}" style="background:transparent;border:none;border-bottom:1px solid rgba(232,200,122,0.2);color:var(--text-muted);font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:1px;text-align:center;width:70px;outline:none;margin-top:2px;" onchange="buildJournalCardsFromLayout()">`;
+  if(addBtn) canvas.insertBefore(slot,addBtn);
+  else canvas.appendChild(slot);
+  slot.querySelector('input').addEventListener('input',buildJournalCardsFromLayout);
+}
+
+function addLayoutAddBtn() {
+  const canvas = document.getElementById('layout-canvas');
+  const btn = document.createElement('div');
+  btn.className='layout-add';
+  btn.innerHTML='+';
+  btn.onclick=()=>{ addLayoutCard('🌙','Card'); buildJournalCardsFromLayout(); };
+  canvas.appendChild(btn);
+}
+
+function toggleReversedLayout(el) {
+  el.classList.toggle('reversed-mini');
+  buildJournalCardsFromLayout();
+}
+
+function buildJournalCards(drawnArr) {
+  const container = document.getElementById('journal-cards');
+  container.innerHTML='';
+  drawnArr.forEach(draw=>{
+    addJournalCardEntry(draw.card.symbol, draw.card.name+(draw.reversed?' (Reversed)':''), draw.position);
+  });
+}
+
+function buildJournalCardsFromLayout() {
+  const slots = document.querySelectorAll('#layout-canvas .layout-card-slot');
+  const container = document.getElementById('journal-cards');
+  const existing = [...container.querySelectorAll('.jcard-entry')];
+  while(container.children.length > slots.length) container.removeChild(container.lastChild);
+  slots.forEach((slot,i)=>{
+    const label = slot.querySelector('input')?.value || `Card ${i+1}`;
+    if(i<container.children.length) {
+      container.children[i].querySelector('.jcard-pos').textContent=label;
+    } else {
+      addJournalCardEntry('🌙','Card name',label);
+    }
+  });
+}
+
+function addJournalCardEntry(symbol, name, position) {
+  const container = document.getElementById('journal-cards');
+  const entry = document.createElement('div');
+  entry.className='jcard-entry';
+  entry.innerHTML=`
+    <div class="jcard-thumb">${symbol}</div>
+    <div class="jcard-body">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px;">
+        <input style="background:transparent;border:none;border-bottom:1px solid rgba(232,200,122,0.2);color:var(--moon-gold);font-family:'Cinzel',serif;font-size:12px;outline:none;flex:1;" value="${name}" placeholder="Card name...">
+      </div>
+      <div class="jcard-pos" style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--text-muted);margin-bottom:8px;">${position}</div>
+      <textarea style="width:100%;background:transparent;border:none;border-bottom:1px solid rgba(232,200,122,0.1);color:var(--text-soft);font-family:'EB Garamond',serif;font-style:italic;font-size:15px;outline:none;resize:none;min-height:50px;line-height:1.7;" placeholder="What did this card mean to you in this position?"></textarea>
+    </div>`;
+  entry.querySelectorAll('input,textarea').forEach(el=>el.addEventListener('input',schedSave));
+  container.appendChild(entry);
+}
+
+function saveJournalEntry() {
+  if(!currentJournalId) currentJournalId='j'+Date.now();
+  const cards = [...document.querySelectorAll('.jcard-entry')].map(e=>({
+    name: e.querySelector('input').value,
+    position: e.querySelector('.jcard-pos').textContent,
+    note: e.querySelector('textarea').value,
+  }));
+  const entry = {
+    id: currentJournalId,
+    date: document.getElementById('j-date').value,
+    spread: document.getElementById('j-spread').value,
+    question: document.getElementById('j-question').value,
+    cards,
+    reflections: document.getElementById('j-reflections').value,
+    mood: document.getElementById('j-mood').value,
+    remember: document.getElementById('j-remember').value,
+    savedAt: new Date().toISOString(),
+  };
+  const idx = journalEntries.findIndex(e=>e.id===currentJournalId);
+  if(idx>-1) journalEntries[idx]=entry; else journalEntries.unshift(entry);
+  localStorage.setItem('tarot_journal',JSON.stringify(journalEntries));
+  flashSaved(); renderJournalList();
+}
+
+let saveTimer=null;
+function schedSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveJournalEntry,1000);}
+document.querySelectorAll('#section-journal textarea, #section-journal input[type=text]').forEach(el=>el.addEventListener('input',schedSave));
+
+function flashSaved(){
+  const el=document.getElementById('save-indicator');
+  el.classList.add('visible');
+  setTimeout(()=>el.classList.remove('visible'),1800);
+}
+
+function renderJournalList(){
+  const list=document.getElementById('jlist-items');
+  if(!journalEntries.length){list.innerHTML='<div class="jlist-empty">Your readings will appear here.<br>🌙</div>';return;}
+  list.innerHTML='';
+  journalEntries.forEach(e=>{
+    const item=document.createElement('div');
+    item.className='jlist-item'+(e.id===currentJournalId?' active':'');
+    item.innerHTML=`<div class="jlist-date">${e.date||'Undated'}</div><div class="jlist-spread">${e.spread||'No spread'} · ${e.question?e.question.substring(0,30)+'...':'No question'}</div>`;
+    item.addEventListener('click',()=>loadJournalEntry(e.id));
+    list.appendChild(item);
+  });
+}
+
+function loadJournalEntry(id){
+  const e=journalEntries.find(x=>x.id===id);
+  if(!e) return;
+  currentJournalId=id;
+  document.getElementById('j-date').value=e.date||'';
+  document.getElementById('j-spread').value=e.spread||'';
+  document.getElementById('j-question').value=e.question||'';
+  document.getElementById('j-reflections').value=e.reflections||'';
+  document.getElementById('j-mood').value=e.mood||'';
+  document.getElementById('j-remember').value=e.remember||'';
+  const canvas=document.getElementById('layout-canvas');
+  canvas.innerHTML='';
+  const jcards=document.getElementById('journal-cards');
+  jcards.innerHTML='';
+  (e.cards||[]).forEach(c=>{
+    addLayoutCard('🌙',c.position,false);
+    addJournalCardEntry('🌙',c.name,c.position);
+    const lastTA=jcards.lastElementChild?.querySelector('textarea');
+    if(lastTA) lastTA.value=c.note||'';
+  });
+  addLayoutAddBtn();
+  renderJournalList();
+}
+
+// ══════════════════════════════════════════════════════
+// REFERENCE
+// ══════════════════════════════════════════════════════
+const SUITE_COLORS={major:'bg:linear-gradient(135deg,rgba(155,106,191,0.3),rgba(104,136,204,0.2))',wands:'bg:linear-gradient(135deg,rgba(200,100,60,0.25),rgba(200,140,60,0.2))',cups:'bg:linear-gradient(135deg,rgba(60,100,200,0.25),rgba(104,136,204,0.2))',swords:'bg:linear-gradient(135deg,rgba(180,180,220,0.2),rgba(104,136,204,0.15))',pentacles:'bg:linear-gradient(135deg,rgba(80,160,80,0.25),rgba(150,180,60,0.2))'};
+const SUITE_TAG_STYLES={major:'background:rgba(155,106,191,0.2);color:#c4a8d8;border:1px solid rgba(155,106,191,0.3)',wands:'background:rgba(200,100,60,0.2);color:#e8a880;border:1px solid rgba(200,120,60,0.3)',cups:'background:rgba(60,100,200,0.2);color:#88b0e8;border:1px solid rgba(60,120,200,0.3)',swords:'background:rgba(180,180,220,0.15);color:#c0c8e8;border:1px solid rgba(160,170,220,0.3)',pentacles:'background:rgba(80,160,80,0.2);color:#a0d090;border:1px solid rgba(80,160,80,0.3)'};
+const SUITE_LABELS={major:'Major Arcana',wands:'Suit of Wands',cups:'Suit of Cups',swords:'Suit of Swords',pentacles:'Suit of Pentacles'};
+
+function buildRef(filter='all'){
+  const grid=document.getElementById('ref-grid');
+  grid.innerHTML='';
+  const cards=TAROT.filter(c=>filter==='all'||c.suite===filter);
+  cards.forEach((card,i)=>{
+    const el=document.createElement('div');
+    el.className='ref-card'; el.dataset.suite=card.suite;
+    el.style.animationDelay=(i*0.03)+'s';
+    el.innerHTML=`
+      <div class="ref-card-art" style="${SUITE_COLORS[card.suite]||''}"><span style="font-size:32px;position:relative;z-index:1;">${card.symbol}</span></div>
+      <div class="ref-card-body">
+        <div class="ref-card-name">${card.name}</div>
+        <div class="ref-card-suite">${SUITE_LABELS[card.suite]||''}</div>
+      </div>`;
+    el.addEventListener('click',()=>openRefModal(card));
+    grid.appendChild(el);
+  });
+}
+
+function filterRef(filter,btn){
+  document.querySelectorAll('.ref-filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); buildRef(filter);
+}
+
+function openRefModal(card){
+  document.getElementById('modal-art').textContent=card.symbol;
+  document.getElementById('modal-art').style=card.art||'';
+  document.getElementById('modal-name').textContent=card.name;
+  document.getElementById('modal-suite-tag').textContent=`${SUITE_LABELS[card.suite]} · ${card.num}`;
+  document.getElementById('modal-suite-tag').style=SUITE_TAG_STYLES[card.suite]||'';
+  document.getElementById('modal-number').textContent='';
+  document.getElementById('modal-keywords-up').innerHTML=card.upright.map(k=>`<span class="keyword">${k}</span>`).join('');
+  document.getElementById('modal-meaning-up').textContent=card.meaning_up;
+  document.getElementById('modal-keywords-rev').innerHTML=card.reversed.map(k=>`<span class="keyword" style="background:rgba(201,122,170,0.1);border-color:rgba(201,122,170,0.25);color:#e8aad0;">${k}</span>`).join('');
+  document.getElementById('modal-meaning-rev').textContent=card.meaning_rev;
+  document.getElementById('modal-symbols').textContent=card.symbols;
+  document.getElementById('ref-modal-overlay').classList.add('open');
+}
+
+function closeRefModal(e){
+  if(!e||e.target===document.getElementById('ref-modal-overlay'))
+    document.getElementById('ref-modal-overlay').classList.remove('open');
+}
+
+// ══════════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ══════════════════════════════════════════════════════
+function exportData(){
+  const data={tarot_journal:localStorage.getItem('tarot_journal')||'[]'};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='tarot-journal-backup-'+new Date().toISOString().split('T')[0]+'.json';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+function importData(event){
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(data.tarot_journal){localStorage.setItem('tarot_journal',data.tarot_journal);loadJournalData();alert('Journal imported successfully 🌙');}
+    }catch(err){alert('Something went wrong reading that file.');}
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+// ══════════════════════════════════════════════════════
+// SECTION NAVIGATION
+// ══════════════════════════════════════════════════════
+function showSection(name, btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-pill').forEach(b=>b.classList.remove('active'));
+  document.getElementById('section-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+function loadJournalData(){
+  try{ journalEntries=JSON.parse(localStorage.getItem('tarot_journal')||'[]'); }catch(e){ journalEntries=[]; }
+  renderJournalList();
+  if(journalEntries.length) loadJournalEntry(journalEntries[0].id);
+  else newJournalEntry();
+}
+
+buildRef('all');
+loadJournalData();
+applyPreset('three');
+</script>
+</body>
+</html>

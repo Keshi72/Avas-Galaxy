@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌿 Ava's Roadmap · 2026–2027</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --void:#07070f; --deep:#0e0e1f; --navy:#131328;
+  --gold:#e8c87a; --gold-dim:rgba(232,200,122,0.25); --gold-pale:rgba(232,200,122,0.08);
+  --sage:#6a9070; --sage-light:#9abea2; --sage-pale:rgba(154,190,162,0.1);
+  --rose:#c97a9a; --rose-light:#e8b8d0; --rose-pale:rgba(201,122,154,0.1);
+  --plum:#9b6abf; --plum-light:#c4a8d8; --plum-pale:rgba(155,106,191,0.1);
+  --blue:#6888cc; --blue-light:#a8b8e8; --blue-pale:rgba(104,136,204,0.1);
+  --amber:#c87a20; --amber-light:#e8a840;
+  --text:#f0eaf8; --text-soft:#b0a8d0; --text-muted:#6a6480;
+  --border:rgba(255,255,255,0.08); --border-gold:rgba(232,200,122,0.2);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--void);font-family:'Nunito',sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ── STARS ── */
+#star-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.nebula{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;}
+.nb1{width:700px;height:500px;background:radial-gradient(ellipse,rgba(155,106,191,0.14) 0%,transparent 70%);top:-150px;left:-200px;}
+.nb2{width:500px;height:600px;background:radial-gradient(ellipse,rgba(104,144,112,0.08) 0%,transparent 70%);bottom:0;right:-100px;}
+
+/* ── TOPBAR ── */
+#topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:rgba(7,7,15,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-gold);}
+.tb-logo{font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:var(--gold);text-decoration:none;letter-spacing:1px;}
+.tb-nav{display:flex;gap:6px;flex-wrap:wrap;}
+.tb-link{background:transparent;border:1px solid var(--border);border-radius:16px;padding:5px 12px;font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;text-decoration:none;white-space:nowrap;}
+.tb-link:hover,.tb-link.active{background:var(--gold-pale);border-color:var(--gold-dim);color:var(--gold);}
+
+/* ── HERO ── */
+.hero{position:relative;z-index:1;text-align:center;padding:60px 32px 50px;}
+.hero-eyebrow{font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);opacity:0.7;display:block;margin-bottom:14px;}
+.hero-title{font-family:'Cinzel',serif;font-size:clamp(28px,5vw,52px);font-weight:600;background:linear-gradient(135deg,#f0eaf8 0%,var(--gold) 50%,var(--plum-light) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;margin-bottom:16px;}
+.hero-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--text-muted);max-width:600px;margin:0 auto 30px;line-height:1.7;}
+.hero-divider{display:flex;align-items:center;justify-content:center;gap:16px;opacity:0.4;}
+.hero-divider::before,.hero-divider::after{content:'';width:80px;height:1px;background:linear-gradient(to right,transparent,var(--gold));}
+.hero-divider::after{background:linear-gradient(to left,transparent,var(--gold));}
+
+/* ── PHASE STRIP ── */
+.phase-strip{position:relative;z-index:1;display:flex;overflow-x:auto;gap:0;padding:0 32px 0;scrollbar-width:none;-ms-overflow-style:none;}
+.phase-strip::-webkit-scrollbar{display:none;}
+.phase-node{display:flex;flex-direction:column;align-items:center;min-width:100px;cursor:pointer;transition:all 0.2s;}
+.phase-node:hover .phase-dot{transform:scale(1.2);}
+.phase-line{flex:1;height:2px;background:linear-gradient(to right,var(--gold-dim),var(--border));margin-top:14px;min-width:40px;}
+.phase-dot{width:28px;height:28px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:13px;transition:transform 0.2s;margin-bottom:6px;flex-shrink:0;}
+.phase-lbl{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;color:var(--text-muted);text-align:center;white-space:nowrap;}
+.phase-month{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;color:var(--text-muted);margin-top:2px;}
+
+/* ── MAIN CONTENT ── */
+.content{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:40px 32px 120px;}
+
+/* ── SECTION HEADER ── */
+.section-header{display:flex;align-items:flex-start;gap:20px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border-gold);}
+.section-month-badge{flex-shrink:0;text-align:center;background:var(--gold-pale);border:1px solid var(--gold-dim);border-radius:10px;padding:10px 14px;min-width:80px;}
+.badge-month{font-family:'Cinzel',serif;font-size:18px;font-weight:600;color:var(--gold);display:block;}
+.badge-year{font-family:'Cormorant Garamond',serif;font-size:12px;color:var(--text-muted);display:block;}
+.section-title-wrap{}
+.section-theme{font-family:'Cinzel',serif;font-size:22px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.section-tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--text-muted);line-height:1.6;}
+.section-mantra{display:inline-block;margin-top:8px;padding:4px 14px;border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:1px;}
+
+/* ── FOCUS CARDS ── */
+.focus-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+.focus-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:16px;border-top:3px solid transparent;transition:all 0.2s;}
+.focus-card:hover{background:rgba(255,255,255,0.05);}
+.focus-card.sage{border-top-color:var(--sage);}
+.focus-card.gold{border-top-color:var(--gold);}
+.focus-card.rose{border-top-color:var(--rose);}
+.focus-card.plum{border-top-color:var(--plum);}
+.focus-card.blue{border-top-color:var(--blue);}
+.focus-card.amber{border-top-color:var(--amber);}
+.focus-icon{font-size:20px;margin-bottom:8px;display:block;}
+.focus-title{font-family:'Playfair Display',serif;font-size:14px;color:var(--text-soft);margin-bottom:6px;}
+.focus-tasks{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.focus-tasks li{font-family:'Nunito',sans-serif;font-size:13px;color:var(--text-muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+.focus-tasks li::before{content:'◦';color:var(--text-muted);flex-shrink:0;margin-top:1px;}
+.focus-tasks li.urgent::before{content:'●';color:var(--rose);}
+.focus-tasks li.key::before{content:'★';color:var(--gold);}
+
+/* ── WEEKLY BREAKDOWN ── */
+.week-section{margin-bottom:20px;}
+.week-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;cursor:pointer;}
+.week-badge{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;padding:4px 12px;border-radius:16px;background:var(--gold-pale);border:1px solid var(--gold-dim);color:var(--gold);}
+.week-theme{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);}
+.week-tasks{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.week-task{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:13px;color:var(--text-muted);line-height:1.5;cursor:pointer;transition:all 0.15s;user-select:none;}
+.week-task:hover{background:rgba(255,255,255,0.05);}
+.week-task.done{opacity:0.4;}
+.week-task.done .task-check{background:var(--sage);border-color:var(--sage);}
+.task-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;transition:all 0.15s;display:flex;align-items:center;justify-content:center;}
+.week-task.done .task-check::after{content:'✓';font-size:10px;color:white;}
+.task-cat{font-size:10px;padding:2px 7px;border-radius:10px;font-family:'Cormorant Garamond',serif;letter-spacing:1px;margin-left:auto;flex-shrink:0;align-self:center;}
+.cat-school{background:rgba(104,136,204,0.15);color:var(--blue-light);}
+.cat-money{background:rgba(232,200,122,0.12);color:var(--gold);}
+.cat-health{background:rgba(154,190,162,0.12);color:var(--sage-light);}
+.cat-admin{background:rgba(201,122,154,0.12);color:var(--rose-light);}
+.cat-life{background:rgba(155,106,191,0.12);color:var(--plum-light);}
+
+/* ── DAILY TEMPLATE ── */
+.daily-template{background:rgba(255,255,255,0.02);border:1px solid var(--border-gold);border-radius:12px;padding:20px 24px;margin-bottom:24px;}
+.daily-title{font-family:'Cinzel',serif;font-size:13px;letter-spacing:2px;color:var(--gold);opacity:0.8;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.daily-title::after{content:'';flex:1;height:1px;background:var(--border-gold);}
+.time-block{display:flex;align-items:flex-start;gap:14px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.time-block:last-child{border-bottom:none;}
+.time-label{font-family:'Cinzel',serif;font-size:11px;color:var(--text-muted);width:60px;flex-shrink:0;padding-top:2px;letter-spacing:0.5px;}
+.time-bar{width:3px;border-radius:4px;flex-shrink:0;align-self:stretch;min-height:16px;}
+.time-content{flex:1;}
+.time-task{font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;color:var(--text-soft);margin-bottom:3px;}
+.time-note{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--text-muted);line-height:1.6;}
+
+/* ── MILESTONE BANNER ── */
+.milestone{display:flex;align-items:center;gap:16px;background:rgba(232,200,122,0.06);border:1px solid var(--gold-dim);border-radius:10px;padding:14px 18px;margin:16px 0;}
+.milestone-icon{font-size:24px;flex-shrink:0;}
+.milestone-text{flex:1;}
+.milestone-label{font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;color:var(--gold);display:block;margin-bottom:2px;}
+.milestone-desc{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-soft);}
+
+/* ── AUDHD NOTES ── */
+.audhd-box{background:rgba(155,106,191,0.06);border:1px solid rgba(155,106,191,0.2);border-radius:10px;padding:14px 18px;margin:16px 0;}
+.audhd-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--plum-light);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.audhd-text{font-family:'Nunito',sans-serif;font-size:13px;color:var(--text-muted);line-height:1.7;}
+
+/* ── MONTH DIVIDER ── */
+.month-divider{position:relative;z-index:1;display:flex;align-items:center;gap:20px;padding:40px 32px 0;max-width:1080px;margin:0 auto;}
+.month-divider-line{flex:1;height:1px;background:linear-gradient(to right,transparent,var(--border-gold),transparent);}
+.month-divider-label{font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:var(--text-muted);}
+
+/* ── GOALS OVERVIEW ── */
+.goals-sidebar{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.goals-sidebar-title{font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;color:var(--gold);opacity:0.7;margin-bottom:14px;}
+.goal-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.goal-item:last-child{border-bottom:none;}
+.goal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.goal-name{font-family:'Nunito',sans-serif;font-size:13px;color:var(--text-muted);flex:1;}
+.goal-status{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:1px;padding:2px 8px;border-radius:10px;}
+.status-now{background:rgba(232,200,122,0.12);color:var(--gold);}
+.status-building{background:rgba(154,190,162,0.12);color:var(--sage-light);}
+.status-soon{background:rgba(201,122,154,0.12);color:var(--rose-light);}
+.status-done{background:rgba(154,190,162,0.15);color:var(--sage-light);}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(232,200,122,0.2);border-radius:4px}
+@media(max-width:700px){.focus-grid{grid-template-columns:1fr}.week-tasks{grid-template-columns:1fr}.content{padding:20px 16px 80px}.tb-nav{display:none}}
+</style>
+</head>
+<body>
+
+<canvas id="star-canvas"></canvas>
+<div class="nebula nb1"></div>
+<div class="nebula nb2"></div>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <a class="tb-logo" href="index.html">✦ Ava's Galaxy</a>
+  <nav class="tb-nav">
+    <a class="tb-link" href="#may">May</a>
+    <a class="tb-link" href="#jun">Jun</a>
+    <a class="tb-link" href="#jul">Jul</a>
+    <a class="tb-link" href="#aug">Aug</a>
+    <a class="tb-link" href="#sep">Sep</a>
+    <a class="tb-link" href="#oct">Oct</a>
+    <a class="tb-link" href="#nov">Nov</a>
+    <a class="tb-link" href="#dec">Dec</a>
+    <a class="tb-link" href="#jan">Jan</a>
+    <a class="tb-link" href="#feb">Feb</a>
+    <a class="tb-link" href="#mar">Mar</a>
+    <a class="tb-link" href="#apr">Apr</a>
+    <a class="tb-link" href="#daily">Daily Schedule</a>
+  </nav>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-eyebrow">May 2026 — April 2027</span>
+  <h1 class="hero-title">Ava's Roadmap</h1>
+  <p class="hero-sub">Every big life change is just a series of small days. This is your map. You don't have to do everything at once — you just have to do today.</p>
+  <div class="hero-divider">✦</div>
+</div>
+
+<!-- GOALS OVERVIEW -->
+<div class="content" style="padding-bottom:0;">
+  <div class="goals-sidebar" style="margin-bottom:30px;">
+    <div class="goals-sidebar-title">Your Year in Goals</div>
+    <div class="goal-item"><div class="goal-dot" style="background:var(--blue)"></div><span class="goal-name">Study & prepare for Temple College Rad Tech</span><span class="goal-status status-now">Priority Now</span></div>
+    <div class="goal-item"><div class="goal-dot" style="background:var(--blue)"></div><span class="goal-name">Apply to Temple College Rad Tech (Fall 2026 start)</span><span class="goal-status status-now">This Summer</span></div>
+    <div class="goal-item"><div class="goal-dot" style="background:var(--rose)"></div><span class="goal-name">Get birth certificate → driver's license → car</span><span class="goal-status status-now">Start Now</span></div>
+    <div class="goal-item"><div class="goal-dot" style="background:var(--amber)"></div><span class="goal-name">Find a better / new job</span><span class="goal-status status-now">Ongoing</span></div>
+    <div class="goal-item"><div class="goal-dot" style="background:var(--gold)"></div><span class="goal-name">Pay off / manage student loans</span><span class="goal-status status-building">Ongoing</span></div>
+    <div class="goal-item"><div class="goal-dot" style="background:var(--gold)"></div><span class="goal-name">Build functional savings account</span><span class="goal-status status-building">Building</span></div>
+    <div class="goal-item"><div class="goal-dot" style="background:var(--amber)"></div><span class="goal-name">Fix credit score to 650+</span><span class="goal-status status-building">Building</span></div>
+    <div class="goal-item"><div class="goal-dot" style="background:var(--rose)"></div><span class="goal-name">Dentist appointment</span><span class="goal-status status-soon">This Month</span></div>
+    <div class="goal-item"><div class="goal-dot" style="background:var(--sage)"></div><span class="goal-name">Work out consistently — sustainable movement</span><span class="goal-status status-building">Daily Habit</span></div>
+    <div class="goal-item"><div class="goal-dot" style="background:var(--sage)"></div><span class="goal-name">Self-care routine — skin, body, grooming</span><span class="goal-status status-building">Daily Habit</span></div>
+    <div class="goal-item"><div class="goal-dot" style="background:var(--sage)"></div><span class="goal-name">Keep a clean, functional living space</span><span class="goal-status status-building">Weekly Habit</span></div>
+    <div class="goal-item"><div class="goal-dot" style="background:var(--plum)"></div><span class="goal-name">Protect focus — no overstimulation spirals</span><span class="goal-status status-building">Daily Practice</span></div>
+  </div>
+
+  <!-- AUDHD GROUND RULES -->
+  <div class="audhd-box">
+    <div class="audhd-title">🧠 AUDHD Ground Rules — Read These First</div>
+    <div class="audhd-text">
+      <strong style="color:var(--plum-light);">One thing at a time.</strong> This planner has a lot in it. That doesn't mean you do it all at once. Pick ONE focus for today and do that. Everything else waits.<br><br>
+      <strong style="color:var(--plum-light);">Done is better than perfect.</strong> A 20-minute study session that actually happened beats a 2-hour one you planned but didn't. Lower the bar. Show up. That's it.<br><br>
+      <strong style="color:var(--plum-light);">When you spiral, use the Three Question Reset:</strong> What am I actually trying to do right now? What's the smallest possible step? Can I do just that one thing?<br><br>
+      <strong style="color:var(--plum-light);">Stimulation budget.</strong> You get a finite amount of focus per day. Protect mornings. Don't open social media before you've done one goal task. The scroll can wait.<br><br>
+      <strong style="color:var(--plum-light);">Progress is not linear.</strong> A bad week doesn't erase a good month. Keep going.
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ -->
+<!-- MAY 2026 -->
+<!-- ════════════════════════════════ -->
+<div class="month-divider"><div class="month-divider-line"></div><span class="month-divider-label">MAY 2026</span><div class="month-divider-line"></div></div>
+<div class="content" id="may">
+  <div class="section-header">
+    <div class="section-month-badge"><span class="badge-month">MAY</span><span class="badge-year">2026</span></div>
+    <div class="section-title-wrap">
+      <div class="section-theme">The Foundation Month</div>
+      <div class="section-tagline">You are laying the groundwork for everything. Nothing you do this month is small — it's all load-bearing. Get the paperwork moving, see the dentist, start the math, start moving.</div>
+      <span class="section-mantra" style="background:rgba(104,136,204,0.1);color:var(--blue-light);">"Start before you're ready."</span>
+    </div>
+  </div>
+
+  <div class="milestone">
+    <span class="milestone-icon">🦷</span>
+    <div class="milestone-text">
+      <span class="milestone-label">First Week Priority</span>
+      <span class="milestone-desc">Book the dentist appointment this week — not next week, this week. One phone call. That's it.</span>
+    </div>
+  </div>
+
+  <div class="milestone">
+    <span class="milestone-icon">📄</span>
+    <div class="milestone-text">
+      <span class="milestone-label">Birth Certificate — Start Immediately</span>
+      <span class="milestone-desc">Order your birth certificate online through Texas DSHS (VitalChek.com) or in person at the vital records office. Cost is around $22. This unlocks your license, which unlocks your car, which unlocks your life. Do not let this sit.</span>
+    </div>
+  </div>
+
+  <div class="focus-grid">
+    <div class="focus-card blue">
+      <span class="focus-icon">📚</span>
+      <div class="focus-title">School Prep</div>
+      <ul class="focus-tasks">
+        <li class="key">Email Temple College Rad Tech office — introduce yourself, ask about info sessions</li>
+        <li>Start Khan Academy: Arithmetic → Decimals → Percentages → Fractions</li>
+        <li>30 min study minimum, 5 days a week — same time every day</li>
+        <li>Watch 1 "day in the life of a rad tech" video per week</li>
+      </ul>
+    </div>
+    <div class="focus-card rose">
+      <span class="focus-icon">📋</span>
+      <div class="focus-title">Documents & Admin</div>
+      <ul class="focus-tasks">
+        <li class="urgent">Order birth certificate — VitalChek.com — Week 1</li>
+        <li>Gather SSN card (or know where it is)</li>
+        <li>Book dentist appointment — don't reschedule it</li>
+        <li>Pull credit report — AnnualCreditReport.com (free)</li>
+      </ul>
+    </div>
+    <div class="focus-card amber">
+      <span class="focus-icon">💰</span>
+      <div class="focus-title">Money</div>
+      <ul class="focus-tasks">
+        <li class="key">Log into studentaid.gov — check loan balances and status</li>
+        <li>Set up a separate savings account if you don't have one</li>
+        <li>Set a savings goal: even $5/week is a habit being built</li>
+        <li>Check credit score — Credit Karma is free</li>
+      </ul>
+    </div>
+    <div class="focus-card sage">
+      <span class="focus-icon">🌿</span>
+      <div class="focus-title">Health & Body</div>
+      <ul class="focus-tasks">
+        <li>Walk 15–20 minutes, 4 days a week — doesn't have to be more</li>
+        <li>Drink water before coffee every morning</li>
+        <li>Cook at home at least 5 nights — use The Kitchen planner</li>
+        <li>Sleep 7+ hours — this is non-negotiable for AUDHD</li>
+      </ul>
+    </div>
+    <div class="focus-card plum">
+      <span class="focus-icon">🧠</span>
+      <div class="focus-title">Mind & Focus</div>
+      <ul class="focus-tasks">
+        <li>No phone for first 30 minutes of the day</li>
+        <li>Use the habit tracker — just 3 habits to start</li>
+        <li>Write in The Diary at least 3x this week</li>
+        <li>When you feel overwhelmed: step outside for 5 minutes</li>
+      </ul>
+    </div>
+    <div class="focus-card gold">
+      <span class="focus-icon">⭐</span>
+      <div class="focus-title">May Wins To Celebrate</div>
+      <ul class="focus-tasks">
+        <li>Birth certificate ordered ✓</li>
+        <li>Dentist booked ✓</li>
+        <li>Khan Academy started ✓</li>
+        <li>Credit score checked ✓</li>
+        <li>Job applications started ✓</li>
+        <li>Walked at least 3 times ✓</li>
+      </ul>
+    </div>
+    <div class="focus-card amber">
+      <span class="focus-icon">💼</span>
+      <div class="focus-title">Job Search</div>
+      <ul class="focus-tasks">
+        <li class="key">Update your resume this week — even a rough version</li>
+        <li>Apply to 3–5 jobs this month — quality over quantity</li>
+        <li>Look for healthcare-adjacent roles (clinic receptionist, CNA, hospital admin)</li>
+        <li>Use Indeed, LinkedIn, and local hospital career pages</li>
+        <li>Follow up on any applications after one week</li>
+      </ul>
+    </div>
+    <div class="focus-card rose">
+      <span class="focus-icon">🪥</span>
+      <div class="focus-title">Self-Care & Cleaning</div>
+      <ul class="focus-tasks">
+        <li>Morning routine: face, teeth, body — every single day</li>
+        <li>Pick one cleaning task per day — not the whole house at once</li>
+        <li>Sunday reset: tidy, laundry, prep for the week</li>
+        <li>Your space affects your focus. A clear space = a clearer head.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="daily-template" style="margin-bottom:24px;">
+    <div class="daily-title">Weekly Self-Care & Cleaning Checklist — Every Week</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Morning routine completed every day this week</span><span class="task-cat cat-health">daily</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Shower / bath — at least every other day</span><span class="task-cat cat-health">daily</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Skincare morning & night</span><span class="task-cat cat-health">daily</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Laundry done and put away</span><span class="task-cat cat-life">weekly</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Kitchen cleaned — dishes, counters, bin</span><span class="task-cat cat-life">weekly</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Bathroom wiped down</span><span class="task-cat cat-life">weekly</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Living space tidied — floor clear, surfaces clear</span><span class="task-cat cat-life">weekly</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Bed made every morning (takes 2 minutes)</span><span class="task-cat cat-life">daily</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Nails + hair taken care of</span><span class="task-cat cat-health">weekly</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Trash taken out before it overflows</span><span class="task-cat cat-life">weekly</span></div>
+    </div>
+  </div>
+
+  <div class="audhd-box" style="margin-bottom:24px;">
+    <div class="audhd-title">🧹 AUDHD + Cleaning — The Only System That Works</div>
+    <div class="audhd-text">
+      Don't clean the whole house. Pick <strong style="color:var(--plum-light);">one room, one task</strong> per day. Monday: kitchen. Tuesday: bathroom. Wednesday: bedroom. Thursday: living space. Friday: laundry. That's it. Five small tasks. Never a mountain.<br><br>
+      <strong style="color:var(--plum-light);">The 2-minute rule:</strong> If it takes less than 2 minutes, do it immediately. Don't put it down, put it away.<br><br>
+      <strong style="color:var(--plum-light);">Sunday reset (20 minutes):</strong> Quick tidy of all rooms, prep meals, lay out clothes for the week. This one habit changes how Monday feels.
+    </div>
+  </div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-header"><span class="week-badge">Week 1 · May 1–7</span><span class="week-theme">Start the hardest things first</span></div>
+    <div class="week-tasks">
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Order birth certificate on VitalChek.com</span><span class="task-cat cat-admin">admin</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Call dentist and book appointment</span><span class="task-cat cat-health">health</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Email Temple College Rad Tech office</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Create Khan Academy account — start decimals</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Update resume — even a rough draft is fine</span><span class="task-cat cat-admin">admin</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Apply to 2 jobs this week</span><span class="task-cat cat-admin">admin</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Check credit score on Credit Karma</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Log into studentaid.gov — note loan balances</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Walk 3 times this week — any length counts</span><span class="task-cat cat-health">health</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Morning routine every day — face, teeth, body</span><span class="task-cat cat-health">health</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Sunday reset — tidy, laundry, prep for week ahead</span><span class="task-cat cat-life">life</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Set up 3 habits in The Garden Calendar</span><span class="task-cat cat-life">life</span></div>
+    </div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-header"><span class="week-badge">Week 2 · May 8–14</span><span class="week-theme">Build the rhythm</span></div>
+    <div class="week-tasks">
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Khan Academy: 30 min daily — fractions & percentages</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Attend dentist appointment</span><span class="task-cat cat-health">health</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Open a savings account if you haven't yet</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Pull full credit report — note what needs fixing</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Walk 4 times this week</span><span class="task-cat cat-health">health</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Cook at home 5 nights — use meal planner</span><span class="task-cat cat-health">health</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>No phone first 30 min of day — every day this week</span><span class="task-cat cat-life">life</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Write in diary 3x — just 5 minutes is enough</span><span class="task-cat cat-life">life</span></div>
+    </div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-header"><span class="week-badge">Week 3–4 · May 15–31</span><span class="week-theme">Keep going — this is where most people stop</span></div>
+    <div class="week-tasks">
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Birth certificate should arrive — store it safely</span><span class="task-cat cat-admin">admin</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Research TX ID requirements for driver's license</span><span class="task-cat cat-admin">admin</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Continue Khan Academy daily — intro to variables</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Dispute any incorrect items on credit report</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Set up automatic savings transfer — even $10/week</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Walk consistently 4x/week — same time each day</span><span class="task-cat cat-health">health</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Check Temple College website for application updates</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>End of month: write what you're proud of in The Diary</span><span class="task-cat cat-life">life</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ -->
+<!-- JUNE 2026 -->
+<!-- ════════════════════════════════ -->
+<div class="month-divider"><div class="month-divider-line"></div><span class="month-divider-label">JUNE 2026</span><div class="month-divider-line"></div></div>
+<div class="content" id="jun">
+  <div class="section-header">
+    <div class="section-month-badge"><span class="badge-month">JUN</span><span class="badge-year">2026</span></div>
+    <div class="section-title-wrap">
+      <div class="section-theme">The Driver's Seat</div>
+      <div class="section-tagline">Birth certificate is here. License is the next unlocking move. School applications may open this month — watch the Temple website. Study is getting real now.</div>
+      <span class="section-mantra" style="background:rgba(201,122,154,0.1);color:var(--rose-light);">"The license is the key to everything else."</span>
+    </div>
+  </div>
+
+  <div class="milestone">
+    <span class="milestone-icon">🪪</span>
+    <div class="milestone-text">
+      <span class="milestone-label">June Mission: Driver's License</span>
+      <span class="milestone-desc">Book your DPS appointment at the Temple TX DPS office. Bring: birth certificate, SSN, proof of TX residency (two documents — utility bill, bank statement). Study the TX Driver's Handbook. Take the written test. This is a concrete, completable thing.</span>
+    </div>
+  </div>
+
+  <div class="focus-grid">
+    <div class="focus-card rose">
+      <span class="focus-icon">🪪</span>
+      <div class="focus-title">License Push</div>
+      <ul class="focus-tasks">
+        <li class="urgent">Book DPS appointment — txdpsscheduler.com</li>
+        <li>Download and study TX Driver's Handbook</li>
+        <li>Practice permit test online (tx.dps.texas.gov)</li>
+        <li>Gather all required documents before your appointment</li>
+      </ul>
+    </div>
+    <div class="focus-card blue">
+      <span class="focus-icon">📚</span>
+      <div class="focus-title">School Prep</div>
+      <ul class="focus-tasks">
+        <li class="key">Watch Temple College website daily for application opening</li>
+        <li>Khan Academy: algebra foundations — equations, basic algebra</li>
+        <li>Start learning medical terminology — 5 terms a day</li>
+        <li>Look into what TEAS test prep looks like</li>
+      </ul>
+    </div>
+    <div class="focus-card amber">
+      <span class="focus-icon">💰</span>
+      <div class="focus-title">Money</div>
+      <ul class="focus-tasks">
+        <li>Research income-driven repayment for student loans</li>
+        <li>Make one extra loan payment if possible</li>
+        <li>Track all spending this month in The Treasury</li>
+        <li>Credit score should start moving — check again</li>
+      </ul>
+    </div>
+    <div class="focus-card sage">
+      <span class="focus-icon">🌿</span>
+      <div class="focus-title">Health</div>
+      <ul class="focus-tasks">
+        <li>Walk 4x/week — increase to 25–30 min if comfortable</li>
+        <li>Add one small strength exercise — squats, wall push-ups</li>
+        <li>Plan meals weekly using The Kitchen</li>
+        <li>Hydration: aim for 8 glasses of water daily</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-header"><span class="week-badge">June · Key Tasks</span><span class="week-theme">License, study, money discipline</span></div>
+    <div class="week-tasks">
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Book DPS appointment online</span><span class="task-cat cat-admin">admin</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Study TX Driver's Handbook — 20 min/day</span><span class="task-cat cat-admin">admin</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Take practice permit test online — pass all sections</span><span class="task-cat cat-admin">admin</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Khan Academy: basic algebra — 30 min/day</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>5 medical terms per day (Quizlet or cards)</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Check Temple College website — application update?</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Research IDR plans on studentaid.gov</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Add $50+ to savings this month</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Go to DPS — get your license or learner's permit</span><span class="task-cat cat-admin">admin</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Walk 4x/week — consistent, same time</span><span class="task-cat cat-health">health</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ -->
+<!-- JULY 2026 -->
+<!-- ════════════════════════════════ -->
+<div class="month-divider"><div class="month-divider-line"></div><span class="month-divider-label">JULY 2026</span><div class="month-divider-line"></div></div>
+<div class="content" id="jul">
+  <div class="section-header">
+    <div class="section-month-badge"><span class="badge-month">JUL</span><span class="badge-year">2026</span></div>
+    <div class="section-title-wrap">
+      <div class="section-theme">The Application Push</div>
+      <div class="section-tagline">Temple College's Rad Tech application should be opening around now or very soon. This is what all the studying has been for. Everything else continues building underneath.</div>
+      <span class="section-mantra" style="background:rgba(104,136,204,0.1);color:var(--blue-light);">"You prepared for this. Now apply."</span>
+    </div>
+  </div>
+
+  <div class="milestone">
+    <span class="milestone-icon">🎓</span>
+    <div class="milestone-text">
+      <span class="milestone-label">CRITICAL: Submit Rad Tech Application</span>
+      <span class="milestone-desc">Temple College's program begins Fall 2026. Applications will likely open Summer 2026. The moment they do — apply immediately. Don't wait until it's perfect. Have your transcripts, personal statement, and any recommendation letters ready in advance.</span>
+    </div>
+  </div>
+
+  <div class="focus-grid">
+    <div class="focus-card blue">
+      <span class="focus-icon">🎓</span>
+      <div class="focus-title">Application Ready</div>
+      <ul class="focus-tasks">
+        <li class="urgent">Apply the moment applications open</li>
+        <li class="key">Write personal statement — why rad tech, why you</li>
+        <li>Request transcripts from any previous schools</li>
+        <li>Prepare recommendation letters if required</li>
+        <li>Continue Khan Academy — push into algebra</li>
+      </ul>
+    </div>
+    <div class="focus-card rose">
+      <span class="focus-icon">🚗</span>
+      <div class="focus-title">Car Research</div>
+      <ul class="focus-tasks">
+        <li>Research reliable affordable used cars in Texas</li>
+        <li>Look into what insurance costs for your situation</li>
+        <li>Check auto loan requirements — what credit score is needed?</li>
+        <li>Start saving specifically for car — separate account</li>
+      </ul>
+    </div>
+    <div class="focus-card amber">
+      <span class="focus-icon">💰</span>
+      <div class="focus-title">Money</div>
+      <ul class="focus-tasks">
+        <li>Apply for FAFSA if not done — opens October for 2026-27</li>
+        <li>Check if any student loan payments are due</li>
+        <li>Savings growing — check balance and feel good about it</li>
+        <li>Credit score: aim for 620+ for basic auto loan</li>
+      </ul>
+    </div>
+    <div class="focus-card sage">
+      <span class="focus-icon">🌿</span>
+      <div class="focus-title">Health — Level Up</div>
+      <ul class="focus-tasks">
+        <li>Increase walks to 30–35 min, 5x/week</li>
+        <li>Add a stretching routine — 5 min morning or night</li>
+        <li>Weigh in once a week — same day, same time</li>
+        <li>Stay consistent with meal planning</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-header"><span class="week-badge">July · Key Tasks</span><span class="week-theme">The application is the most important thing this month</span></div>
+    <div class="week-tasks">
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Check Temple College website — applications open?</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Draft personal statement for application</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Request official transcripts from previous schools</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>SUBMIT APPLICATION the moment it opens</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Khan Academy: continue algebra — 30 min/day</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Research car options + insurance costs</span><span class="task-cat cat-admin">admin</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Add $50+ to savings this month</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Walk 5x/week</span><span class="task-cat cat-health">health</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ -->
+<!-- AUG 2026 -->
+<!-- ════════════════════════════════ -->
+<div class="month-divider"><div class="month-divider-line"></div><span class="month-divider-label">AUGUST 2026</span><div class="month-divider-line"></div></div>
+<div class="content" id="aug">
+  <div class="section-header">
+    <div class="section-month-badge"><span class="badge-month">AUG</span><span class="badge-year">2026</span></div>
+    <div class="section-title-wrap">
+      <div class="section-theme">The Beginning</div>
+      <div class="section-tagline">School starts. Or you're waiting to hear back from your application. Either way — this is when the life you've been building begins to show up visually. Keep your routines. They are the reason you got here.</div>
+      <span class="section-mantra" style="background:rgba(154,190,162,0.1);color:var(--sage-light);">"You are not who you were in April."</span>
+    </div>
+  </div>
+
+  <div class="focus-grid">
+    <div class="focus-card blue">
+      <span class="focus-icon">🏫</span>
+      <div class="focus-title">School Begins</div>
+      <ul class="focus-tasks">
+        <li class="key">First day of Rad Tech program — show up</li>
+        <li>Get your schedule — block study time immediately</li>
+        <li>Introduce yourself to one classmate each week</li>
+        <li>Don't compare yourself to others — just do your work</li>
+      </ul>
+    </div>
+    <div class="focus-card amber">
+      <span class="focus-icon">💰</span>
+      <div class="focus-title">FAFSA & Aid</div>
+      <ul class="focus-tasks">
+        <li class="urgent">Complete FAFSA if not done — aid for school</li>
+        <li>Look into scholarships for health professions students</li>
+        <li>Understand what financial aid covers vs what you owe</li>
+        <li>Keep saving — car is getting closer</li>
+      </ul>
+    </div>
+    <div class="focus-card rose">
+      <span class="focus-icon">🚗</span>
+      <div class="focus-title">Car Goal</div>
+      <ul class="focus-tasks">
+        <li>With license in hand — start actively saving for car</li>
+        <li>Look into buy here pay here options if credit is still low</li>
+        <li>Consider used reliable cars: Toyota Corolla, Honda Civic</li>
+        <li>Target: car by end of 2026 if possible</li>
+      </ul>
+    </div>
+    <div class="focus-card plum">
+      <span class="focus-icon">🧠</span>
+      <div class="focus-title">AUDHD + School</div>
+      <ul class="focus-tasks">
+        <li>Talk to disability services at Temple — accommodations help</li>
+        <li>Study in 25-min blocks (Pomodoro) — timer on, then break</li>
+        <li>Keep your home study space clear and consistent</li>
+        <li>Sleep before exams — always. No all-nighters.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ -->
+<!-- SEP–DEC 2026 -->
+<!-- ════════════════════════════════ -->
+<div class="month-divider"><div class="month-divider-line"></div><span class="month-divider-label">SEPTEMBER – DECEMBER 2026</span><div class="month-divider-line"></div></div>
+<div class="content" id="sep">
+  <div class="section-header">
+    <div class="section-month-badge"><span class="badge-month">SEP–DEC</span><span class="badge-year">2026</span></div>
+    <div class="section-title-wrap">
+      <div class="section-theme">The First Semester</div>
+      <div class="section-tagline">You're in school. This is where you prove to yourself that you can do this. Your only job is to pass your classes, protect your health, and keep your finances from falling apart.</div>
+      <span class="section-mantra" style="background:rgba(232,200,122,0.08);color:var(--gold);">"Keep your routines. They carry you when motivation doesn't."</span>
+    </div>
+  </div>
+
+  <div class="focus-grid">
+    <div class="focus-card blue">
+      <span class="focus-icon">📖</span>
+      <div class="focus-title">School — First Semester</div>
+      <ul class="focus-tasks">
+        <li class="key">Attend every single class — attendance is everything in health programs</li>
+        <li>Study daily — 45 min minimum on weekdays</li>
+        <li>Form or join a study group</li>
+        <li>Office hours: go even when you don't think you need to</li>
+        <li>Ask for help early — don't wait until you're drowning</li>
+      </ul>
+    </div>
+    <div class="focus-card amber">
+      <span class="focus-icon">💰</span>
+      <div class="focus-title">Finances</div>
+      <ul class="focus-tasks">
+        <li>Budget monthly — use The Treasury every single month</li>
+        <li>Keep student loan status current — set reminders</li>
+        <li>Build savings to $300–500 by December</li>
+        <li>Credit score: check monthly — watch it improve</li>
+        <li>Car savings: separate account, auto-transfer weekly</li>
+      </ul>
+    </div>
+    <div class="focus-card sage">
+      <span class="focus-icon">🌿</span>
+      <div class="focus-title">Health — Consistent</div>
+      <ul class="focus-tasks">
+        <li>Don't let school kill your movement routine</li>
+        <li>Walk on campus between classes — counts</li>
+        <li>Meal prep Sundays — save money and stay healthy</li>
+        <li>Sleep is medicine. Protect it especially during exams.</li>
+      </ul>
+    </div>
+    <div class="focus-card plum">
+      <span class="focus-icon">🧠</span>
+      <div class="focus-title">AUDHD Management</div>
+      <ul class="focus-tasks">
+        <li>Build a weekly reset ritual — Sunday planning session</li>
+        <li>Use The Garden Calendar to track habits daily</li>
+        <li>Identify your overstimulation triggers — avoid them</li>
+        <li>Decompression time is not optional — schedule it</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-header"><span class="week-badge">Monthly Recurring Tasks · Sep–Dec</span><span class="week-theme">Do these every month without fail</span></div>
+    <div class="week-tasks">
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Update The Treasury with this month's income/expenses</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Check savings account balance — celebrate growth</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Check credit score — note the number</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Sunday planning session — map next week</span><span class="task-cat cat-life">life</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>End of month diary entry — what went well?</span><span class="task-cat cat-life">life</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Meal prep Sunday — plan the week ahead</span><span class="task-cat cat-health">health</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Confirm student loan status is current</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Review habit tracker — where did you show up?</span><span class="task-cat cat-life">life</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Weekly self-care checklist completed every week</span><span class="task-cat cat-health">health</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Morning routine — didn't miss more than 2 days</span><span class="task-cat cat-health">health</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Sunday reset every week — tidy, laundry, prep</span><span class="task-cat cat-life">life</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Walked or moved at least 4x this week</span><span class="task-cat cat-health">health</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ -->
+<!-- JAN–APR 2027 -->
+<!-- ════════════════════════════════ -->
+<div class="month-divider"><div class="month-divider-line"></div><span class="month-divider-label">JANUARY – APRIL 2027</span><div class="month-divider-line"></div></div>
+<div class="content" id="jan">
+  <div class="section-header">
+    <div class="section-month-badge"><span class="badge-month">JAN–APR</span><span class="badge-year">2027</span></div>
+    <div class="section-title-wrap">
+      <div class="section-theme">The New Person</div>
+      <div class="section-tagline">You are not the same person who was spiralling in April 2026. You have a license. You're in school. Your credit is rebuilding. You have savings. You are becoming the person you described wanting to be.</div>
+      <span class="section-mantra" style="background:rgba(154,190,162,0.1);color:var(--sage-light);">"One year ago you decided. Look at you now."</span>
+    </div>
+  </div>
+
+  <div class="milestone">
+    <span class="milestone-icon">🚗</span>
+    <div class="milestone-text">
+      <span class="milestone-label">Q1 2027 Target: Car</span>
+      <span class="milestone-desc">With your savings built, license in hand, and credit improving — begin seriously looking at your first car. Even a modest, reliable used car changes your life significantly. Public transportation has limits. A car doesn't.</span>
+    </div>
+  </div>
+
+  <div class="focus-grid">
+    <div class="focus-card blue">
+      <span class="focus-icon">📖</span>
+      <div class="focus-title">Second Semester</div>
+      <ul class="focus-tasks">
+        <li class="key">You know how the program works now — push harder</li>
+        <li>Start thinking about clinical rotations</li>
+        <li>Stay ahead on assignments — AUDHD hates catching up</li>
+        <li>Keep asking questions. Smart students do.</li>
+      </ul>
+    </div>
+    <div class="focus-card rose">
+      <span class="focus-icon">🚗</span>
+      <div class="focus-title">Car + Independence</div>
+      <ul class="focus-tasks">
+        <li>Savings target: $1,000–2,000 for down payment</li>
+        <li>Get pre-approved for auto loan if credit allows</li>
+        <li>Buy the car — reliable, affordable, insured</li>
+        <li>Don't get a car payment that breaks your budget</li>
+      </ul>
+    </div>
+    <div class="focus-card amber">
+      <span class="focus-icon">💰</span>
+      <div class="focus-title">Financial Health</div>
+      <ul class="focus-tasks">
+        <li>Credit score target: 650+ by April 2027</li>
+        <li>Student loans: keep current — look into forgiveness programs</li>
+        <li>Emergency fund: build to 1 month of expenses</li>
+        <li>Open a Roth IRA if you can — even $25/month</li>
+      </ul>
+    </div>
+    <div class="focus-card sage">
+      <span class="focus-icon">🌿</span>
+      <div class="focus-title">Body & Health</div>
+      <ul class="focus-tasks">
+        <li>One year of consistent movement — notice the difference</li>
+        <li>Weight loss is a byproduct of habits, not willpower</li>
+        <li>Book a check-up with a doctor — full physical</li>
+        <li>You've been showing up for yourself. Keep it up.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-header"><span class="week-badge">April 2027 · One Year Later</span><span class="week-theme">Look back. Look at what you built.</span></div>
+    <div class="week-tasks">
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Write a letter to April 2026 you in The Diary</span><span class="task-cat cat-life">life</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Check: Do you have a license?</span><span class="task-cat cat-admin">admin</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Check: Are you in or have completed a semester of school?</span><span class="task-cat cat-school">school</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Check: Is your credit score higher than it was?</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Check: Do you have savings?</span><span class="task-cat cat-money">money</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Check: Have you been moving your body regularly?</span><span class="task-cat cat-health">health</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Check: Do you have a car?</span><span class="task-cat cat-admin">admin</span></div>
+      <div class="week-task" onclick="this.classList.toggle('done')"><div class="task-check"></div><span>Celebrate. You did this.</span><span class="task-cat cat-life">life</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ -->
+<!-- DAILY SCHEDULE -->
+<!-- ════════════════════════════════ -->
+<div class="month-divider" id="daily"><div class="month-divider-line"></div><span class="month-divider-label">YOUR DAILY SCHEDULE</span><div class="month-divider-line"></div></div>
+<div class="content">
+  <div class="section-header">
+    <div class="section-month-badge" style="background:rgba(155,106,191,0.1);border-color:rgba(155,106,191,0.2);"><span class="badge-month" style="color:var(--plum-light);">DAILY</span><span class="badge-year">template</span></div>
+    <div class="section-title-wrap">
+      <div class="section-theme">Your AUDHD-Friendly Daily Structure</div>
+      <div class="section-tagline">This is a framework, not a prison. The goal is that the structure removes the need to decide — you just follow the next step. On hard days, even doing 3 of these is a win.</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div>
+      <div class="daily-template">
+        <div class="daily-title">WEEKDAY — Before School Starts</div>
+        <div class="time-block">
+          <span class="time-label">7:30</span>
+          <div class="time-bar" style="background:var(--sage)"></div>
+          <div class="time-content"><div class="time-task">Wake up</div><div class="time-note">Water first. Sit by a window for 5 min. No phone yet. This is not negotiable.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">7:45</span>
+          <div class="time-bar" style="background:var(--sage)"></div>
+          <div class="time-content"><div class="time-task">Breakfast</div><div class="time-note">Something with protein. Don't skip it — your focus depends on it.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">8:30</span>
+          <div class="time-bar" style="background:var(--blue)"></div>
+          <div class="time-content"><div class="time-task">Khan Academy — 30 min</div><div class="time-note">Same spot, same time every day. Streak beats output. Just sit down and start.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">9:00</span>
+          <div class="time-bar" style="background:var(--amber)"></div>
+          <div class="time-content"><div class="time-task">Admin / Money — 30 min</div><div class="time-note">One task only: apply for job, check loan, update budget, email office. One thing.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">10:00</span>
+          <div class="time-bar" style="background:var(--sage)"></div>
+          <div class="time-content"><div class="time-task">Walk — 20–30 min</div><div class="time-note">Outside if possible. This is your movement and your mental reset. Both at once.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">11:00</span>
+          <div class="time-bar" style="background:var(--plum)"></div>
+          <div class="time-content"><div class="time-task">Free / Creative time</div><div class="time-note">Sketchbook, crochet, music, reading — anything that isn't productive on purpose.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">12:30</span>
+          <div class="time-bar" style="background:var(--sage)"></div>
+          <div class="time-content"><div class="time-task">Lunch</div><div class="time-note">Sit down to eat. Away from screens if you can manage it.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">1:30</span>
+          <div class="time-bar" style="background:var(--plum)"></div>
+          <div class="time-content"><div class="time-task">Rest / Decompress</div><div class="time-note">Actual rest. A show, music, nap. Zero productivity required. This refills you.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">3:30</span>
+          <div class="time-bar" style="background:var(--amber)"></div>
+          <div class="time-content"><div class="time-task">Second study or admin block — 45 min</div><div class="time-note">Medical terminology, driver's handbook, or the next admin task. One thing.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">5:30</span>
+          <div class="time-bar" style="background:var(--sage)"></div>
+          <div class="time-content"><div class="time-task">Dinner</div><div class="time-note">Something you meal prepped if possible. This is where the Kitchen planner saves you.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">7:00</span>
+          <div class="time-bar" style="background:var(--plum)"></div>
+          <div class="time-content"><div class="time-task">Wind down — no new tasks</div><div class="time-note">Show, music, crochet. The day is done. Your brain needs to power down.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">9:30</span>
+          <div class="time-bar" style="background:var(--rose)"></div>
+          <div class="time-content"><div class="time-task">No new screens / prep tomorrow</div><div class="time-note">Dim lights. Lay out what you need. Write one intention for tomorrow in The Diary.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">10:30</span>
+          <div class="time-bar" style="background:var(--plum)"></div>
+          <div class="time-content"><div class="time-task">Lights out</div><div class="time-note">7+ hours. Sleep is medication for AUDHD. Protect it like your most important job.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="daily-template">
+        <div class="daily-title">WEEKDAY — During School</div>
+        <div class="time-block">
+          <span class="time-label">7:00</span>
+          <div class="time-bar" style="background:var(--sage)"></div>
+          <div class="time-content"><div class="time-task">Wake up — earlier now</div><div class="time-note">Water. 5 minutes quiet. Do not scroll yet. Get dressed before you sit down.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">7:30</span>
+          <div class="time-bar" style="background:var(--sage)"></div>
+          <div class="time-content"><div class="time-task">Breakfast + pack bag</div><div class="time-note">Bring water, snacks, any notes you need. Leave 10 minutes early — always.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">—</span>
+          <div class="time-bar" style="background:var(--blue)"></div>
+          <div class="time-content"><div class="time-task">School / Class</div><div class="time-note">Sit near the front. Take handwritten notes — it helps AUDHD retain information better.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">Between</span>
+          <div class="time-bar" style="background:var(--sage)"></div>
+          <div class="time-content"><div class="time-task">Movement between classes</div><div class="time-note">Walk outside for 5 minutes between classes. Don't sit on your phone — decompress physically.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">After class</span>
+          <div class="time-bar" style="background:var(--plum)"></div>
+          <div class="time-content"><div class="time-task">Decompression — 30 min minimum</div><div class="time-note">You've been regulated all day. You need to decompress before you can study again.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">+1 hr</span>
+          <div class="time-bar" style="background:var(--blue)"></div>
+          <div class="time-content"><div class="time-task">Study block — 45 min max</div><div class="time-note">Pomodoro: 25 min on, 5 min break, 25 min on. Timer is mandatory. Stop when it rings.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">Eve</span>
+          <div class="time-bar" style="background:var(--sage)"></div>
+          <div class="time-content"><div class="time-task">Dinner + rest</div><div class="time-note">You worked hard today. Eat well. Rest fully. Tomorrow you do it again.</div></div>
+        </div>
+        <div class="time-block">
+          <span class="time-label">9:30</span>
+          <div class="time-bar" style="background:var(--rose)"></div>
+          <div class="time-content"><div class="time-task">Prep tomorrow + lights down</div><div class="time-note">One intention. What do you need to bring? What's the one thing tomorrow needs from you?</div></div>
+        </div>
+      </div>
+
+      <div class="audhd-box">
+        <div class="audhd-title">🧠 When You Hit a Wall</div>
+        <div class="audhd-text">
+          <strong style="color:var(--plum-light);">You will have bad days.</strong> Days where nothing gets done and you spiral for three hours on something unrelated to your goals. That's okay. It's part of having AUDHD.<br><br>
+          When it happens:<br>
+          1. Stop. Go outside for 5 minutes.<br>
+          2. Do one tiny thing from your list — not the big one, the tiny one.<br>
+          3. Write in The Diary what happened. Don't judge it. Just record it.<br>
+          4. Sleep on it. Tomorrow is not today.<br><br>
+          <strong style="color:var(--plum-light);">You are not behind. You are building.</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STAR FIELD ──
+const sc=document.getElementById('star-canvas'),sctx=sc.getContext('2d');
+let STARS=[],stTick=0,SHOOTERS=[];
+function rsz(){sc.width=window.innerWidth;sc.height=document.body.scrollHeight;}
+rsz();window.addEventListener('resize',rsz);
+function initS(){STARS=[];const n=Math.floor(window.innerWidth*window.innerHeight/2200);for(let i=0;i<n;i++)STARS.push({x:Math.random()*sc.width,y:Math.random()*sc.height,r:Math.random()*1+0.2,o:Math.random()*0.4+0.05,ts:Math.random()*0.015+0.003,to:Math.random()*Math.PI*2,c:['255,255,255','220,200,255','196,200,255'][Math.floor(Math.random()*3)]});}
+initS();
+function animS(){sctx.clearRect(0,0,sc.width,sc.height);stTick+=0.016;STARS.forEach(s=>{const tw=Math.sin(stTick*s.ts*60+s.to)*0.3+0.7;sctx.beginPath();sctx.arc(s.x,s.y,s.r,0,Math.PI*2);sctx.fillStyle=`rgba(${s.c},${s.o*tw})`;sctx.fill();});requestAnimationFrame(animS);}
+animS();
+
+// ── SAVE TASK STATE TO LOCAL STORAGE ──
+function saveState(){
+  const tasks={};
+  document.querySelectorAll('.week-task').forEach((el,i)=>{tasks[i]=el.classList.contains('done');});
+  localStorage.setItem('roadmap_tasks',JSON.stringify(tasks));
+}
+function loadState(){
+  try{
+    const tasks=JSON.parse(localStorage.getItem('roadmap_tasks')||'{}');
+    document.querySelectorAll('.week-task').forEach((el,i)=>{if(tasks[i])el.classList.add('done');});
+  }catch(e){}
+}
+// Patch all task clicks to also save
+document.querySelectorAll('.week-task').forEach(el=>{
+  const orig=el.getAttribute('onclick');
+  el.removeAttribute('onclick');
+  el.addEventListener('click',()=>{el.classList.toggle('done');saveState();});
+});
+loadState();
+
+// ── ACTIVE NAV ──
+const sections=['may','jun','jul','aug','sep','jan','daily'];
+window.addEventListener('scroll',()=>{
+  sections.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const rect=el.getBoundingClientRect();
+    if(rect.top<=120&&rect.bottom>120){
+      document.querySelectorAll('.tb-link').forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+id));
+    }
+  });
+});
+
+// ── FIX STAR CANVAS HEIGHT ON SCROLL ──
+setInterval(()=>{
+  if(sc.height!==document.body.scrollHeight){sc.height=document.body.scrollHeight;initS();}
+},2000);
+</script>
+</body>
+</html>

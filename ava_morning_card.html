@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FAF7F2">
+<meta name="description" content="A gentle morning checklist — routines, three tasks, and progress for the day.">
+<title>Ava's Morning</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --cream: #FAF7F2;
+    --blush: #E8C4C0;
+    --rose: #C4847A;
+    --sage: #A8B89A;
+    --sage-dark: #6B7D62;
+    --bark: #7A6552;
+    --ink: #2C2416;
+    --mist: #EDE8E0;
+    --lavender: #CECBF6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 1.5rem 1rem 3rem;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  :where(.step, .task-check-btn, .reset-btn):focus-visible {
+    outline: 2px solid var(--rose);
+    outline-offset: 2px;
+  }
+
+  .task-input:focus-visible {
+    outline: 2px solid var(--sage);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .step, .task-check-btn, .reset-btn, .progress-bar-fill {
+      transition-duration: 0.01ms !important;
+    }
+    .step:active { transform: none; }
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--blush);
+    position: relative;
+  }
+
+  .date {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--bark);
+    margin-bottom: 6px;
+    font-weight: 400;
+  }
+
+  .greeting {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem;
+    font-weight: 300;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+
+  .greeting em {
+    font-style: italic;
+    color: var(--rose);
+  }
+
+  .mantra {
+    font-size: 0.75rem;
+    color: var(--bark);
+    font-weight: 300;
+    margin-top: 6px;
+    letter-spacing: 0.05em;
+  }
+
+  .section {
+    margin-bottom: 1.25rem;
+  }
+
+  .section-title {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bark);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: var(--mist);
+  }
+
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  button.step {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid var(--mist);
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .step:active { transform: scale(0.98); }
+  .step.done { opacity: 0.45; }
+  .step.done .step-name { text-decoration: line-through; }
+
+  .step-check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--blush);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: white;
+    transition: all 0.2s;
+  }
+
+  .step.done .step-check {
+    background: var(--rose);
+    border-color: var(--rose);
+  }
+
+  .step-name {
+    font-size: 0.85rem;
+    color: var(--ink);
+    font-weight: 400;
+    flex: 1;
+    display: block;
+    text-align: left;
+  }
+
+  .step-tag {
+    font-size: 0.6rem;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .tag-anchor { background: #FBEAF0; color: #72243E; }
+  .tag-body { background: #E1F5EE; color: #085041; }
+  .tag-work { background: #EEEDFE; color: #3C3489; }
+  .tag-skin { background: #FAEEDA; color: #633806; }
+
+  .three-tasks {
+    background: white;
+    border: 1px solid var(--mist);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+
+  .task-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 0.5px solid var(--mist);
+  }
+
+  .task-row:last-child { border-bottom: none; }
+
+  .task-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--mist);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--bark);
+    flex-shrink: 0;
+  }
+
+  .task-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.83rem;
+    color: var(--ink);
+    outline: none;
+    padding: 2px 0;
+  }
+
+  .task-input::placeholder { color: #C4B8AC; }
+
+  button.task-check-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    padding: 0;
+    font: inherit;
+  }
+
+  .task-check-btn {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--blush);
+    border-radius: 4px;
+    flex-shrink: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: white;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .task-check-btn.done {
+    background: var(--sage);
+    border-color: var(--sage);
+  }
+
+  .reminder-box {
+    background: linear-gradient(135deg, #F5F0E8, #EDE8E0);
+    border: 1px solid var(--blush);
+    border-radius: 8px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .reminder-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--bark);
+    line-height: 1.6;
+  }
+
+  .reset-btn {
+    display: block;
+    width: 100%;
+    background: var(--ink);
+    border: none;
+    appearance: none;
+    -webkit-appearance: none;
+    color: var(--cream);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.75rem;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-top: 1.25rem;
+    transition: background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .reset-btn:active { background: var(--bark); }
+
+  .north-star {
+    background: var(--ink);
+    border-radius: 8px;
+    padding: 14px 16px;
+    text-align: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .north-star-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--blush);
+    margin-bottom: 5px;
+  }
+
+  .north-star-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: var(--cream);
+    font-style: italic;
+  }
+
+  .progress-bar-wrap {
+    height: 3px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    margin-top: 10px;
+  }
+
+  .progress-bar-fill {
+    height: 3px;
+    background: var(--blush);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    font-size: 0.6rem;
+    color: rgba(250,247,242,0.5);
+    margin-top: 5px;
+    letter-spacing: 0.06em;
+  }
+
+  .streak-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .streak-flame {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .streak-count {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.75rem;
+    font-weight: 400;
+    color: var(--cream);
+    line-height: 1;
+  }
+
+  .streak-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(250,247,242,0.55);
+  }
+
+  .streak-hint {
+    font-size: 0.62rem;
+    color: rgba(250,247,242,0.45);
+    margin-top: 6px;
+    line-height: 1.45;
+    max-width: 16rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+</style>
+</head>
+<body>
+
+<main>
+
+<div class="header">
+  <div class="date" id="today-date"></div>
+  <div class="greeting">Good morning, <em>Ava</em></div>
+  <div class="mantra">Ava's Revitalization — one day at a time 🌿</div>
+</div>
+
+<div class="north-star">
+  <div class="north-star-label">Your north star</div>
+  <div class="north-star-text">Radiologic Technologist · Austin · ACC</div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+  <div class="progress-label" id="progress-label">0 of 0 steps done today</div>
+  <div class="streak-row" aria-live="polite">
+    <span class="streak-flame" aria-hidden="true">🔥</span>
+    <span class="streak-count" id="streak-count">0</span>
+    <span class="streak-label" id="streak-label">day streak</span>
+  </div>
+  <p class="streak-hint" id="streak-hint"></p>
+</div>
+
+<div class="section">
+  <div class="section-title">Morning — before work</div>
+  <div class="step-list">
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Get up — no snoozing</span>
+      <span class="step-tag tag-anchor">Anchor</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Open blinds — natural light</span>
+      <span class="step-tag tag-body">Body</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Drink a full glass of water</span>
+      <span class="step-tag tag-body">Body</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">AM skincare — cleanser, HA, moisturiser, SPF</span>
+      <span class="step-tag tag-skin">Skin</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Get dressed — before sitting down</span>
+      <span class="step-tag tag-anchor">Anchor</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Breakfast</span>
+      <span class="step-tag tag-body">Body</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Write today's 3 tasks — before opening anything</span>
+      <span class="step-tag tag-anchor">Anchor</span>
+    </button>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Today's 3 tasks</div>
+  <div class="three-tasks">
+    <div class="task-row">
+      <div class="task-num">1</div>
+      <input class="task-input" id="t1" placeholder="Most important task..." />
+      <button type="button" class="task-check-btn" aria-pressed="false" aria-label="Mark task 1 done"></button>
+    </div>
+    <div class="task-row">
+      <div class="task-num">2</div>
+      <input class="task-input" id="t2" placeholder="Second task..." />
+      <button type="button" class="task-check-btn" aria-pressed="false" aria-label="Mark task 2 done"></button>
+    </div>
+    <div class="task-row">
+      <div class="task-num">3</div>
+      <input class="task-input" id="t3" placeholder="Third task..." />
+      <button type="button" class="task-check-btn" aria-pressed="false" aria-label="Mark task 3 done"></button>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Work day</div>
+  <div class="step-list">
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">8:30am — work begins, one task at a time</span>
+      <span class="step-tag tag-work">Work</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Write down anything confusing — don't hold it in your head</span>
+      <span class="step-tag tag-work">Work</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Lunch away from your desk</span>
+      <span class="step-tag tag-body">Body</span>
+    </button>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">After work — 5pm</div>
+  <div class="step-list">
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Close laptop fully — work is done</span>
+      <span class="step-tag tag-anchor">Anchor</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Change into workout clothes immediately</span>
+      <span class="step-tag tag-anchor">Key habit</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Small snack — banana or Greek yoghurt</span>
+      <span class="step-tag tag-body">Body</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">5:30pm — 25 min workout</span>
+      <span class="step-tag tag-body">Body</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Post-workout snack within 30 mins</span>
+      <span class="step-tag tag-body">Body</span>
+    </button>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Evening wind-down — 9:30pm</div>
+  <div class="step-list">
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Dim lights + Night Shift on</span>
+      <span class="step-tag tag-anchor">Anchor</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Reset 10 — 10 minute tidy</span>
+      <span class="step-tag tag-anchor">Anchor</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">PM skincare — cleanser, HA, moisturiser</span>
+      <span class="step-tag tag-skin">Skin</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Brain dump — write everything out</span>
+      <span class="step-tag tag-anchor">Anchor</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">Phone outside the room — in bed by 11pm</span>
+      <span class="step-tag tag-anchor">Anchor</span>
+    </button>
+    <button type="button" class="step" aria-pressed="false">
+      <span class="step-check" aria-hidden="true"></span>
+      <span class="step-name">4-7-8 breathing if mind is racing</span>
+      <span class="step-tag tag-body">Body</span>
+    </button>
+  </div>
+</div>
+
+<div class="reminder-box">
+  <div class="reminder-quote">"Every day I do this is a day closer to Austin, ACC, and the life I'm building."</div>
+</div>
+
+<button type="button" class="reset-btn" id="reset-btn">Reset for tomorrow</button>
+
+</main>
+
+<script>
+(function () {
+  const STORAGE_PREFIX = 'ava_morning_';
+  const STREAK_KEY = 'ava_morning_streak';
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  function todayKey() {
+    const n = new Date();
+    return n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+  }
+
+  function storageKey() {
+    return STORAGE_PREFIX + todayKey();
+  }
+
+  function parseDayKey(key) {
+    const p = String(key).split('-').map(Number);
+    if (p.length !== 3 || p.some(n => Number.isNaN(n))) return null;
+    return new Date(p[0], p[1] - 1, p[2]);
+  }
+
+  function calendarDaysBetween(aKey, bKey) {
+    const a = parseDayKey(aKey);
+    const b = parseDayKey(bKey);
+    if (!a || !b) return 0;
+    return Math.round((b.getTime() - a.getTime()) / 86400000);
+  }
+
+  function yesterdayKey() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function safeParse(str) {
+    try {
+      return str ? JSON.parse(str) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function readStreakMeta() {
+    const m = safeParse(localStorage.getItem(STREAK_KEY));
+    if (!m || typeof m !== 'object') return { streak: 0, lastCompleteDate: null };
+    return {
+      streak: Math.max(0, parseInt(m.streak, 10) || 0),
+      lastCompleteDate: m.lastCompleteDate || null
+    };
+  }
+
+  function writeStreakMeta(meta) {
+    try {
+      localStorage.setItem(STREAK_KEY, JSON.stringify(meta));
+    } catch (e) {
+      if (e && e.name === 'QuotaExceededError') {
+        alert('Could not save streak — storage may be full.');
+      }
+    }
+  }
+
+  function allStepsComplete() {
+    const steps = [...document.querySelectorAll('.step')];
+    return steps.length > 0 && steps.every(s => s.classList.contains('done'));
+  }
+
+  function pruneBrokenStreak() {
+    const meta = readStreakMeta();
+    if (!meta.lastCompleteDate) return;
+    const today = todayKey();
+    if (meta.lastCompleteDate === today) return;
+    const gap = calendarDaysBetween(meta.lastCompleteDate, today);
+    if (gap >= 2) {
+      writeStreakMeta({ streak: 0, lastCompleteDate: null });
+    }
+  }
+
+  function syncStreakFromUI() {
+    const today = todayKey();
+    const meta = readStreakMeta();
+
+    if (!allStepsComplete()) {
+      refreshStreakDisplay();
+      return;
+    }
+
+    if (meta.lastCompleteDate === today) {
+      refreshStreakDisplay();
+      return;
+    }
+
+    const y = yesterdayKey();
+    const gap = meta.lastCompleteDate ? calendarDaysBetween(meta.lastCompleteDate, today) : null;
+
+    let next = 1;
+    if (meta.lastCompleteDate === y || gap === 1) {
+      next = (meta.streak || 0) + 1;
+    } else if (gap != null && gap > 1) {
+      next = 1;
+    }
+
+    writeStreakMeta({ streak: next, lastCompleteDate: today });
+    refreshStreakDisplay();
+  }
+
+  function refreshStreakDisplay() {
+    const meta = readStreakMeta();
+    const countEl = document.getElementById('streak-count');
+    const hintEl = document.getElementById('streak-hint');
+    if (!countEl || !hintEl) return;
+
+    const today = todayKey();
+    const y = yesterdayKey();
+    const n = meta.streak || 0;
+    countEl.textContent = String(n);
+    const lbl = document.getElementById('streak-label');
+    if (lbl) lbl.textContent = n === 1 ? 'day streak' : 'days streak';
+
+    if (allStepsComplete()) {
+      hintEl.textContent =
+        n <= 1
+          ? 'Full routine done today — that counts.'
+          : 'Full routine done — you extended your streak.';
+      return;
+    }
+
+    if (meta.lastCompleteDate === y) {
+      hintEl.textContent = 'Finish every routine step today to keep your streak going.';
+      return;
+    }
+
+    if (meta.lastCompleteDate === today) {
+      hintEl.textContent = 'Almost there — finish every step to seal today.';
+      return;
+    }
+
+    if (n > 0 && meta.lastCompleteDate) {
+      hintEl.textContent = 'Complete all routine steps to start a fresh streak.';
+      return;
+    }
+
+    hintEl.textContent = 'Complete all routine steps (any day) to begin your streak.';
+  }
+
+  function saveState() {
+    const steps = [...document.querySelectorAll('.step')].map(s => s.classList.contains('done'));
+    const tasks = ['t1', 't2', 't3'].map(id => {
+      const el = document.getElementById(id);
+      return el ? el.value : '';
+    });
+    const taskDone = [...document.querySelectorAll('.task-check-btn')].map(b => b.classList.contains('done'));
+    try {
+      localStorage.setItem(storageKey(), JSON.stringify({ steps, tasks, taskDone }));
+    } catch (e) {
+      if (e && e.name === 'QuotaExceededError') {
+        alert('Could not save — storage may be full.');
+      }
+    }
+    syncStreakFromUI();
+  }
+
+  function loadState() {
+    const raw = localStorage.getItem(storageKey());
+    const state = safeParse(raw);
+    if (!state || !Array.isArray(state.steps)) return;
+
+    const stepEls = [...document.querySelectorAll('.step')];
+    state.steps.forEach((done, i) => {
+      const el = stepEls[i];
+      if (!el || !done) return;
+      el.classList.add('done');
+      const chk = el.querySelector('.step-check');
+      if (chk) chk.textContent = '✓';
+      el.setAttribute('aria-pressed', 'true');
+    });
+
+    if (Array.isArray(state.tasks) && state.tasks.length === 3) {
+      ['t1', 't2', 't3'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el) el.value = state.tasks[i] || '';
+      });
+    }
+
+    if (Array.isArray(state.taskDone) && state.taskDone.length === 3) {
+      document.querySelectorAll('.task-check-btn').forEach((btn, i) => {
+        if (state.taskDone[i]) {
+          btn.classList.add('done');
+          btn.textContent = '✓';
+          btn.setAttribute('aria-pressed', 'true');
+        }
+      });
+    }
+  }
+
+  function setDateHeader() {
+    const n = new Date();
+    document.getElementById('today-date').textContent =
+      days[n.getDay()] + ' · ' + months[n.getMonth()] + ' ' + n.getDate();
+  }
+
+  function updateProgress() {
+    const steps = document.querySelectorAll('.step');
+    const done = document.querySelectorAll('.step.done').length;
+    const n = steps.length;
+    const pct = n > 0 ? Math.round((done / n) * 100) : 0;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = done + ' of ' + n + ' steps done today';
+  }
+
+  function toggleStep(el) {
+    el.classList.toggle('done');
+    const on = el.classList.contains('done');
+    el.setAttribute('aria-pressed', on ? 'true' : 'false');
+    const chk = el.querySelector('.step-check');
+    if (chk) chk.textContent = on ? '✓' : '';
+    updateProgress();
+    saveState();
+  }
+
+  function toggleTask(btn) {
+    btn.classList.toggle('done');
+    const on = btn.classList.contains('done');
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.textContent = on ? '✓' : '';
+    saveState();
+  }
+
+  function resetAll() {
+    if (!confirm('Reset everything for tomorrow?')) return;
+    try {
+      localStorage.removeItem(storageKey());
+    } catch (e) { /* ignore */ }
+    document.querySelectorAll('.step').forEach(s => {
+      s.classList.remove('done');
+      s.setAttribute('aria-pressed', 'false');
+      const chk = s.querySelector('.step-check');
+      if (chk) chk.textContent = '';
+    });
+    document.querySelectorAll('.task-check-btn').forEach(b => {
+      b.classList.remove('done');
+      b.setAttribute('aria-pressed', 'false');
+      b.textContent = '';
+    });
+    ['t1', 't2', 't3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    setDateHeader();
+    updateProgress();
+    const meta = readStreakMeta();
+    if (meta.lastCompleteDate === todayKey()) {
+      meta.streak = Math.max(0, (meta.streak || 1) - 1);
+      meta.lastCompleteDate = null;
+      writeStreakMeta(meta);
+    }
+    refreshStreakDisplay();
+  }
+
+  document.querySelectorAll('.step').forEach(step => {
+    const name = step.querySelector('.step-name');
+    if (name) {
+      step.setAttribute('aria-label', 'Mark complete: ' + name.textContent.trim());
+    }
+  });
+
+  const main = document.querySelector('main');
+  main.addEventListener('click', function (e) {
+    const step = e.target.closest('.step');
+    if (step) {
+      toggleStep(step);
+      return;
+    }
+    const taskBtn = e.target.closest('.task-check-btn');
+    if (taskBtn) {
+      e.preventDefault();
+      toggleTask(taskBtn);
+    }
+  });
+
+  ['t1', 't2', 't3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', saveState);
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+  pruneBrokenStreak();
+  setDateHeader();
+  loadState();
+  updateProgress();
+  syncStreakFromUI();
+})();
+</script>
+</body>
+</html>

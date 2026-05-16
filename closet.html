@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Closet · Ava's Galaxy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --void:#07070f;
+  --gold:#e8c87a; --gold-dim:rgba(232,200,122,0.2); --gold-pale:rgba(232,200,122,0.07);
+  --blush:#c890b8; --blush-pale:rgba(200,144,184,0.1); --blush-border:rgba(200,144,184,0.25);
+  --sage:#7aaa82; --sage-pale:rgba(122,170,130,0.1); --sage-light:#9abea2;
+  --rose:#c4847a; --rose-pale:rgba(196,132,122,0.1);
+  --sky:#a8c0e8; --sky-pale:rgba(168,192,232,0.1);
+  --text:#f0eaf8; --text-soft:#b0a8d0; --text-muted:#5a5470;
+  --border:rgba(232,200,122,0.12); --border-med:rgba(232,200,122,0.22);
+  --card:rgba(255,255,255,0.03); --card-hover:rgba(255,255,255,0.05);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--void);font-family:'EB Garamond',serif;color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse at 20% 20%,rgba(200,144,184,0.1) 0%,transparent 55%),
+  radial-gradient(ellipse at 80% 65%,rgba(196,168,216,0.07) 0%,transparent 55%),
+  radial-gradient(ellipse at 50% 95%,rgba(122,170,130,0.05) 0%,transparent 55%);
+pointer-events:none;z-index:0;}
+#star-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.page{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:48px 28px 100px;}
+
+/* NAV */
+.back{display:inline-flex;align-items:center;gap:8px;font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);text-decoration:none;margin-bottom:44px;transition:color 0.2s;}
+.back:hover{color:var(--gold);}
+
+/* HEADER */
+.header{text-align:center;margin-bottom:44px;}
+.eyebrow{font-family:'Cinzel',serif;font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);opacity:0.6;display:block;margin-bottom:12px;}
+.page-title{font-family:'Playfair Display',serif;font-size:clamp(34px,6vw,54px);font-weight:700;background:linear-gradient(135deg,#f0eaf8 0%,#c890b8 45%,#e8c87a 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.05;margin-bottom:10px;}
+.page-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--text-muted);}
+
+/* TABS */
+.main-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:28px;}
+.tab{padding:8px 20px;border:1px solid var(--border);border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:15px;cursor:pointer;background:transparent;color:var(--text-muted);transition:all 0.15s;}
+.tab:hover{border-color:var(--border-med);color:var(--text-soft);}
+.tab.active{background:var(--blush-pale);border-color:var(--blush-border);color:var(--blush);}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ── WISHLIST ── */
+.wish-head{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.wish-head h2{font-family:'Cinzel',serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--blush);opacity:0.85;flex:1;}
+.add-btn{padding:7px 18px;border:1px solid var(--blush-border);border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:14px;cursor:pointer;background:var(--blush-pale);color:var(--blush);transition:all 0.15s;}
+.add-btn:hover{background:rgba(200,144,184,0.2);}
+
+/* filter bar */
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.filter-chip{padding:4px 12px;border:1px solid var(--border);border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:13px;cursor:pointer;background:transparent;color:var(--text-muted);transition:all 0.15s;}
+.filter-chip:hover{color:var(--text-soft);border-color:var(--border-med);}
+.filter-chip.active{background:var(--gold-pale);border-color:var(--gold-dim);color:var(--gold);}
+
+/* wish grid */
+.wish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+.wish-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all 0.2s;cursor:pointer;}
+.wish-card:hover{border-color:var(--blush-border);background:var(--card-hover);}
+.wish-card.purchased{opacity:0.45;}
+.wish-card.purchased .wish-name{text-decoration:line-through;}
+
+.wish-img{width:100%;height:160px;object-fit:cover;display:block;background:rgba(200,144,184,0.08);position:relative;}
+.wish-img-placeholder{width:100%;height:160px;display:flex;align-items:center;justify-content:center;background:rgba(200,144,184,0.06);font-size:32px;color:var(--blush);opacity:0.4;}
+.wish-body{padding:13px 14px;}
+.wish-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.wish-name{font-family:'EB Garamond',serif;font-size:16px;color:var(--text);line-height:1.3;flex:1;}
+.wish-price{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold);white-space:nowrap;flex-shrink:0;}
+.wish-brand{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--text-muted);margin-bottom:6px;}
+.wish-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+.wish-tag{font-family:'Cinzel',serif;font-size:9px;padding:2px 8px;border-radius:10px;letter-spacing:0.5px;}
+.wt-month{background:rgba(232,200,122,0.12);color:#c4a050;border:1px solid rgba(232,200,122,0.2);}
+.wt-cat{background:var(--blush-pale);color:var(--blush);border:1px solid var(--blush-border);}
+.wt-status-dreaming{background:rgba(196,168,216,0.15);color:#c4a8d8;border:1px solid rgba(196,168,216,0.25);}
+.wt-status-planned{background:rgba(232,200,122,0.12);color:#c4a050;border:1px solid rgba(232,200,122,0.2);}
+.wt-status-purchased{background:rgba(122,170,130,0.15);color:#9abea2;border:1px solid rgba(122,170,130,0.25);}
+.wish-actions{display:flex;gap:6px;margin-top:8px;}
+.w-btn{flex:1;padding:6px;border-radius:8px;font-family:'Cormorant Garamond',serif;font-size:12px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-muted);transition:all 0.15s;text-align:center;}
+.w-btn:hover{color:var(--text-soft);border-color:var(--border-med);}
+.w-btn.buy-btn:hover{background:rgba(122,170,130,0.15);border-color:rgba(122,170,130,0.3);color:var(--sage-light);}
+.w-btn.link-btn{color:var(--blush);border-color:var(--blush-border);}
+.w-btn.link-btn:hover{background:var(--blush-pale);}
+.wish-note{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--text-muted);line-height:1.4;margin-top:4px;}
+
+/* empty state */
+.empty-state{text-align:center;padding:60px 20px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--text-muted);}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(6,6,14,0.85);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:#0e0e1f;border:1px solid var(--blush-border);border-radius:16px;padding:28px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;}
+.modal h3{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:6px;}
+.modal-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);margin-bottom:20px;}
+.field{margin-bottom:14px;}
+.field label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;font-family:'EB Garamond',serif;font-size:15px;color:var(--text);padding:10px 12px;outline:none;transition:border-color 0.2s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blush-border);}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-muted);font-style:italic;}
+.field select option{background:#0e0e1f;}
+.field textarea{resize:vertical;min-height:70px;font-style:italic;}
+.modal-actions{display:flex;gap:8px;margin-top:20px;}
+.modal-btn{flex:1;padding:10px;border-radius:10px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border:1px solid var(--border);}
+.btn-primary{background:var(--blush-pale);border-color:var(--blush-border);color:var(--blush);}
+.btn-primary:hover{background:rgba(200,144,184,0.25);}
+.btn-secondary{background:transparent;color:var(--text-muted);}
+.btn-danger{background:var(--rose-pale);border-color:rgba(196,132,122,0.3);color:var(--rose);}
+
+/* ── CLOSET ── */
+.closet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.closet-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color 0.2s;}
+.closet-card:hover{border-color:rgba(200,144,184,0.25);}
+.closet-img{width:100%;height:130px;object-fit:cover;background:rgba(200,144,184,0.06);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--blush);opacity:0.4;}
+.closet-body{padding:10px 12px;}
+.closet-name{font-family:'EB Garamond',serif;font-size:14px;color:var(--text);margin-bottom:3px;}
+.closet-detail{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--text-muted);}
+.closet-laundry{display:flex;gap:5px;margin-top:8px;}
+.laundry-btn{font-family:'Cinzel',serif;font-size:9px;padding:3px 8px;border-radius:10px;border:1px solid var(--border);cursor:pointer;background:transparent;color:var(--text-muted);transition:all 0.15s;}
+.laundry-btn.dirty{background:rgba(200,120,120,0.15);border-color:rgba(200,120,120,0.3);color:var(--rose);}
+.laundry-btn.clean{background:rgba(122,170,130,0.15);border-color:rgba(122,170,130,0.3);color:var(--sage-light);}
+.fabric-badge{font-family:'Cinzel',serif;font-size:9px;padding:2px 8px;border-radius:10px;margin-top:5px;display:inline-block;letter-spacing:0.5px;}
+.fb-safe{background:rgba(122,170,130,0.15);color:#9abea2;border:1px solid rgba(122,170,130,0.25);}
+.fb-warn{background:rgba(200,120,120,0.12);color:var(--rose);border:1px solid rgba(200,120,120,0.25);}
+
+/* ── CARE GUIDE ── */
+.care-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+.care-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.care-fabric{font-family:'Playfair Display',serif;font-size:16px;color:var(--text);margin-bottom:6px;}
+.care-rule{font-family:'EB Garamond',serif;font-size:14px;color:var(--text-soft);line-height:1.7;display:flex;gap:8px;}
+.care-dot{color:var(--gold);flex-shrink:0;}
+
+/* ── OUTFIT BUILDER ── */
+.outfit-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:20px;}
+.slot{background:var(--card);border:2px dashed rgba(200,144,184,0.2);border-radius:10px;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;cursor:pointer;transition:all 0.2s;}
+.slot:hover{border-color:var(--blush-border);background:var(--blush-pale);}
+.slot.filled{border-style:solid;border-color:var(--blush-border);}
+.slot-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
+.slot-icon{font-size:24px;margin-bottom:6px;opacity:0.4;}
+.slot-content{font-family:'EB Garamond',serif;font-size:13px;color:var(--text-soft);}
+
+/* page footer */
+.page-footer{text-align:center;padding-top:44px;margin-top:20px;border-top:1px solid var(--border);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);}
+
+/* sync badge */
+.sync-badge{display:inline-flex;align-items:center;gap:6px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:20px;background:rgba(232,200,122,0.08);border:1px solid var(--gold-dim);color:var(--gold);opacity:0.7;margin-left:10px;}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+</style>
+</head>
+<body>
+<canvas id="star-canvas"></canvas>
+<div class="page">
+
+  <a class="back" href="index.html">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Back to the galaxy
+  </a>
+
+  <div class="header">
+    <span class="eyebrow">Ava's Galaxy</span>
+    <h1 class="page-title">The Closet</h1>
+    <p class="page-sub">Everything I own, everything I want, in one beautiful place</p>
+  </div>
+
+  <div class="main-tabs">
+    <button class="tab active" onclick="switchTab('wishlist',this)">✦ Wishlist</button>
+    <button class="tab" onclick="switchTab('closet',this)">My Closet</button>
+    <button class="tab" onclick="switchTab('outfit',this)">Outfit Builder</button>
+    <button class="tab" onclick="switchTab('care',this)">Care Guide</button>
+  </div>
+
+  <!-- WISHLIST -->
+  <div class="panel active" id="panel-wishlist">
+    <div class="wish-head">
+      <h2>Wishlist</h2>
+      <span class="sync-badge"><span class="sync-dot"></span>Synced to Treasury</span>
+      <button class="add-btn" onclick="openWishModal()">+ Add piece</button>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-chip active" onclick="filterWish('all',this)">All</button>
+      <button class="filter-chip" onclick="filterWish('dreaming',this)">Dreaming</button>
+      <button class="filter-chip" onclick="filterWish('planned',this)">Planned</button>
+      <button class="filter-chip" onclick="filterWish('purchased',this)">Purchased</button>
+      <button class="filter-chip" onclick="filterWish('clothing',this)">Clothing</button>
+      <button class="filter-chip" onclick="filterWish('shoes',this)">Shoes</button>
+      <button class="filter-chip" onclick="filterWish('accessories',this)">Accessories</button>
+    </div>
+
+    <div class="wish-grid" id="wish-grid">
+      <div class="empty-state" id="wish-empty">No pieces on your wishlist yet.<br>Add something beautiful. 🌿</div>
+    </div>
+  </div>
+
+  <!-- CLOSET -->
+  <div class="panel" id="panel-closet">
+    <div class="wish-head">
+      <h2>My Closet</h2>
+      <button class="add-btn" onclick="openClosetModal()">+ Add piece</button>
+    </div>
+
+    <div class="filter-bar" id="closet-filter-bar">
+      <button class="filter-chip active" onclick="filterCloset('all',this)">All</button>
+      <button class="filter-chip" onclick="filterCloset('clothing',this)">Clothing</button>
+      <button class="filter-chip" onclick="filterCloset('shoes',this)">Shoes</button>
+      <button class="filter-chip" onclick="filterCloset('accessories',this)">Accessories</button>
+      <button class="filter-chip" onclick="filterCloset('dirty',this)">Needs washing</button>
+    </div>
+
+    <div class="closet-grid" id="closet-grid">
+      <div class="empty-state" id="closet-empty">Your closet is waiting to be filled.<br>Add your first piece. 🌿</div>
+    </div>
+  </div>
+
+  <!-- OUTFIT BUILDER -->
+  <div class="panel" id="panel-outfit">
+    <div class="wish-head"><h2>Outfit Builder</h2></div>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--text-muted);margin-bottom:20px;line-height:1.6;">Your formula: Hero piece + Layer + Shoes + One detail. Tap each slot to assign a piece from your closet.</p>
+    <div class="outfit-slots">
+      <div class="slot" id="slot-hero" onclick="assignSlot('hero')"><div class="slot-label">Hero piece</div><div class="slot-icon">👗</div><div class="slot-content" id="slot-hero-content">Dress or skirt</div></div>
+      <div class="slot" id="slot-layer" onclick="assignSlot('layer')"><div class="slot-label">Layer</div><div class="slot-icon">🧥</div><div class="slot-content" id="slot-layer-content">Cardigan or blazer</div></div>
+      <div class="slot" id="slot-shoes" onclick="assignSlot('shoes')"><div class="slot-label">Shoes</div><div class="slot-icon">👡</div><div class="slot-content" id="slot-shoes-content">Simple neutral</div></div>
+      <div class="slot" id="slot-detail" onclick="assignSlot('detail')"><div class="slot-label">One detail</div><div class="slot-icon">✨</div><div class="slot-content" id="slot-detail-content">Earrings or hair clip</div></div>
+      <div class="slot" id="slot-bag" onclick="assignSlot('bag')"><div class="slot-label">Bag</div><div class="slot-icon">🧺</div><div class="slot-content" id="slot-bag-content">Natural material</div></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="add-btn" onclick="saveOutfit()" style="flex:1;">Save this outfit ✦</button>
+      <button class="add-btn" onclick="clearOutfit()" style="background:transparent;color:var(--text-muted);border-color:var(--border);">Clear</button>
+    </div>
+    <div id="saved-outfits" style="margin-top:24px;"></div>
+  </div>
+
+  <!-- CARE GUIDE -->
+  <div class="panel" id="panel-care">
+    <div class="wish-head"><h2>Fabric Care Guide</h2></div>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--text-muted);margin-bottom:20px;line-height:1.6;">Your wardrobe is natural fabrics only. Treat them right and they last years.</p>
+    <div class="care-grid">
+      <div class="care-card">
+        <div class="care-fabric">Linen</div>
+        <div class="care-rule"><span class="care-dot">·</span>Cold wash, gentle cycle only</div>
+        <div class="care-rule"><span class="care-dot">·</span>Lay flat or hang to dry — never tumble</div>
+        <div class="care-rule"><span class="care-dot">·</span>Iron while slightly damp on medium heat</div>
+        <div class="care-rule"><span class="care-dot">·</span>Softens beautifully with every wash</div>
+        <div class="care-rule"><span class="care-dot">·</span>Never use bleach — yellows the fibres</div>
+      </div>
+      <div class="care-card">
+        <div class="care-fabric">Organic Cotton</div>
+        <div class="care-rule"><span class="care-dot">·</span>30°C wash, gentle cycle</div>
+        <div class="care-rule"><span class="care-dot">·</span>Tumble dry low or air dry</div>
+        <div class="care-rule"><span class="care-dot">·</span>Iron on medium — cotton can handle heat</div>
+        <div class="care-rule"><span class="care-dot">·</span>Wash inside out to preserve prints</div>
+        <div class="care-rule"><span class="care-dot">·</span>Wash with similar colours</div>
+      </div>
+      <div class="care-card">
+        <div class="care-fabric">TENCEL / Lyocell</div>
+        <div class="care-rule"><span class="care-dot">·</span>Cold wash, delicate cycle always</div>
+        <div class="care-rule"><span class="care-dot">·</span>Air dry — heat destroys the fibres</div>
+        <div class="care-rule"><span class="care-dot">·</span>Never wring or twist — press gently</div>
+        <div class="care-rule"><span class="care-dot">·</span>Steam rather than iron where possible</div>
+        <div class="care-rule"><span class="care-dot">·</span>Softens and drapes more beautifully over time</div>
+      </div>
+      <div class="care-card">
+        <div class="care-fabric">Merino Wool</div>
+        <div class="care-rule"><span class="care-dot">·</span>Hand wash cold or wool cycle only</div>
+        <div class="care-rule"><span class="care-dot">·</span>Lay flat to dry — never hang (stretches)</div>
+        <div class="care-rule"><span class="care-dot">·</span>No tumble dryer ever — will felt and shrink</div>
+        <div class="care-rule"><span class="care-dot">·</span>Wool wash detergent only (Eucalan or Woolite)</div>
+        <div class="care-rule"><span class="care-dot">·</span>Air between wears — self-cleaning fibres</div>
+      </div>
+      <div class="care-card">
+        <div class="care-fabric">Silk or Satin</div>
+        <div class="care-rule"><span class="care-dot">·</span>Hand wash cold in gentle detergent</div>
+        <div class="care-rule"><span class="care-dot">·</span>Never wring — roll in a towel to absorb water</div>
+        <div class="care-rule"><span class="care-dot">·</span>Air dry away from direct sunlight</div>
+        <div class="care-rule"><span class="care-dot">·</span>Iron on low with a pressing cloth between</div>
+        <div class="care-rule"><span class="care-dot">·</span>Store folded in cotton, not plastic</div>
+      </div>
+      <div class="care-card">
+        <div class="care-fabric">Velvet</div>
+        <div class="care-rule"><span class="care-dot">·</span>Spot clean where possible — avoid full wash</div>
+        <div class="care-rule"><span class="care-dot">·</span>If washing: cold, delicate, inside out</div>
+        <div class="care-rule"><span class="care-dot">·</span>Never iron directly — steam only</div>
+        <div class="care-rule"><span class="care-dot">·</span>Hang to dry — never fold (crushes pile)</div>
+        <div class="care-rule"><span class="care-dot">·</span>Brush pile gently when dry with a soft brush</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <p>A wardrobe built slowly and with intention is worth more than a wardrobe built fast. 🌿</p>
+  </div>
+</div>
+
+<!-- ADD WISH MODAL -->
+<div class="modal-overlay" id="wish-modal-overlay">
+  <div class="modal">
+    <h3 id="wish-modal-title">Add a piece</h3>
+    <p class="modal-sub">Paste the link directly — from Depop, Cleobella, or anywhere.</p>
+    <div class="field"><label>Item name</label><input id="w-name" placeholder="e.g. Zaha Ankle Dress · Camellia print"/></div>
+    <div class="field"><label>Direct link</label><input id="w-url" type="url" placeholder="https://shop.cleobella.com/...  or depop.com/..."/></div>
+    <div class="field"><label>Image URL (optional)</label><input id="w-img" type="url" placeholder="Paste image URL for a preview photo"/></div>
+    <div class="field"><label>Brand</label><input id="w-brand" placeholder="e.g. Cleobella, Depop seller, Faithfull..."/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field"><label>Price ($)</label><input id="w-price" type="number" min="0" step="0.01" placeholder="0.00"/></div>
+      <div class="field"><label>Category</label>
+        <select id="w-cat">
+          <option value="clothing">Clothing</option>
+          <option value="shoes">Shoes</option>
+          <option value="accessories">Accessories</option>
+          <option value="hair">Hair</option>
+          <option value="skincare">Skincare</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field"><label>Status</label>
+        <select id="w-status">
+          <option value="dreaming">Dreaming 🌙</option>
+          <option value="planned">Planned ✦</option>
+          <option value="purchased">Purchased ✓</option>
+        </select>
+      </div>
+      <div class="field"><label>Target month</label>
+        <select id="w-month">
+          <option value="">No specific month</option>
+          <option value="2026-05">May 2026</option>
+          <option value="2026-06">June 2026</option>
+          <option value="2026-07">July 2026</option>
+          <option value="2026-08">August 2026</option>
+          <option value="2026-09">September 2026</option>
+          <option value="2026-10">October 2026</option>
+          <option value="2026-11">November 2026</option>
+          <option value="2026-12">December 2026</option>
+          <option value="2027-01">January 2027</option>
+          <option value="2027-02">February 2027</option>
+          <option value="2027-03">March 2027</option>
+          <option value="2027-04">April 2027</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Notes</label><textarea id="w-note" placeholder="Depop size guide, why you love it, which outfit it completes..."></textarea></div>
+    <div class="modal-actions">
+      <button class="modal-btn btn-secondary" onclick="closeWishModal()">Cancel</button>
+      <button class="modal-btn btn-danger" id="w-delete-btn" style="display:none;" onclick="deleteWishItem()">Delete</button>
+      <button class="modal-btn btn-primary" onclick="saveWishItem()">Save piece ✦</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CLOSET MODAL -->
+<div class="modal-overlay" id="closet-modal-overlay">
+  <div class="modal">
+    <h3>Add to my closet</h3>
+    <p class="modal-sub">Log what you already own.</p>
+    <div class="field"><label>Item name</label><input id="c-name" placeholder="e.g. Cream linen wrap dress"/></div>
+    <div class="field"><label>Image URL (optional)</label><input id="c-img" type="url" placeholder="Paste photo URL"/></div>
+    <div class="field"><label>Brand</label><input id="c-brand" placeholder="e.g. Faithfull the Brand"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field"><label>Category</label>
+        <select id="c-cat">
+          <option value="clothing">Clothing</option>
+          <option value="shoes">Shoes</option>
+          <option value="accessories">Accessories</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Fabric</label>
+        <select id="c-fabric">
+          <option value="linen">100% Linen ✓</option>
+          <option value="cotton">Organic Cotton ✓</option>
+          <option value="tencel">TENCEL / Lyocell ✓</option>
+          <option value="merino">Merino Wool ✓</option>
+          <option value="silk">Silk / Satin ✓</option>
+          <option value="velvet">Velvet ✓</option>
+          <option value="mixed">Mixed / Unknown</option>
+          <option value="synthetic">Synthetic ✕</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn btn-secondary" onclick="closeClosetModal()">Cancel</button>
+      <button class="modal-btn btn-danger" id="c-delete-btn" style="display:none;" onclick="deleteClosetItem()">Delete</button>
+      <button class="modal-btn btn-primary" onclick="saveClosetItem()">Add to closet ✦</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STARS ──
+const canvas=document.getElementById('star-canvas');
+const ctx=canvas.getContext('2d');
+let W,H;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+const STARS=Array.from({length:110},()=>({x:Math.random(),y:Math.random(),r:Math.random()*0.8+0.1,o:Math.random()*0.3+0.05,ts:Math.random()*0.02+0.004,to:Math.random()*Math.PI*2}));
+let t=0;
+function drawStars(){ctx.clearRect(0,0,W,H);t+=0.016;STARS.forEach(s=>{const tw=Math.sin(t*s.ts*60+s.to)*0.3+0.7;ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(240,234,248,${s.o*tw})`;ctx.fill();});requestAnimationFrame(drawStars);}
+drawStars();
+
+// ── STORAGE ──
+const WISH_KEY='ava_wishlist';
+const CLOSET_KEY='ava_closet';
+const OUTFIT_KEY='ava_outfits';
+
+function loadWish(){return JSON.parse(localStorage.getItem(WISH_KEY)||'[]');}
+function saveWish(d){localStorage.setItem(WISH_KEY,JSON.stringify(d));}
+function loadCloset(){return JSON.parse(localStorage.getItem(CLOSET_KEY)||'[]');}
+function saveCloset(d){localStorage.setItem(CLOSET_KEY,JSON.stringify(d));}
+function loadOutfits(){return JSON.parse(localStorage.getItem(OUTFIT_KEY)||'[]');}
+function saveOutfits(d){localStorage.setItem(OUTFIT_KEY,JSON.stringify(d));}
+
+// ── TABS ──
+function switchTab(name,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.main-tabs .tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='wishlist')renderWishlist();
+  if(name==='closet')renderCloset();
+  if(name==='outfit')renderSavedOutfits();
+}
+
+// ── MONTH LABELS ──
+const MONTH_LABELS={'2026-05':'May 2026','2026-06':'Jun 2026','2026-07':'Jul 2026','2026-08':'Aug 2026','2026-09':'Sep 2026','2026-10':'Oct 2026','2026-11':'Nov 2026','2026-12':'Dec 2026','2027-01':'Jan 2027','2027-02':'Feb 2027','2027-03':'Mar 2027','2027-04':'Apr 2027'};
+
+// ── WISHLIST RENDER ──
+let wishFilter='all';
+function filterWish(f,btn){
+  wishFilter=f;
+  document.querySelectorAll('#panel-wishlist .filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderWishlist();
+}
+
+function renderWishlist(){
+  const items=loadWish();
+  const grid=document.getElementById('wish-grid');
+  const empty=document.getElementById('wish-empty');
+  
+  let filtered=items;
+  if(wishFilter==='dreaming')filtered=items.filter(i=>i.status==='dreaming');
+  else if(wishFilter==='planned')filtered=items.filter(i=>i.status==='planned');
+  else if(wishFilter==='purchased')filtered=items.filter(i=>i.status==='purchased');
+  else if(['clothing','shoes','accessories'].includes(wishFilter))filtered=items.filter(i=>i.category===wishFilter);
+
+  // Remove old cards but keep empty state
+  grid.querySelectorAll('.wish-card').forEach(c=>c.remove());
+
+  if(filtered.length===0){empty.style.display='block';return;}
+  empty.style.display='none';
+
+  filtered.forEach(item=>{
+    const card=document.createElement('div');
+    card.className=`wish-card${item.status==='purchased'?' purchased':''}`;
+
+    const imgHtml = item.imageUrl
+      ? `<img src="${item.imageUrl}" style="width:100%;height:160px;object-fit:cover;display:block;" onerror="this.parentNode.innerHTML='<div class=wish-img-placeholder>🌿</div>'" />`
+      : `<div class="wish-img-placeholder">🌿</div>`;
+
+    const statusClass={dreaming:'wt-status-dreaming',planned:'wt-status-planned',purchased:'wt-status-purchased'}[item.status]||'';
+    const statusLabel={dreaming:'Dreaming 🌙',planned:'Planned ✦',purchased:'Purchased ✓'}[item.status]||item.status;
+
+    card.innerHTML=`
+      ${imgHtml}
+      <div class="wish-body">
+        <div class="wish-top">
+          <div class="wish-name">${item.name}</div>
+          ${item.price?`<div class="wish-price">$${parseFloat(item.price).toFixed(0)}</div>`:''}
+        </div>
+        ${item.brand?`<div class="wish-brand">${item.brand}</div>`:''}
+        <div class="wish-tags">
+          <span class="wish-tag ${statusClass}">${statusLabel}</span>
+          ${item.category?`<span class="wish-tag wt-cat">${item.category}</span>`:''}
+          ${item.targetMonth?`<span class="wish-tag wt-month">${MONTH_LABELS[item.targetMonth]||item.targetMonth}</span>`:''}
+        </div>
+        ${item.note?`<div class="wish-note">${item.note}</div>`:''}
+        <div class="wish-actions">
+          ${item.url?`<button class="w-btn link-btn" onclick="openLink('${item.url.replace(/'/g,"\\'")}',event)">View listing ↗</button>`:''}
+          <button class="w-btn buy-btn" onclick="markPurchased('${item.id}',event)">Mark purchased</button>
+          <button class="w-btn" onclick="editWish('${item.id}',event)">Edit</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function openLink(url,e){e.stopPropagation();window.open(url,'_blank');}
+
+function markPurchased(id,e){
+  e.stopPropagation();
+  const items=loadWish();
+  const item=items.find(i=>i.id===id);
+  if(!item)return;
+  item.status='purchased';
+  item.purchasedDate=new Date().toISOString().split('T')[0];
+  saveWish(items);
+  // Sync to treasury purchases
+  syncWishToPurchases(item);
+  renderWishlist();
+}
+
+function syncWishToPurchases(item){
+  if(!item.targetMonth)return;
+  try{
+    const overrides=JSON.parse(localStorage.getItem('ava_purchases')||'{}');
+    const wid='wish-'+item.id;
+    if(!overrides[item.targetMonth])overrides[item.targetMonth]={};
+    if(!overrides[item.targetMonth].extras)overrides[item.targetMonth].extras=[];
+    // Update if exists or add
+    const extras=overrides[item.targetMonth].extras;
+    const idx=extras.findIndex(e=>e.id===wid);
+    if(idx>-1)extras[idx].status='purchased';
+    else extras.push({id:wid,name:item.name,amount:item.price||0,category:item.category||'clothing',note:item.brand||'',status:'purchased',fromWishlist:true});
+    localStorage.setItem('ava_purchases',JSON.stringify(overrides));
+  }catch(e){console.error(e);}
+}
+
+// ── WISH MODAL ──
+let editingWishId=null;
+function openWishModal(id){
+  editingWishId=id||null;
+  const modal=document.getElementById('wish-modal-overlay');
+  const deleteBtn=document.getElementById('w-delete-btn');
+  document.getElementById('wish-modal-title').textContent=id?'Edit piece':'Add a piece';
+  deleteBtn.style.display=id?'block':'none';
+  if(id){
+    const items=loadWish();
+    const item=items.find(i=>i.id===id);
+    if(item){
+      document.getElementById('w-name').value=item.name||'';
+      document.getElementById('w-url').value=item.url||'';
+      document.getElementById('w-img').value=item.imageUrl||'';
+      document.getElementById('w-brand').value=item.brand||'';
+      document.getElementById('w-price').value=item.price||'';
+      document.getElementById('w-cat').value=item.category||'clothing';
+      document.getElementById('w-status').value=item.status||'dreaming';
+      document.getElementById('w-month').value=item.targetMonth||'';
+      document.getElementById('w-note').value=item.note||'';
+    }
+  } else {
+    ['w-name','w-url','w-img','w-brand','w-price','w-note'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('w-cat').value='clothing';
+    document.getElementById('w-status').value='dreaming';
+    document.getElementById('w-month').value='';
+  }
+  modal.classList.add('open');
+  document.getElementById('w-name').focus();
+}
+function closeWishModal(){document.getElementById('wish-modal-overlay').classList.remove('open');}
+function editWish(id,e){e.stopPropagation();openWishModal(id);}
+
+function saveWishItem(){
+  const name=document.getElementById('w-name').value.trim();
+  if(!name)return;
+  const items=loadWish();
+  const item={
+    id:editingWishId||'w-'+Date.now(),
+    name,
+    url:document.getElementById('w-url').value.trim(),
+    imageUrl:document.getElementById('w-img').value.trim(),
+    brand:document.getElementById('w-brand').value.trim(),
+    price:document.getElementById('w-price').value,
+    category:document.getElementById('w-cat').value,
+    status:document.getElementById('w-status').value,
+    targetMonth:document.getElementById('w-month').value,
+    note:document.getElementById('w-note').value.trim(),
+    addedDate:new Date().toISOString().split('T')[0]
+  };
+
+  if(editingWishId){
+    const idx=items.findIndex(i=>i.id===editingWishId);
+    if(idx>-1)items[idx]={...items[idx],...item};
+  } else {
+    items.unshift(item);
+  }
+  saveWish(items);
+
+  // If planned or purchased — sync to Treasury
+  if(item.status==='planned'||item.status==='purchased'){
+    injectWishIntoTreasury(item);
+  }
+
+  closeWishModal();
+  renderWishlist();
+}
+
+function injectWishIntoTreasury(item){
+  if(!item.targetMonth)return;
+  try{
+    const overrides=JSON.parse(localStorage.getItem('ava_purchases')||'{}');
+    const wid='wish-'+item.id;
+    if(!overrides[item.targetMonth])overrides[item.targetMonth]={};
+    if(!overrides[item.targetMonth].extras)overrides[item.targetMonth].extras=[];
+    const extras=overrides[item.targetMonth].extras;
+    const idx=extras.findIndex(e=>e.id===wid);
+    const entry={id:wid,name:item.name,amount:parseFloat(item.price)||0,category:item.category||'clothing',note:(item.brand?item.brand+' · ':'')+( item.url?'Link saved ↗':''),status:item.status==='purchased'?'purchased':'pending',fromWishlist:true};
+    if(idx>-1)extras[idx]=entry;
+    else extras.push(entry);
+    localStorage.setItem('ava_purchases',JSON.stringify(overrides));
+  }catch(e){console.error(e);}
+}
+
+function deleteWishItem(){
+  if(!editingWishId)return;
+  const items=loadWish().filter(i=>i.id!==editingWishId);
+  saveWish(items);
+  closeWishModal();
+  renderWishlist();
+}
+
+// ── CLOSET ──
+let closetFilter='all';
+let editingClosetId=null;
+
+function filterCloset(f,btn){
+  closetFilter=f;
+  document.querySelectorAll('#closet-filter-bar .filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCloset();
+}
+
+const SAFE_FABRICS=['linen','cotton','tencel','merino','silk','velvet'];
+
+function renderCloset(){
+  const items=loadCloset();
+  const grid=document.getElementById('closet-grid');
+  const empty=document.getElementById('closet-empty');
+  grid.querySelectorAll('.closet-card').forEach(c=>c.remove());
+
+  let filtered=items;
+  if(closetFilter==='dirty')filtered=items.filter(i=>i.laundry==='dirty');
+  else if(closetFilter!=='all')filtered=items.filter(i=>i.category===closetFilter);
+
+  if(filtered.length===0){empty.style.display='block';return;}
+  empty.style.display='none';
+
+  filtered.forEach(item=>{
+    const card=document.createElement('div');
+    card.className='closet-card';
+    const isSafe=SAFE_FABRICS.includes(item.fabric);
+    const fabricLabel={linen:'Linen ✓',cotton:'Cotton ✓',tencel:'TENCEL ✓',merino:'Merino ✓',silk:'Silk ✓',velvet:'Velvet ✓',mixed:'Mixed',synthetic:'Synthetic ✕'}[item.fabric]||item.fabric;
+
+    const imgEl = item.imageUrl
+      ? `<img src="${item.imageUrl}" style="width:100%;height:130px;object-fit:cover;display:block;" onerror="this.style.display='none'" />`
+      : `<div class="closet-img">👗</div>`;
+
+    card.innerHTML=`
+      ${imgEl}
+      <div class="closet-body">
+        <div class="closet-name">${item.name}</div>
+        ${item.brand?`<div class="closet-detail">${item.brand}</div>`:''}
+        <span class="fabric-badge ${isSafe?'fb-safe':'fb-warn'}">${fabricLabel}</span>
+        <div class="closet-laundry">
+          <button class="laundry-btn ${item.laundry==='clean'?'clean':''}" onclick="setLaundry('${item.id}','clean')">Clean</button>
+          <button class="laundry-btn ${item.laundry==='dirty'?'dirty':''}" onclick="setLaundry('${item.id}','dirty')">Dirty</button>
+          <button class="laundry-btn" onclick="openClosetModal('${item.id}')">Edit</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function setLaundry(id,status){
+  const items=loadCloset();
+  const item=items.find(i=>i.id===id);
+  if(item){item.laundry=status;saveCloset(items);renderCloset();}
+}
+
+function openClosetModal(id){
+  editingClosetId=id||null;
+  const modal=document.getElementById('closet-modal-overlay');
+  const deleteBtn=document.getElementById('c-delete-btn');
+  deleteBtn.style.display=id?'block':'none';
+  if(id){
+    const items=loadCloset();
+    const item=items.find(i=>i.id===id);
+    if(item){
+      document.getElementById('c-name').value=item.name||'';
+      document.getElementById('c-img').value=item.imageUrl||'';
+      document.getElementById('c-brand').value=item.brand||'';
+      document.getElementById('c-cat').value=item.category||'clothing';
+      document.getElementById('c-fabric').value=item.fabric||'linen';
+    }
+  } else {
+    ['c-name','c-img','c-brand'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('c-cat').value='clothing';
+    document.getElementById('c-fabric').value='linen';
+  }
+  modal.classList.add('open');
+  document.getElementById('c-name').focus();
+}
+function closeClosetModal(){document.getElementById('closet-modal-overlay').classList.remove('open');}
+
+function saveClosetItem(){
+  const name=document.getElementById('c-name').value.trim();
+  if(!name)return;
+  const items=loadCloset();
+  const item={
+    id:editingClosetId||'c-'+Date.now(),
+    name,
+    imageUrl:document.getElementById('c-img').value.trim(),
+    brand:document.getElementById('c-brand').value.trim(),
+    category:document.getElementById('c-cat').value,
+    fabric:document.getElementById('c-fabric').value,
+    laundry:'clean',
+    addedDate:new Date().toISOString().split('T')[0]
+  };
+  if(editingClosetId){
+    const idx=items.findIndex(i=>i.id===editingClosetId);
+    if(idx>-1)items[idx]={...items[idx],...item};
+  } else items.unshift(item);
+  saveCloset(items);
+  closeClosetModal();
+  renderCloset();
+}
+
+function deleteClosetItem(){
+  if(!editingClosetId)return;
+  const items=loadCloset().filter(i=>i.id!==editingClosetId);
+  saveCloset(items);
+  closeClosetModal();
+  renderCloset();
+}
+
+// ── OUTFIT BUILDER ──
+let currentOutfit={hero:null,layer:null,shoes:null,detail:null,bag:null};
+
+function assignSlot(slot){
+  const items=loadCloset();
+  if(items.length===0){alert('Add some pieces to your closet first! 🌿');return;}
+  const name=prompt('Which piece? (type the name)\n\n'+items.map(i=>i.name).join('\n'));
+  if(!name)return;
+  const found=items.find(i=>i.name.toLowerCase().includes(name.toLowerCase()));
+  if(!found){alert('Not found in your closet.');return;}
+  currentOutfit[slot]=found.name;
+  document.getElementById('slot-'+slot).classList.add('filled');
+  document.getElementById('slot-'+slot+'-content').textContent=found.name;
+}
+
+function saveOutfit(){
+  const entries=Object.entries(currentOutfit).filter(([_,v])=>v);
+  if(entries.length===0){alert('Add at least one piece to the outfit first.');return;}
+  const name=prompt('Name this outfit:');
+  if(!name)return;
+  const outfits=loadOutfits();
+  outfits.unshift({id:'o-'+Date.now(),name,pieces:{...currentOutfit},date:new Date().toISOString().split('T')[0]});
+  saveOutfits(outfits);
+  renderSavedOutfits();
+}
+
+function clearOutfit(){
+  currentOutfit={hero:null,layer:null,shoes:null,detail:null,bag:null};
+  ['hero','layer','shoes','detail','bag'].forEach(s=>{
+    document.getElementById('slot-'+s).classList.remove('filled');
+    document.getElementById('slot-'+s+'-content').textContent={hero:'Dress or skirt',layer:'Cardigan or blazer',shoes:'Simple neutral',detail:'Earrings or hair clip',bag:'Natural material'}[s];
+  });
+}
+
+function renderSavedOutfits(){
+  const outfits=loadOutfits();
+  const el=document.getElementById('saved-outfits');
+  if(!outfits.length){el.innerHTML='';return;}
+  el.innerHTML=`<div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">Saved outfits</div>`+
+    outfits.map(o=>`
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;">
+        <div style="font-family:'EB Garamond',serif;font-size:16px;color:var(--text);margin-bottom:6px;">${o.name}</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--text-muted);line-height:1.7;">${Object.entries(o.pieces).filter(([_,v])=>v).map(([k,v])=>`<span style="color:var(--text-soft);">${k}:</span> ${v}`).join(' · ')}</div>
+      </div>`).join('');
+}
+
+// Close modals on backdrop click
+document.getElementById('wish-modal-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeWishModal();});
+document.getElementById('closet-modal-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeClosetModal();});
+
+// ── INIT ──
+renderWishlist();
+</script>
+</body>
+</html>

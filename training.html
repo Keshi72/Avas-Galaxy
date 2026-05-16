@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Training Grounds · Ava's Galaxy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --void:#07070f; --deep:#0e0e1f;
+  --gold:#e8c87a; --gold-dim:rgba(232,200,122,0.2); --gold-pale:rgba(232,200,122,0.07);
+  --sage:#7aaa82; --sage-pale:rgba(122,170,130,0.1); --sage-light:#9abea2;
+  --blush:#c890b8; --blush-pale:rgba(200,144,184,0.1);
+  --rose:#c4847a; --rose-pale:rgba(196,132,122,0.1);
+  --sky:#a8c0e8; --sky-pale:rgba(168,192,232,0.1);
+  --text:#f0eaf8; --text-soft:#b0a8d0; --text-muted:#5a5470;
+  --border:rgba(232,200,122,0.12); --border-med:rgba(232,200,122,0.22);
+  --card:rgba(255,255,255,0.03);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--void);font-family:'EB Garamond',serif;color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse at 20% 15%,rgba(122,170,130,0.09) 0%,transparent 55%),
+  radial-gradient(ellipse at 80% 75%,rgba(168,192,232,0.07) 0%,transparent 55%),
+  radial-gradient(ellipse at 50% 95%,rgba(200,144,184,0.05) 0%,transparent 55%);
+pointer-events:none;z-index:0;}
+#star-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:48px 28px 100px;}
+
+/* NAV */
+.back{display:inline-flex;align-items:center;gap:8px;font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);text-decoration:none;margin-bottom:44px;transition:color 0.2s;}
+.back:hover{color:var(--gold);}
+
+/* HEADER */
+.header{text-align:center;margin-bottom:48px;}
+.eyebrow{font-family:'Cinzel',serif;font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);opacity:0.6;display:block;margin-bottom:12px;}
+.page-title{font-family:'Playfair Display',serif;font-size:clamp(34px,6vw,56px);font-weight:700;background:linear-gradient(135deg,#f0eaf8 0%,#9abea2 45%,#a8c0e8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.05;margin-bottom:10px;}
+.page-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--text-muted);}
+
+/* NORTH STAR */
+.north-star{background:rgba(122,170,130,0.06);border:1px solid rgba(122,170,130,0.2);border-radius:12px;padding:18px 22px;margin-bottom:32px;text-align:center;}
+.ns-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--sage-light);opacity:0.7;margin-bottom:6px;}
+.ns-text{font-family:'Playfair Display',serif;font-style:italic;font-size:18px;color:var(--sage-light);}
+.ns-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);margin-top:4px;}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:32px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.stat-val{font-family:'Playfair Display',serif;font-size:26px;color:var(--text);margin-bottom:4px;}
+.stat-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);}
+
+/* TABS */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+.tab{padding:7px 18px;border:1px solid var(--border);border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:14px;cursor:pointer;background:transparent;color:var(--text-muted);transition:all 0.15s;}
+.tab:hover{border-color:var(--border-med);color:var(--text-soft);}
+.tab.active{background:var(--sage-pale);border-color:rgba(122,170,130,0.3);color:var(--sage-light);}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* SESSION CARD */
+.session-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:16px;}
+.session-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.session-title-wrap{}
+.session-day{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sage-light);opacity:0.7;margin-bottom:4px;}
+.session-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:4px;}
+.session-meta{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);}
+.session-badge{font-family:'Cinzel',serif;font-size:10px;padding:5px 12px;border-radius:20px;white-space:nowrap;flex-shrink:0;letter-spacing:1px;}
+.badge-burn{background:rgba(200,144,184,0.15);color:#c890b8;border:1px solid rgba(200,144,184,0.25);}
+.badge-flow{background:rgba(168,192,232,0.15);color:#a8c0e8;border:1px solid rgba(168,192,232,0.25);}
+.badge-walk{background:rgba(122,170,130,0.15);color:#9abea2;border:1px solid rgba(122,170,130,0.25);}
+.badge-quick{background:rgba(232,200,122,0.12);color:#c4a050;border:1px solid rgba(232,200,122,0.2);}
+
+/* EXERCISE LIST */
+.exercise-list{display:flex;flex-direction:column;gap:5px;}
+.ex-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid rgba(122,170,130,0.1);border-radius:8px;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}
+.ex-item:hover{border-color:rgba(122,170,130,0.2);background:rgba(122,170,130,0.04);}
+.ex-item.done{opacity:0.35;}
+.ex-item.done .ex-name{text-decoration:line-through;}
+.ex-check{width:18px;height:18px;border-radius:50%;border:1px solid rgba(122,170,130,0.4);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--void);transition:all 0.2s;}
+.ex-item.done .ex-check{background:var(--sage);border-color:var(--sage);box-shadow:0 0 8px rgba(122,170,130,0.4);}
+.ex-name{font-family:'EB Garamond',serif;font-size:15px;color:var(--text-soft);flex:1;}
+.ex-detail{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;}
+.ex-target{font-family:'Cormorant Garamond',serif;font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(200,144,184,0.1);color:#c890b8;border:1px solid rgba(200,144,184,0.2);white-space:nowrap;flex-shrink:0;}
+
+/* ROUND TRACKER */
+.round-tracker{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+.round-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);}
+.round-dots{display:flex;gap:6px;}
+.round-dot{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:10px;color:var(--text-muted);transition:all 0.2s;}
+.round-dot.done{background:var(--sage);border-color:var(--sage);color:white;box-shadow:0 0 10px rgba(122,170,130,0.4);}
+.session-note{margin-top:10px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);line-height:1.6;padding:10px 14px;background:rgba(122,170,130,0.04);border-radius:8px;border:1px solid rgba(122,170,130,0.12);}
+
+/* TIMER */
+.timer-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:16px;text-align:center;}
+.timer-display{font-family:'Cinzel',serif;font-size:52px;font-weight:500;color:var(--text);letter-spacing:4px;margin:12px 0;text-shadow:0 0 30px rgba(122,170,130,0.3);}
+.timer-controls{display:flex;gap:8px;justify-content:center;margin-top:14px;}
+.timer-btn{padding:10px 24px;border-radius:20px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border:1px solid var(--border);}
+.timer-start{background:rgba(122,170,130,0.15);color:var(--sage-light);border-color:rgba(122,170,130,0.3);}
+.timer-start:hover{background:rgba(122,170,130,0.25);}
+.timer-pause{background:rgba(232,200,122,0.12);color:#c4a050;border-color:rgba(232,200,122,0.25);}
+.timer-reset{background:transparent;color:var(--text-muted);}
+.timer-presets{display:flex;gap:6px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;}
+.preset-btn{padding:5px 14px;border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:13px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-muted);transition:all 0.15s;}
+.preset-btn:hover{border-color:var(--border-med);color:var(--text-soft);}
+
+/* STREAK */
+.streak-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:16px;}
+.streak-head{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--sage-light);opacity:0.7;margin-bottom:14px;}
+.streak-dots{display:flex;gap:5px;flex-wrap:wrap;}
+.streak-dot{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-muted);transition:all 0.2s;font-family:'Cinzel',serif;}
+.streak-dot.active{background:var(--sage);border-color:var(--sage);color:white;box-shadow:0 0 10px rgba(122,170,130,0.4);}
+.streak-dot.rest{background:rgba(90,84,112,0.2);border-color:rgba(90,84,112,0.3);color:var(--text-muted);}
+
+/* NOTES */
+.notes-area{width:100%;min-height:100px;background:transparent;border:1px solid var(--border);border-radius:10px;font-family:'EB Garamond',serif;font-size:16px;color:var(--text-soft);font-style:italic;padding:14px 16px;outline:none;resize:none;line-height:1.7;transition:border-color 0.2s;}
+.notes-area:focus{border-color:rgba(122,170,130,0.3);}
+.notes-area::placeholder{color:var(--text-muted);}
+
+/* PLAN OVERVIEW */
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:20px;}
+.plan-day{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+.plan-day-name{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px;}
+.plan-day-session{font-family:'EB Garamond',serif;font-size:15px;color:var(--text-soft);margin-bottom:4px;}
+.plan-day-tag{font-family:'Cinzel',serif;font-size:9px;padding:2px 8px;border-radius:10px;display:inline-block;letter-spacing:0.5px;}
+.tag-burn{background:rgba(200,144,184,0.15);color:#c890b8;border:1px solid rgba(200,144,184,0.2);}
+.tag-flow{background:rgba(168,192,232,0.15);color:#a8c0e8;border:1px solid rgba(168,192,232,0.2);}
+.tag-walk{background:rgba(122,170,130,0.15);color:#9abea2;border:1px solid rgba(122,170,130,0.2);}
+.tag-rest{background:rgba(90,84,112,0.2);color:var(--text-muted);border:1px solid rgba(90,84,112,0.3);}
+
+.honest-box{background:rgba(232,200,122,0.05);border:1px solid var(--gold-dim);border-radius:12px;padding:16px 20px;margin-bottom:20px;}
+.honest-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);opacity:0.7;margin-bottom:10px;}
+.honest-row{font-family:'EB Garamond',serif;font-size:15px;color:var(--text-soft);line-height:1.9;display:flex;gap:10px;}
+.h-dot{color:var(--gold);flex-shrink:0;}
+
+/* FOOTER */
+.page-footer{text-align:center;padding-top:44px;margin-top:20px;border-top:1px solid var(--border);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);}
+</style>
+</head>
+<body>
+<canvas id="star-canvas"></canvas>
+<div class="page">
+
+  <a class="back" href="index.html">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Back to the galaxy
+  </a>
+
+  <div class="header">
+    <span class="eyebrow">Ava's Galaxy</span>
+    <h1 class="page-title">The Training Grounds</h1>
+    <p class="page-sub">Pilates-first, weight-loss focused, built for real life</p>
+  </div>
+
+  <div class="north-star">
+    <div class="ns-label">Your goal</div>
+    <div class="ns-text">Stomach · Inner thighs · Glutes · Fuller feeling in your body</div>
+    <div class="ns-sub">2 sessions minimum · 3 as the target · 4 as a good week · no guilt for bad weeks</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="streak-count">0</div><div class="stat-label">Week streak</div></div>
+    <div class="stat-card"><div class="stat-val" id="sessions-week">0</div><div class="stat-label">This week</div></div>
+    <div class="stat-card"><div class="stat-val" id="sessions-total">0</div><div class="stat-label">Total sessions</div></div>
+    <div class="stat-card"><div class="stat-val" id="floor-status">💪</div><div class="stat-label">Floor met</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('plan',this)">Weekly Plan</button>
+    <button class="tab" onclick="switchTab('burn',this)">🔥 Pilates Burn</button>
+    <button class="tab" onclick="switchTab('flow',this)">🌊 Flow & Flex</button>
+    <button class="tab" onclick="switchTab('walk',this)">🚶 Walk Day</button>
+    <button class="tab" onclick="switchTab('quick',this)">⚡ Quick 15</button>
+    <button class="tab" onclick="switchTab('timer',this)">⏱ Timer</button>
+    <button class="tab" onclick="switchTab('notes',this)">✦ Notes</button>
+  </div>
+
+  <!-- PLAN -->
+  <div class="panel active" id="panel-plan">
+    <div class="honest-box">
+      <div class="honest-title">Your honest plan</div>
+      <div class="honest-row"><span class="h-dot">·</span><span><strong style="color:var(--text);">2 days minimum</strong> — Mon + Fri Pilates Burn. This is the floor. Show up for these two and nothing is wasted.</span></div>
+      <div class="honest-row"><span class="h-dot">·</span><span><strong style="color:var(--text);">3 days target</strong> — add Wednesday Flow & Flex. Feels like a gift, not a punishment.</span></div>
+      <div class="honest-row"><span class="h-dot">·</span><span><strong style="color:var(--text);">4 days good week</strong> — add the Saturday walk. This is the fat-burning backbone of the whole plan.</span></div>
+      <div class="honest-row"><span class="h-dot">·</span><span><strong style="color:var(--text);">Bad weeks</strong> — use Quick 15. 5 exercises, 15 minutes, still counts. Never skip two days in a row.</span></div>
+    </div>
+
+    <div class="plan-grid">
+      <div class="plan-day"><div class="plan-day-name">Monday</div><div class="plan-day-session">Pilates Burn</div><span class="plan-day-tag tag-burn">30 min · burn</span></div>
+      <div class="plan-day"><div class="plan-day-name">Tuesday</div><div class="plan-day-session">Rest</div><span class="plan-day-tag tag-rest">Recovery</span></div>
+      <div class="plan-day"><div class="plan-day-name">Wednesday</div><div class="plan-day-session">Flow & Flex</div><span class="plan-day-tag tag-flow">20 min · restore</span></div>
+      <div class="plan-day"><div class="plan-day-name">Thursday</div><div class="plan-day-session">Rest</div><span class="plan-day-tag tag-rest">Recovery</span></div>
+      <div class="plan-day"><div class="plan-day-name">Friday</div><div class="plan-day-session">Pilates Burn</div><span class="plan-day-tag tag-burn">30 min · burn</span></div>
+      <div class="plan-day"><div class="plan-day-name">Saturday</div><div class="plan-day-session">Walk Day</div><span class="plan-day-tag tag-walk">30–45 min</span></div>
+      <div class="plan-day"><div class="plan-day-name">Sunday</div><div class="plan-day-session">Rest</div><span class="plan-day-tag tag-rest">Batch cook day</span></div>
+    </div>
+  </div>
+
+  <!-- PILATES BURN -->
+  <div class="panel" id="panel-burn">
+    <div class="session-card">
+      <div class="session-head">
+        <div class="session-title-wrap">
+          <div class="session-day">Monday & Friday</div>
+          <div class="session-title">Pilates Burn</div>
+          <div class="session-meta">30 minutes · pilates-cardio hybrid · targets stomach, inner thighs, glutes</div>
+        </div>
+        <span class="session-badge badge-burn">Burn</span>
+      </div>
+
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">Do 2–3 rounds of the full circuit. Rest 30–45 seconds between exercises. The goal is to keep moving — not to be perfect. Quality over speed.</div>
+
+      <div class="exercise-list" id="burn-list">
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">The Hundred</div><div class="ex-detail">100 arm pulses</div><span class="ex-target">Core · cardio warmup</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Single Leg Stretch</div><div class="ex-detail">10 each side</div><span class="ex-target">Core · lower belly</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Double Leg Stretch</div><div class="ex-detail">10 reps</div><span class="ex-target">Full core</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Standing Pilates Squats</div><div class="ex-detail">15 reps · heels together</div><span class="ex-target">Inner thighs · glutes</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Glute Bridge Pulses</div><div class="ex-detail">20 pulses · hold 2 sec</div><span class="ex-target">Glutes · hamstrings</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Clam Shell</div><div class="ex-detail">15 each side</div><span class="ex-target">Outer hip · glutes</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Pilates Swimming</div><div class="ex-detail">30 seconds</div><span class="ex-target">Back · glutes · core</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Inner Thigh Lift</div><div class="ex-detail">15 each side</div><span class="ex-target">Inner thigh · target</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Criss-Cross</div><div class="ex-detail">10 each side · slow</div><span class="ex-target">Obliques · waist</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Roll Down & Hold</div><div class="ex-detail">5 reps · slow and controlled</div><span class="ex-target">Full core · cool down</span></div>
+      </div>
+
+      <div class="round-tracker">
+        <span class="round-label">Rounds</span>
+        <div class="round-dots">
+          <div class="round-dot" onclick="toggleRound(this)">1</div>
+          <div class="round-dot" onclick="toggleRound(this)">2</div>
+          <div class="round-dot" onclick="toggleRound(this)">3</div>
+        </div>
+      </div>
+
+      <div class="session-note">💜 If the full 30 minutes feels too long today — do one round and stop. One round of this is still real work. You showed up.</div>
+
+      <div style="text-align:center;margin-top:16px;">
+        <button class="timer-btn timer-start" onclick="logSession('Pilates Burn')">✦ Log this session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOW -->
+  <div class="panel" id="panel-flow">
+    <div class="session-card">
+      <div class="session-head">
+        <div class="session-title-wrap">
+          <div class="session-day">Wednesday</div>
+          <div class="session-title">Flow & Flex</div>
+          <div class="session-meta">20 minutes · movement as a gift to your body · no intensity required</div>
+        </div>
+        <span class="session-badge badge-flow">Restore</span>
+      </div>
+
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">This is the session you love most. Move slowly, breathe, let your body open. There's no rep count that matters more than how you feel at the end.</div>
+
+      <div class="exercise-list" id="flow-list">
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Cat-Cow</div><div class="ex-detail">8 slow rounds</div><span class="ex-target">Spine · warm-up</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Child's Pose</div><div class="ex-detail">Hold 60 seconds</div><span class="ex-target">Hips · lower back</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Thread the Needle</div><div class="ex-detail">6 each side</div><span class="ex-target">Thoracic spine · shoulders</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Pigeon Pose</div><div class="ex-detail">90 seconds each side</div><span class="ex-target">Hip flexors · deep stretch</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Pilates Roll-Down</div><div class="ex-detail">5 reps · slow and articulated</div><span class="ex-target">Spine · hamstrings</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">The Roll-Up</div><div class="ex-detail">5 reps · use breath</div><span class="ex-target">Full core · spine mobility</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Supine Twist</div><div class="ex-detail">60 seconds each side</div><span class="ex-target">Lower back · hips</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Legs Up the Wall</div><div class="ex-detail">3–5 minutes</div><span class="ex-target">Circulation · nervous system · close</span></div>
+      </div>
+
+      <div class="session-note">🌊 Legs up the wall is not optional. It's the best part. Stay there for as long as you want. This is what recovery feels like.</div>
+
+      <div style="text-align:center;margin-top:16px;">
+        <button class="timer-btn timer-start" onclick="logSession('Flow & Flex')">✦ Log this session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WALK -->
+  <div class="panel" id="panel-walk">
+    <div class="session-card">
+      <div class="session-head">
+        <div class="session-title-wrap">
+          <div class="session-day">Saturday</div>
+          <div class="session-title">Walk Day</div>
+          <div class="session-meta">30–45 minutes · the fat-burning backbone of this whole plan</div>
+        </div>
+        <span class="session-badge badge-walk">Walk</span>
+      </div>
+
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.7;">Walking in a fasted or semi-fasted state (morning before a big meal, or 2+ hours after eating) at a comfortable pace is one of the most effective fat-burning tools available. It doesn't feel like exercise. It feels like living. That's the point.</div>
+
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Get dressed and out the door</div><div class="ex-detail">The only hard part</div></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Walk for at least 30 minutes</div><div class="ex-detail">Comfortable pace — you should be able to talk</div></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Notice something beautiful</div><div class="ex-detail">This is joy, not exercise</div></div>
+      </div>
+
+      <div class="session-note" style="margin-top:14px;">🌿 Saturday walk is joy practice AND your main cardio. Put on something you love, a playlist that moves you, and go somewhere that feels good. You're not exercising — you're living beautifully.</div>
+
+      <div style="margin-top:16px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);line-height:1.6;">Eventually — add a second walk on Wednesday mornings before Flow & Flex. Two walks a week plus pilates is a genuinely powerful combination for your goals.</div>
+
+      <div style="text-align:center;margin-top:16px;">
+        <button class="timer-btn timer-start" onclick="logSession('Walk Day')">✦ Log this session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK 15 -->
+  <div class="panel" id="panel-quick">
+    <div class="session-card">
+      <div class="session-head">
+        <div class="session-title-wrap">
+          <div class="session-day">Any day · bad weeks only</div>
+          <div class="session-title">Quick 15</div>
+          <div class="session-meta">15 minutes · the floor that keeps momentum alive</div>
+        </div>
+        <span class="session-badge badge-quick">Emergency</span>
+      </div>
+
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">This is not a lesser version of your workout. This is a weapon against the spiral. The only rule: never skip two sessions in a row. If you can't face the full session, do this. It counts.</div>
+
+      <div class="exercise-list">
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">The Hundred</div><div class="ex-detail">50 arm pulses</div><span class="ex-target">Core · warm up</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Glute Bridge Pulses</div><div class="ex-detail">20 pulses</div><span class="ex-target">Glutes</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Standing Pilates Squats</div><div class="ex-detail">15 reps</div><span class="ex-target">Inner thighs</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Criss-Cross</div><div class="ex-detail">8 each side</div><span class="ex-target">Obliques</span></div>
+        <div class="ex-item" onclick="toggleEx(this)"><div class="ex-check"></div><div class="ex-name">Legs Up the Wall</div><div class="ex-detail">2 minutes</div><span class="ex-target">Close · reset</span></div>
+      </div>
+
+      <div class="session-note" style="margin-top:14px;">⚡ The 5-minute trick: tell yourself you're only doing the first exercise. Just The Hundred. Set a timer for 5 minutes. You almost always keep going once you've started. But even if you stop — you did something. That matters.</div>
+
+      <div style="text-align:center;margin-top:16px;">
+        <button class="timer-btn timer-start" onclick="logSession('Quick 15')">✦ Log this session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMER -->
+  <div class="panel" id="panel-timer">
+    <div class="timer-section">
+      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Session timer</div>
+      <div class="timer-presets">
+        <button class="preset-btn" onclick="setTimer(20)">20 min</button>
+        <button class="preset-btn" onclick="setTimer(25)">25 min</button>
+        <button class="preset-btn" onclick="setTimer(30)">30 min</button>
+        <button class="preset-btn" onclick="setTimer(45)">45 min</button>
+        <button class="preset-btn" onclick="setTimer(5)">5 min</button>
+      </div>
+      <div class="timer-display" id="timer-display">30:00</div>
+      <div class="timer-controls">
+        <button class="timer-btn timer-start" id="timer-start-btn" onclick="startTimer()">Start</button>
+        <button class="timer-btn timer-pause" id="timer-pause-btn" onclick="pauseTimer()" style="display:none;">Pause</button>
+        <button class="timer-btn timer-reset" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+
+    <div class="streak-section">
+      <div class="streak-head">This week — tap days you worked out</div>
+      <div class="streak-dots" id="streak-dots"></div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="panel" id="panel-notes">
+    <div class="session-card">
+      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sage-light);opacity:0.7;margin-bottom:12px;">Training notes · how your body is feeling</div>
+      <textarea class="notes-area" id="training-notes" placeholder="How did today's session feel? What's getting easier? What hurts? What are you proud of?&#10;&#10;Write anything here..."></textarea>
+      <div style="text-align:right;margin-top:8px;">
+        <button class="timer-btn timer-start" onclick="saveNotes()" style="padding:6px 16px;font-size:10px;">Save notes</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <p>Strong is not a size — it's a practice. Show up, even imperfectly. 🌿</p>
+  </div>
+</div>
+
+<script>
+// ── STARS ──
+const canvas=document.getElementById('star-canvas');
+const ctx=canvas.getContext('2d');
+let W,H;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+const STARS=Array.from({length:100},()=>({x:Math.random(),y:Math.random(),r:Math.random()*0.8+0.1,o:Math.random()*0.3+0.05,ts:Math.random()*0.02+0.004,to:Math.random()*Math.PI*2}));
+let t=0;
+function drawStars(){ctx.clearRect(0,0,W,H);t+=0.016;STARS.forEach(s=>{const tw=Math.sin(t*s.ts*60+s.to)*0.3+0.7;ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(240,234,248,${s.o*tw})`;ctx.fill();});requestAnimationFrame(drawStars);}
+drawStars();
+
+// ── STORAGE ──
+const STORE='ava_training';
+let data=JSON.parse(localStorage.getItem(STORE)||'{}');
+function save(){localStorage.setItem(STORE,JSON.stringify(data));}
+
+// ── TABS ──
+function switchTab(name,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── EXERCISES ──
+function toggleEx(el){
+  el.classList.toggle('done');
+  el.querySelector('.ex-check').textContent=el.classList.contains('done')?'✓':'';
+}
+function toggleRound(el){el.classList.toggle('done');}
+
+// ── SESSION LOG ──
+function logSession(name){
+  const today=new Date().toISOString().split('T')[0];
+  if(!data.sessions)data.sessions=[];
+  data.sessions.push({name,date:today,time:new Date().toLocaleTimeString()});
+  if(!data.total)data.total=0;
+  data.total++;
+  save();updateStats();
+  alert('✦ '+name+' logged for today. Well done. 🌿');
+}
+
+function updateStats(){
+  const now=new Date();
+  const weekStart=new Date(now);
+  weekStart.setDate(now.getDate()-now.getDay()+1);
+  weekStart.setHours(0,0,0,0);
+  const sessions=data.sessions||[];
+  const thisWeek=sessions.filter(s=>new Date(s.date)>=weekStart).length;
+  document.getElementById('sessions-week').textContent=thisWeek;
+  document.getElementById('sessions-total').textContent=data.total||0;
+  document.getElementById('floor-status').textContent=thisWeek>=2?'✓':'—';
+  document.getElementById('streak-count').textContent=data.streak||0;
+}
+
+// ── TIMER ──
+let timerSeconds=30*60,timerRunning=false,timerInterval=null;
+function setTimer(min){timerSeconds=min*60;timerRunning=false;clearInterval(timerInterval);updateTimerDisplay();document.getElementById('timer-start-btn').style.display='block';document.getElementById('timer-pause-btn').style.display='none';}
+function updateTimerDisplay(){const m=Math.floor(timerSeconds/60),s=timerSeconds%60;document.getElementById('timer-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
+function startTimer(){if(timerRunning)return;timerRunning=true;document.getElementById('timer-start-btn').style.display='none';document.getElementById('timer-pause-btn').style.display='block';timerInterval=setInterval(()=>{if(timerSeconds<=0){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-display').textContent='Done!';return;}timerSeconds--;updateTimerDisplay();},1000);}
+function pauseTimer(){timerRunning=false;clearInterval(timerInterval);document.getElementById('timer-start-btn').style.display='block';document.getElementById('timer-pause-btn').style.display='none';}
+function resetTimer(){pauseTimer();timerSeconds=30*60;updateTimerDisplay();}
+
+// ── STREAK DOTS ──
+const WEEK_DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+function renderStreak(){
+  const el=document.getElementById('streak-dots');
+  el.innerHTML='';
+  const worked=data.workedDays||[];
+  WEEK_DAYS.forEach((d,i)=>{
+    const dot=document.createElement('div');
+    dot.className='streak-dot'+(worked.includes(i)?' active':'');
+    dot.textContent=d;
+    dot.onclick=()=>{
+      const idx=worked.indexOf(i);
+      if(idx>-1)worked.splice(idx,1);else worked.push(i);
+      data.workedDays=worked;save();renderStreak();updateStats();
+    };
+    el.appendChild(dot);
+  });
+}
+
+// ── NOTES ──
+function saveNotes(){
+  data.notes=document.getElementById('training-notes').value;
+  save();
+  const btn=document.querySelector('#panel-notes .timer-start');
+  btn.textContent='Saved ✓';
+  setTimeout(()=>btn.textContent='Save notes',1500);
+}
+
+// ── INIT ──
+updateStats();renderStreak();
+const notes=document.getElementById('training-notes');
+if(notes&&data.notes)notes.value=data.notes;
+</script>
+</body>
+</html>

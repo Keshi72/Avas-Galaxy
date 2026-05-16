@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📖 The Grimoire</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bark: #0f0b06;
+  --bark-mid: #1a1208;
+  --bark-light: #241a0c;
+  --moss: #1e2e18;
+  --moss-mid: #2a3e22;
+  --moss-light: #4a6e3a;
+  --moss-pale: #8aaa6a;
+  --spanish-moss: #6a7a4a;
+  --amber: #c87a20;
+  --amber-light: #e8a840;
+  --amber-pale: #f5d080;
+  --copper: #b05820;
+  --copper-light: #d87840;
+  --parchment: #f5ead0;
+  --parchment-mid: #e8d8b0;
+  --parchment-dark: #d0b880;
+  --sage: #7a9a5a;
+  --sage-light: #a8c080;
+  --cream: #faf3e0;
+  --ink: #1a1008;
+  --ink-soft: #3a2810;
+  --warm-gray: #7a6840;
+  --muted: #9a8860;
+  --gold: #c87a20;
+  --gold-dim: rgba(200,122,32,0.3);
+  --candle: #e8a840;
+  --border: rgba(200,160,60,0.2);
+  --text: #f5ead0;
+  --text-soft: #d0b880;
+  --text-muted: #8a7850;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bark);
+  font-family: 'EB Garamond', serif;
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── ATMOSPHERIC BACKGROUND ── */
+#bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+.moss-layer {
+  position:fixed; pointer-events:none; z-index:0;
+  border-radius:50%; filter:blur(100px);
+}
+.ml1 { width:800px;height:500px;background:radial-gradient(ellipse,rgba(30,46,24,0.6) 0%,transparent 70%);top:-100px;left:-200px; }
+.ml2 { width:600px;height:700px;background:radial-gradient(ellipse,rgba(42,62,34,0.4) 0%,transparent 70%);top:20%;right:-200px; }
+.ml3 { width:700px;height:400px;background:radial-gradient(ellipse,rgba(200,122,32,0.08) 0%,transparent 70%);bottom:0;left:20%; }
+.ml4 { width:500px;height:500px;background:radial-gradient(ellipse,rgba(106,122,74,0.15) 0%,transparent 70%);top:40%;left:30%; }
+
+/* ── TOPBAR ── */
+#topbar {
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 28px;
+  background:rgba(15,11,6,0.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(200,122,32,0.2);
+}
+.topbar-logo {
+  font-family:'Cinzel',serif;font-size:15px;font-weight:600;
+  color:var(--amber-light);text-decoration:none;letter-spacing:1px;
+}
+.topbar-logo span { color:var(--text-muted);font-weight:400;font-size:13px;margin-left:8px;font-family:'Cormorant Garamond',serif;font-style:italic; }
+.nav-pills { display:flex;gap:5px;flex-wrap:wrap; }
+.nav-pill {
+  background:transparent;border:1px solid rgba(200,122,32,0.15);border-radius:20px;
+  padding:5px 14px;cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:13px;
+  color:var(--text-muted);transition:all 0.2s;white-space:nowrap;
+}
+.nav-pill:hover,.nav-pill.active {
+  background:rgba(200,122,32,0.12);border-color:var(--gold-dim);color:var(--amber-light);
+}
+.tb-right { display:flex;gap:8px;align-items:center; }
+.tb-btn {
+  background:transparent;border:1px solid rgba(200,122,32,0.15);border-radius:20px;
+  padding:5px 13px;font-family:'Cormorant Garamond',serif;font-size:13px;
+  color:var(--text-muted);cursor:pointer;transition:all 0.2s;
+}
+.tb-btn:hover { border-color:var(--gold-dim);color:var(--amber-light); }
+#save-indicator { font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--sage-light);opacity:0;transition:opacity 0.4s; }
+#save-indicator.visible { opacity:1; }
+
+/* ── SECTIONS ── */
+.section { display:none;min-height:100vh;padding:76px 0 100px;position:relative;z-index:1; }
+.section.active { display:block; }
+.container { max-width:980px;margin:0 auto;padding:0 40px; }
+
+/* ── SECTION HERO ── */
+.section-hero { text-align:center;margin-bottom:52px;opacity:0;animation:fadeUp 1s ease 0.1s forwards; }
+.section-eyebrow {
+  font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:5px;
+  text-transform:uppercase;color:var(--amber);opacity:0.7;display:block;margin-bottom:12px;
+}
+.section-title {
+  font-family:'Cinzel',serif;font-size:clamp(28px,4.5vw,48px);font-weight:600;
+  color:var(--parchment);line-height:1.2;margin-bottom:12px;
+  text-shadow:0 0 40px rgba(200,122,32,0.3);
+}
+.section-sub {
+  font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;
+  color:var(--text-muted);
+}
+.candle-divider {
+  display:flex;align-items:center;justify-content:center;gap:16px;margin-top:22px;
+}
+.candle-divider::before,.candle-divider::after {
+  content:'';width:80px;height:1px;
+  background:linear-gradient(to right,transparent,rgba(200,160,60,0.4));
+}
+.candle-divider::after { background:linear-gradient(to left,transparent,rgba(200,160,60,0.4)); }
+
+/* ── CARDS & PANELS ── */
+.grimoire-card {
+  background:rgba(26,18,8,0.7);border:1px solid var(--border);
+  border-radius:8px;backdrop-filter:blur(8px);
+}
+.grimoire-card:hover { border-color:rgba(200,122,32,0.3); }
+
+/* ── FORM ELEMENTS ── */
+.form-field { display:flex;flex-direction:column;gap:6px;margin-bottom:18px; }
+.form-label {
+  font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--amber);opacity:0.7;
+}
+.form-input {
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;
+  padding:10px 14px;font-family:'Cormorant Garamond',serif;font-size:15px;
+  color:var(--text);outline:none;transition:border-color 0.2s;
+}
+.form-input:focus { border-color:var(--gold-dim); }
+.form-input::placeholder { color:var(--text-muted);font-style:italic; }
+.form-textarea {
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;
+  padding:14px 16px;font-family:'EB Garamond',serif;font-size:16px;font-style:italic;
+  color:var(--text-soft);outline:none;resize:none;line-height:1.85;min-height:100px;
+  transition:border-color 0.2s;width:100%;
+}
+.form-textarea:focus { border-color:var(--gold-dim); }
+.form-textarea::placeholder { color:var(--text-muted); }
+.form-row { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+.form-row-3 { display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px; }
+
+/* Tags */
+.tag-area { display:flex;flex-wrap:wrap;gap:8px;align-items:center; }
+.entry-tag {
+  background:rgba(200,122,32,0.12);border:1px solid rgba(200,122,32,0.25);
+  border-radius:16px;padding:4px 12px;font-family:'Cormorant Garamond',serif;
+  font-size:13px;color:var(--amber-light);display:flex;align-items:center;gap:6px;
+}
+.entry-tag button { background:none;border:none;cursor:pointer;color:var(--amber);font-size:11px;opacity:0.5;padding:0; }
+.entry-tag button:hover { opacity:1; }
+.tag-input-field {
+  border:1px dashed rgba(200,122,32,0.25);border-radius:16px;padding:4px 12px;
+  background:transparent;font-family:'Cormorant Garamond',serif;font-size:13px;
+  color:var(--text);outline:none;width:110px;
+}
+.tag-input-field::placeholder { color:var(--text-muted);font-style:italic; }
+
+/* Buttons */
+.btn {
+  padding:10px 24px;border-radius:24px;cursor:pointer;
+  font-family:'Cormorant Garamond',serif;font-size:14px;letter-spacing:0.5px;
+  transition:all 0.2s;border:1px solid var(--border);
+}
+.btn-primary {
+  background:rgba(200,122,32,0.15);border-color:var(--gold-dim);color:var(--amber-light);
+}
+.btn-primary:hover { background:rgba(200,122,32,0.25); }
+.btn-ghost { background:transparent;color:var(--text-muted); }
+.btn-ghost:hover { border-color:var(--gold-dim);color:var(--amber-light); }
+.btn-danger:hover { border-color:rgba(180,60,60,0.4);color:#e09090; }
+
+/* Section header */
+.entry-section-header {
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;
+}
+.entry-section-title {
+  font-family:'Cinzel',serif;font-size:14px;letter-spacing:2px;color:var(--amber-light);
+}
+
+/* Grid layouts */
+.two-col { display:grid;grid-template-columns:1fr 1fr;gap:20px; }
+.three-col { display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px; }
+
+/* ── SIDE PANEL LAYOUT ── */
+.side-layout { display:grid;grid-template-columns:270px 1fr;gap:24px; }
+.side-panel {
+  background:rgba(15,11,6,0.7);border:1px solid var(--border);border-radius:10px;
+  display:flex;flex-direction:column;height:calc(100vh - 130px);position:sticky;
+  top:76px;overflow:hidden;
+}
+.side-panel-header {
+  padding:16px 18px;border-bottom:1px solid var(--border);
+  font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--text-muted);flex-shrink:0;
+}
+.side-panel-list { flex:1;overflow-y:auto;padding:10px; }
+.side-panel-item {
+  padding:12px 14px;border-radius:8px;cursor:pointer;
+  border:1px solid transparent;transition:all 0.15s;margin-bottom:5px;
+  border-left:3px solid transparent;
+}
+.side-panel-item:hover { background:rgba(200,122,32,0.05);border-color:var(--border); }
+.side-panel-item.active { background:rgba(200,122,32,0.08);border-left-color:var(--amber); }
+.side-panel-item-title {
+  font-family:'Playfair Display',serif;font-size:14px;color:var(--text-soft);
+  margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.side-panel-item.active .side-panel-item-title { color:var(--amber-light); }
+.side-panel-item-meta { font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--text-muted); }
+.side-panel-empty { padding:24px 14px;text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--text-muted);font-size:14px;line-height:1.7; }
+.side-panel-footer { padding:12px;border-top:1px solid var(--border);flex-shrink:0; }
+
+/* ── PILLS / TAGS ── */
+.pill {
+  display:inline-block;padding:4px 12px;border-radius:14px;
+  font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:0.5px;
+  cursor:pointer;user-select:none;transition:all 0.15s;border:1px solid var(--border);
+  color:var(--text-muted);
+}
+.pill:hover,.pill.active {
+  background:rgba(200,122,32,0.12);border-color:var(--gold-dim);color:var(--amber-light);
+}
+
+/* ── CORRESPONDENCE GRID ── */
+.corr-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:16px; }
+.corr-card {
+  background:rgba(26,18,8,0.7);border:1px solid var(--border);border-radius:10px;
+  padding:20px;transition:all 0.2s;cursor:pointer;
+}
+.corr-card:hover { border-color:rgba(200,122,32,0.35);transform:translateY(-2px); }
+.corr-card-symbol { font-size:28px;display:block;margin-bottom:10px; }
+.corr-card-name {
+  font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:var(--amber-light);
+  margin-bottom:6px;letter-spacing:0.5px;
+}
+.corr-card-preview {
+  font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;
+  color:var(--text-muted);line-height:1.6;
+}
+
+/* ── MOON PHASE ── */
+.moon-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:16px; }
+.moon-card {
+  background:rgba(26,18,8,0.7);border:1px solid var(--border);border-radius:10px;
+  padding:20px 16px;text-align:center;cursor:pointer;transition:all 0.2s;
+}
+.moon-card:hover,.moon-card.active { border-color:rgba(200,122,32,0.4);background:rgba(200,122,32,0.07); }
+.moon-phase-icon { font-size:36px;display:block;margin-bottom:10px; }
+.moon-phase-name { font-family:'Cinzel',serif;font-size:13px;color:var(--amber-light);margin-bottom:6px;letter-spacing:0.5px; }
+.moon-phase-desc { font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--text-muted);line-height:1.5; }
+
+/* ── SIGIL CANVAS ── */
+.sigil-canvas-wrap {
+  background:rgba(15,11,6,0.8);border:1px solid var(--border);border-radius:8px;
+  position:relative;overflow:hidden;
+}
+#sigil-canvas { display:block;cursor:crosshair;touch-action:none; }
+.sigil-tools { display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);align-items:center;flex-wrap:wrap; }
+.sigil-tool-btn {
+  padding:6px 14px;background:transparent;border:1px solid var(--border);border-radius:14px;
+  cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:12px;color:var(--text-muted);
+  transition:all 0.15s;
+}
+.sigil-tool-btn:hover,.sigil-tool-btn.active { border-color:var(--gold-dim);color:var(--amber-light);background:rgba(200,122,32,0.08); }
+.color-dot {
+  width:20px;height:20px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:all 0.15s;flex-shrink:0;
+}
+.color-dot:hover,.color-dot.active { border-color:var(--amber-light); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display:none;position:fixed;inset:0;background:rgba(10,8,4,0.85);
+  z-index:500;backdrop-filter:blur(6px);align-items:center;justify-content:center;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--bark-mid);border:1px solid var(--gold-dim);border-radius:12px;
+  padding:32px 36px;max-width:680px;width:90%;max-height:86vh;overflow-y:auto;
+  position:relative;animation:fadeUp 0.3s ease forwards;
+}
+.modal-close {
+  position:absolute;top:14px;right:16px;background:rgba(255,255,255,0.06);
+  border:none;color:var(--text-muted);width:30px;height:30px;border-radius:50%;
+  cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;
+}
+.modal-title { font-family:'Cinzel',serif;font-size:20px;color:var(--amber-light);margin-bottom:20px; }
+
+/* ── FAMILY TRADITION SECTION ── */
+.tradition-grid { display:grid;grid-template-columns:1fr 1fr;gap:20px; }
+.tradition-card {
+  background:rgba(26,18,8,0.7);border:1px solid var(--border);border-radius:10px;padding:24px;
+  border-top:3px solid var(--amber);
+}
+.tradition-card-title {
+  font-family:'Cinzel',serif;font-size:15px;color:var(--amber-light);
+  margin-bottom:6px;letter-spacing:0.5px;
+}
+.tradition-card-sub {
+  font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;
+  color:var(--text-muted);margin-bottom:14px;
+}
+
+/* ── REFERENCE BLOCKS ── */
+.ref-block {
+  background:rgba(26,18,8,0.6);border:1px solid var(--border);border-radius:8px;
+  padding:18px 20px;margin-bottom:14px;
+}
+.ref-block-title {
+  font-family:'Cinzel',serif;font-size:13px;letter-spacing:1.5px;color:var(--amber-light);
+  margin-bottom:8px;
+}
+.ref-block-body {
+  font-family:'EB Garamond',serif;font-style:italic;font-size:15px;
+  color:var(--text-soft);line-height:1.8;
+}
+
+/* ── DIVIDERS ── */
+.section-divider {
+  text-align:center;margin:32px 0;color:rgba(200,122,32,0.4);
+  font-size:14px;letter-spacing:8px;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(200,122,32,0.2);border-radius:4px; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes flicker {
+  0%,100%{opacity:1} 50%{opacity:0.85} 75%{opacity:0.95}
+}
+
+textarea::placeholder,input::placeholder { color:var(--text-muted);font-style:italic; }
+
+@media(max-width:700px) {
+  .side-layout{grid-template-columns:1fr}
+  .corr-grid{grid-template-columns:1fr 1fr}
+  .moon-grid{grid-template-columns:1fr 1fr}
+  .tradition-grid{grid-template-columns:1fr}
+  .form-row,.form-row-3{grid-template-columns:1fr}
+  .container{padding:0 20px}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="moss-layer ml1"></div>
+<div class="moss-layer ml2"></div>
+<div class="moss-layer ml3"></div>
+<div class="moss-layer ml4"></div>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <a class="topbar-logo" href="index.html">✦ Ava's Galaxy <span>/ The Grimoire</span></a>
+  <div class="nav-pills">
+    <button class="nav-pill active" onclick="showSection('spells',this)">🕯️ Spells & Rituals</button>
+    <button class="nav-pill" onclick="showSection('tradition',this)">🌿 Family Tradition</button>
+    <button class="nav-pill" onclick="showSection('moon',this)">🌕 Moon Phases</button>
+    <button class="nav-pill" onclick="showSection('correspondences',this)">🌿 Correspondences</button>
+    <button class="nav-pill" onclick="showSection('manifestations',this)">✨ Manifestations</button>
+    <button class="nav-pill" onclick="showSection('sigils',this)">🔮 Sigils</button>
+    <button class="nav-pill" onclick="showSection('reflections',this)">📜 Reflections</button>
+  </div>
+  <div class="tb-right">
+    <button class="tb-btn" onclick="exportGrimoire()">⬇ Export</button>
+    <button class="tb-btn" onclick="document.getElementById('import-file').click()">⬆ Import</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importGrimoire(event)">
+    <div id="save-indicator">Saved ✓</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SPELLS & RITUALS -->
+<!-- ══════════════════════════════════════ -->
+<div class="section active" id="section-spells">
+  <div class="container">
+    <div class="section-hero">
+      <div style="text-align:center;margin-bottom:20px;">
+        <svg width="70" height="70" viewBox="0 0 70 70" fill="none">
+          <path d="M35 8 L35 62" stroke="rgba(200,122,32,0.3)" stroke-width="0.8" fill="none"/>
+          <path d="M35 14 Q42 22 35 30 Q28 38 35 46 Q42 54 35 62" stroke="rgba(200,160,60,0.5)" stroke-width="1.2" fill="none"/>
+          <circle cx="35" cy="14" r="4" fill="rgba(200,122,32,0.5)"/>
+          <circle cx="35" cy="14" r="2" fill="rgba(232,168,64,0.9)"/>
+          <ellipse cx="35" cy="10" rx="2" ry="4" fill="rgba(232,200,80,0.6)"/>
+          <path d="M35 14 Q38 16 36 19 Q34 22 37 25 Q40 28 38 31 Q36 34 35 32" stroke="rgba(200,140,30,0.3)" stroke-width="0.6" fill="none"/>
+          <circle cx="35" cy="30" r="3" fill="rgba(200,122,32,0.25)"/>
+          <circle cx="35" cy="46" r="2.5" fill="rgba(200,122,32,0.2)"/>
+        </svg>
+      </div>
+      <span class="section-eyebrow">Your Practice</span>
+      <h1 class="section-title">Spells & Rituals</h1>
+      <p class="section-sub">Every working, recorded and remembered</p>
+      <div class="candle-divider">✦</div>
+    </div>
+
+    <div class="side-layout">
+      <div class="side-panel">
+        <div class="side-panel-header">Your Spells & Rituals</div>
+        <div class="side-panel-list" id="spells-list">
+          <div class="side-panel-empty">Your workings will appear here.<br>Begin writing. 🕯️</div>
+        </div>
+        <div class="side-panel-footer">
+          <button class="btn btn-primary" style="width:100%;" onclick="newSpell()">+ New Working</button>
+        </div>
+      </div>
+
+      <div id="spell-form">
+        <div class="grimoire-card" style="padding:28px 30px;margin-bottom:20px;">
+          <div class="form-row" style="margin-bottom:18px;">
+            <div class="form-field" style="margin-bottom:0;">
+              <label class="form-label">Title</label>
+              <input class="form-input" id="sp-title" type="text" placeholder="Name this working...">
+            </div>
+            <div class="form-field" style="margin-bottom:0;">
+              <label class="form-label">Type</label>
+              <select class="form-input" id="sp-type">
+                <option value="">Select type...</option>
+                <option>Spell</option>
+                <option>Ritual</option>
+                <option>Prayer</option>
+                <option>Conjure Work</option>
+                <option>Rootwork</option>
+                <option>Protection Working</option>
+                <option>Cleansing</option>
+                <option>Divination</option>
+                <option>Offering</option>
+                <option>Ancestor Work</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:18px;">
+            <div class="form-field" style="margin-bottom:0;">
+              <label class="form-label">Date</label>
+              <input class="form-input" id="sp-date" type="text" placeholder="Month DD, YYYY">
+            </div>
+            <div class="form-field" style="margin-bottom:0;">
+              <label class="form-label">Moon Phase</label>
+              <select class="form-input" id="sp-moon">
+                <option value="">Select phase...</option>
+                <option>🌑 New Moon</option>
+                <option>🌒 Waxing Crescent</option>
+                <option>🌓 First Quarter</option>
+                <option>🌔 Waxing Gibbous</option>
+                <option>🌕 Full Moon</option>
+                <option>🌖 Waning Gibbous</option>
+                <option>🌗 Last Quarter</option>
+                <option>🌘 Waning Crescent</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Intention</label>
+            <textarea class="form-textarea" id="sp-intention" style="min-height:70px;" placeholder="What is the purpose of this working? What do you call upon?"></textarea>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Materials & Ingredients</label>
+            <textarea class="form-textarea" id="sp-materials" style="min-height:80px;" placeholder="Candles, herbs, roots, oils, tools, offerings — list what you used and why..."></textarea>
+          </div>
+          <div class="form-field">
+            <label class="form-label">The Working</label>
+            <textarea class="form-textarea" id="sp-working" style="min-height:160px;" placeholder="Write the full spell, ritual, prayer, or working here. Include words spoken, actions taken, timing, direction faced..."></textarea>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Result & Observations</label>
+            <textarea class="form-textarea" id="sp-result" style="min-height:90px;" placeholder="What happened? How did it feel? What signs did you notice? What would you change?"></textarea>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Tags</label>
+            <div class="tag-area" id="sp-tags">
+              <input class="tag-input-field" id="sp-tag-input" type="text" placeholder="+ add tag">
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:8px;">
+            <button class="btn btn-primary" onclick="saveSpell()">✦ Save Working</button>
+            <button class="btn btn-ghost btn-danger" onclick="deleteSpell()">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- FAMILY TRADITION -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="section-tradition">
+  <div class="container">
+    <div class="section-hero">
+      <div style="text-align:center;margin-bottom:20px;">
+        <svg width="70" height="70" viewBox="0 0 70 70" fill="none">
+          <path d="M10 60 Q20 40 35 30 Q50 40 60 60" stroke="rgba(106,122,74,0.4)" stroke-width="1.5" fill="none"/>
+          <path d="M35 30 Q30 18 25 12" stroke="rgba(106,122,74,0.4)" stroke-width="1.2" fill="none"/>
+          <path d="M35 30 Q40 18 45 12" stroke="rgba(106,122,74,0.4)" stroke-width="1.2" fill="none"/>
+          <ellipse cx="24" cy="11" rx="7" ry="4" fill="rgba(106,122,74,0.4)" transform="rotate(-20 24 11)"/>
+          <ellipse cx="46" cy="11" rx="7" ry="4" fill="rgba(106,122,74,0.4)" transform="rotate(20 46 11)"/>
+          <path d="M20 50 Q35 42 50 50" stroke="rgba(106,122,74,0.3)" stroke-width="1" fill="none"/>
+          <circle cx="35" cy="30" r="4" fill="rgba(200,122,32,0.35)"/>
+          <circle cx="35" cy="30" r="2" fill="rgba(232,168,64,0.6)"/>
+        </svg>
+      </div>
+      <span class="section-eyebrow">Louisiana Creole · Hoodoo · Vodou</span>
+      <h1 class="section-title">Family Tradition</h1>
+      <p class="section-sub">What was passed down, and what you are learning to carry</p>
+      <div class="candle-divider">✦</div>
+    </div>
+
+    <div style="margin-bottom:28px;">
+      <div class="tradition-grid">
+        <div class="tradition-card">
+          <div class="tradition-card-title">What I Know</div>
+          <div class="tradition-card-sub">Practices, stories, and knowledge passed to you</div>
+          <textarea class="form-textarea" id="trad-know" style="min-height:180px;" placeholder="Write what you've been taught, heard, or witnessed from your family..."></textarea>
+        </div>
+        <div class="tradition-card">
+          <div class="tradition-card-title">What I'm Learning</div>
+          <div class="tradition-card-sub">Things still unfolding — questions, discoveries, research</div>
+          <textarea class="form-textarea" id="trad-learning" style="min-height:180px;" placeholder="Write what you're uncovering — books read, elders spoken to, things you've found..."></textarea>
+        </div>
+        <div class="tradition-card">
+          <div class="tradition-card-title">Family Spirits & Ancestors</div>
+          <div class="tradition-card-sub">Those who watch over and guide you</div>
+          <textarea class="form-textarea" id="trad-ancestors" style="min-height:180px;" placeholder="Names, relationships, stories, how they make themselves known to you..."></textarea>
+        </div>
+        <div class="tradition-card">
+          <div class="tradition-card-title">Loa & Spirits I Work With</div>
+          <div class="tradition-card-sub">The spirits of your practice</div>
+          <textarea class="form-textarea" id="trad-loa" style="min-height:180px;" placeholder="Who they are, how they speak, what they ask of you, how you honour them..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider">· · ✦ · ·</div>
+
+    <!-- Practices & Tools -->
+    <div class="entry-section-header">
+      <span class="entry-section-title">Traditional Practices & Tools</span>
+      <button class="btn btn-primary" onclick="newTradEntry()">+ Add Entry</button>
+    </div>
+    <div class="side-layout">
+      <div class="side-panel">
+        <div class="side-panel-header">Your Entries</div>
+        <div class="side-panel-list" id="trad-list">
+          <div class="side-panel-empty">Add practices, recipes, prayers, or tools from your tradition. 🌿</div>
+        </div>
+        <div class="side-panel-footer">
+          <button class="btn btn-primary" style="width:100%;" onclick="newTradEntry()">+ New Entry</button>
+        </div>
+      </div>
+      <div class="grimoire-card" style="padding:28px 30px;">
+        <div class="form-row" style="margin-bottom:18px;">
+          <div class="form-field" style="margin-bottom:0;">
+            <label class="form-label">Title</label>
+            <input class="form-input" id="trad-title" type="text" placeholder="e.g. Gris-gris bag for protection">
+          </div>
+          <div class="form-field" style="margin-bottom:0;">
+            <label class="form-label">Category</label>
+            <select class="form-input" id="trad-cat">
+              <option value="">Select...</option>
+              <option>Gris-gris</option>
+              <option>Mojo Bag</option>
+              <option>Rootwork</option>
+              <option>Prayer</option>
+              <option>Offering</option>
+              <option>Divination</option>
+              <option>Cleansing</option>
+              <option>Protection</option>
+              <option>Ancestor Veneration</option>
+              <option>Food & Cooking Magic</option>
+              <option>Loa Ceremony</option>
+              <option>Family Recipe/Remedy</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Source / Who Taught You</label>
+          <input class="form-input" id="trad-source" type="text" placeholder="Family member, elder, book, discovered yourself...">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Description & Notes</label>
+          <textarea class="form-textarea" id="trad-notes" style="min-height:200px;" placeholder="Write everything you know about this practice, ingredient, tool, or tradition..."></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="saveTradEntry()">✦ Save Entry</button>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;text-align:right;">
+      <button class="btn btn-primary" onclick="saveTradition()">✦ Save Tradition Notes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- MOON PHASES -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="section-moon">
+  <div class="container">
+    <div class="section-hero">
+      <span class="section-eyebrow">Lunar Wisdom</span>
+      <h1 class="section-title">Moon Phases</h1>
+      <p class="section-sub">Working in harmony with the turning of the moon</p>
+      <div class="candle-divider">✦</div>
+    </div>
+
+    <div class="moon-grid" style="margin-bottom:40px;" id="moon-phase-grid">
+      <div class="moon-card active" data-phase="new" onclick="selectMoonPhase('new',this)">
+        <span class="moon-phase-icon">🌑</span>
+        <div class="moon-phase-name">New Moon</div>
+        <div class="moon-phase-desc">Beginnings, intentions, planting seeds</div>
+      </div>
+      <div class="moon-card" data-phase="waxing-crescent" onclick="selectMoonPhase('waxing-crescent',this)">
+        <span class="moon-phase-icon">🌒</span>
+        <div class="moon-phase-name">Waxing Crescent</div>
+        <div class="moon-phase-desc">Growth, attraction, calling in</div>
+      </div>
+      <div class="moon-card" data-phase="first-quarter" onclick="selectMoonPhase('first-quarter',this)">
+        <span class="moon-phase-icon">🌓</span>
+        <div class="moon-phase-name">First Quarter</div>
+        <div class="moon-phase-desc">Challenges, decisions, action</div>
+      </div>
+      <div class="moon-card" data-phase="waxing-gibbous" onclick="selectMoonPhase('waxing-gibbous',this)">
+        <span class="moon-phase-icon">🌔</span>
+        <div class="moon-phase-name">Waxing Gibbous</div>
+        <div class="moon-phase-desc">Refinement, persistence, trust</div>
+      </div>
+      <div class="moon-card" data-phase="full" onclick="selectMoonPhase('full',this)">
+        <span class="moon-phase-icon">🌕</span>
+        <div class="moon-phase-name">Full Moon</div>
+        <div class="moon-phase-desc">Manifestation, power, completion</div>
+      </div>
+      <div class="moon-card" data-phase="waning-gibbous" onclick="selectMoonPhase('waning-gibbous',this)">
+        <span class="moon-phase-icon">🌖</span>
+        <div class="moon-phase-name">Waning Gibbous</div>
+        <div class="moon-phase-desc">Gratitude, sharing, release beginning</div>
+      </div>
+      <div class="moon-card" data-phase="last-quarter" onclick="selectMoonPhase('last-quarter',this)">
+        <span class="moon-phase-icon">🌗</span>
+        <div class="moon-phase-name">Last Quarter</div>
+        <div class="moon-phase-desc">Letting go, forgiveness, banishing</div>
+      </div>
+      <div class="moon-card" data-phase="waning-crescent" onclick="selectMoonPhase('waning-crescent',this)">
+        <span class="moon-phase-icon">🌘</span>
+        <div class="moon-phase-name">Waning Crescent</div>
+        <div class="moon-phase-desc">Rest, surrender, deep intuition</div>
+      </div>
+    </div>
+
+    <!-- Moon phase detail -->
+    <div class="grimoire-card" style="padding:28px 30px;" id="moon-detail">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:22px;">
+        <span style="font-size:40px;" id="moon-detail-icon">🌑</span>
+        <div>
+          <div style="font-family:'Cinzel',serif;font-size:18px;color:var(--amber-light);" id="moon-detail-name">New Moon</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);" id="moon-detail-keyword">Beginnings · Intentions · New cycles</div>
+        </div>
+      </div>
+      <div class="two-col" style="margin-bottom:20px;">
+        <div>
+          <div class="form-label" style="margin-bottom:10px;">Best Workings</div>
+          <div class="ref-block-body" id="moon-detail-workings" style="font-size:15px;"></div>
+        </div>
+        <div>
+          <div class="form-label" style="margin-bottom:10px;">Avoid</div>
+          <div class="ref-block-body" id="moon-detail-avoid" style="font-size:15px;"></div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">My Notes for This Phase</label>
+        <textarea class="form-textarea" id="moon-notes" style="min-height:100px;" placeholder="Your personal observations, workings you've done during this phase, what you've noticed..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="saveMoonNotes()">✦ Save Notes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- CORRESPONDENCES -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="section-correspondences">
+  <div class="container">
+    <div class="section-hero">
+      <span class="section-eyebrow">Herbs · Crystals · Elements</span>
+      <h1 class="section-title">Correspondences</h1>
+      <p class="section-sub">The language of the natural world</p>
+      <div class="candle-divider">✦</div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div style="display:flex;gap:10px;margin-bottom:30px;justify-content:center;flex-wrap:wrap;" id="corr-filters">
+      <button class="pill active" onclick="filterCorr('all',this)">All</button>
+      <button class="pill" onclick="filterCorr('herb',this)">🌿 Herbs & Roots</button>
+      <button class="pill" onclick="filterCorr('crystal',this)">💎 Crystals</button>
+      <button class="pill" onclick="filterCorr('element',this)">🔥 Elements</button>
+      <button class="pill" onclick="filterCorr('color',this)">🕯️ Candle Colours</button>
+      <button class="pill" onclick="filterCorr('custom',this)">+ My Additions</button>
+    </div>
+
+    <div class="corr-grid" id="corr-grid"></div>
+
+    <div class="section-divider">· · ✦ · ·</div>
+
+    <!-- Add custom correspondence -->
+    <div class="entry-section-header">
+      <span class="entry-section-title">Add Your Own Correspondence</span>
+    </div>
+    <div class="grimoire-card" style="padding:24px 28px;">
+      <div class="form-row-3" style="margin-bottom:16px;">
+        <div class="form-field" style="margin-bottom:0;">
+          <label class="form-label">Name</label>
+          <input class="form-input" id="corr-name" type="text" placeholder="e.g. Bay Laurel">
+        </div>
+        <div class="form-field" style="margin-bottom:0;">
+          <label class="form-label">Category</label>
+          <select class="form-input" id="corr-cat">
+            <option>Herb & Root</option>
+            <option>Crystal</option>
+            <option>Element</option>
+            <option>Candle Colour</option>
+            <option>Animal</option>
+            <option>Number</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-field" style="margin-bottom:0;">
+          <label class="form-label">Symbol / Emoji</label>
+          <input class="form-input" id="corr-symbol" type="text" placeholder="🌿" maxlength="4">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Properties & Uses</label>
+        <textarea class="form-textarea" id="corr-notes" style="min-height:80px;" placeholder="Magical properties, how to use it, what tradition it comes from, personal associations..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="addCustomCorr()">✦ Add Correspondence</button>
+    </div>
+  </div>
+</div>
+
+<!-- CORRESPONDENCE MODAL -->
+<div class="modal-overlay" id="corr-modal" onclick="closeCorrModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeCorrModal()">✕</button>
+    <div style="font-size:40px;text-align:center;margin-bottom:16px;" id="corr-modal-symbol"></div>
+    <div class="modal-title" style="text-align:center;" id="corr-modal-name"></div>
+    <div style="text-align:center;margin-bottom:20px;"><span class="pill active" id="corr-modal-cat"></span></div>
+    <div class="ref-block">
+      <div class="ref-block-title">Properties & Associations</div>
+      <div class="ref-block-body" id="corr-modal-props"></div>
+    </div>
+    <div class="ref-block" id="corr-modal-uses-block">
+      <div class="ref-block-title">Traditional Uses</div>
+      <div class="ref-block-body" id="corr-modal-uses"></div>
+    </div>
+    <div class="form-field" style="margin-top:16px;">
+      <label class="form-label">My Personal Notes</label>
+      <textarea class="form-textarea" id="corr-modal-notes" style="min-height:80px;" placeholder="Your own experiences, adaptations, or observations..."></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="saveCorrNotes()">✦ Save Notes</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- MANIFESTATIONS -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="section-manifestations">
+  <div class="container">
+    <div class="section-hero">
+      <span class="section-eyebrow">What You Call In</span>
+      <h1 class="section-title">Manifestations</h1>
+      <p class="section-sub">Speak it into being. Write it into the world.</p>
+      <div class="candle-divider">✦</div>
+    </div>
+
+    <div class="side-layout">
+      <div class="side-panel">
+        <div class="side-panel-header">Your Manifestations</div>
+        <div class="side-panel-list" id="manif-list">
+          <div class="side-panel-empty">Your manifestations will live here. ✨</div>
+        </div>
+        <div class="side-panel-footer">
+          <button class="btn btn-primary" style="width:100%;" onclick="newManif()">+ New Manifestation</button>
+        </div>
+      </div>
+
+      <div class="grimoire-card" style="padding:28px 30px;">
+        <div class="form-row" style="margin-bottom:18px;">
+          <div class="form-field" style="margin-bottom:0;">
+            <label class="form-label">Intention</label>
+            <input class="form-input" id="man-title" type="text" placeholder="What are you calling in?">
+          </div>
+          <div class="form-field" style="margin-bottom:0;">
+            <label class="form-label">Date Set</label>
+            <input class="form-input" id="man-date" type="text" placeholder="Month DD, YYYY">
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">The Manifestation</label>
+          <textarea class="form-textarea" id="man-text" style="min-height:140px;" placeholder="Write your manifestation in the present tense, as if it has already arrived. Be specific, be grateful, be clear..."></textarea>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Actions I'm Taking</label>
+          <textarea class="form-textarea" id="man-actions" style="min-height:80px;" placeholder="What are you doing in the physical world to meet this halfway?"></textarea>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Signs & Evidence</label>
+          <textarea class="form-textarea" id="man-signs" style="min-height:80px;" placeholder="Signs you've noticed, synchronicities, small movements toward this..."></textarea>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+          <label class="form-label" style="margin-bottom:0;">Status</label>
+          <div style="display:flex;gap:8px;">
+            <span class="pill active" data-status="calling" onclick="setManifStatus('calling',this)">Calling In</span>
+            <span class="pill" data-status="unfolding" onclick="setManifStatus('unfolding',this)">Unfolding</span>
+            <span class="pill" data-status="received" onclick="setManifStatus('received',this)">Received 🌟</span>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveManif()">✦ Save Manifestation</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SIGILS -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="section-sigils">
+  <div class="container">
+    <div class="section-hero">
+      <span class="section-eyebrow">Sacred Symbols</span>
+      <h1 class="section-title">Sigils</h1>
+      <p class="section-sub">Draw your intentions into symbol</p>
+      <div class="candle-divider">✦</div>
+    </div>
+
+    <div class="side-layout">
+      <div class="side-panel">
+        <div class="side-panel-header">Your Sigils</div>
+        <div class="side-panel-list" id="sigils-list">
+          <div class="side-panel-empty">Your sigils will appear here. 🔮</div>
+        </div>
+        <div class="side-panel-footer">
+          <button class="btn btn-primary" style="width:100%;" onclick="newSigil()">+ New Sigil</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="grimoire-card" style="padding:20px;margin-bottom:16px;">
+          <div class="form-row" style="margin-bottom:14px;">
+            <div class="form-field" style="margin-bottom:0;">
+              <label class="form-label">Sigil Name / Intention</label>
+              <input class="form-input" id="sig-title" type="text" placeholder="What does this sigil represent?">
+            </div>
+            <div class="form-field" style="margin-bottom:0;">
+              <label class="form-label">Date Created</label>
+              <input class="form-input" id="sig-date" type="text" placeholder="Month DD, YYYY">
+            </div>
+          </div>
+        </div>
+
+        <!-- Drawing canvas -->
+        <div class="sigil-canvas-wrap" style="margin-bottom:16px;">
+          <canvas id="sigil-canvas" width="640" height="360"></canvas>
+          <div class="sigil-tools">
+            <button class="sigil-tool-btn active" id="draw-tool" onclick="setSigilTool('draw')">✏️ Draw</button>
+            <button class="sigil-tool-btn" id="erase-tool" onclick="setSigilTool('erase')">◻ Erase</button>
+            <button class="sigil-tool-btn" onclick="clearSigilCanvas()">Clear</button>
+            <div style="display:flex;gap:6px;margin-left:auto;align-items:center;">
+              <div class="color-dot active" style="background:#f5ead0;" data-color="#f5ead0" onclick="setSigilColor('#f5ead0',this)"></div>
+              <div class="color-dot" style="background:#c87a20;" data-color="#c87a20" onclick="setSigilColor('#c87a20',this)"></div>
+              <div class="color-dot" style="background:#8aaa6a;" data-color="#8aaa6a" onclick="setSigilColor('#8aaa6a',this)"></div>
+              <div class="color-dot" style="background:#9b6abf;" data-color="#9b6abf" onclick="setSigilColor('#9b6abf',this)"></div>
+              <div class="color-dot" style="background:#c97a9a;" data-color="#c97a9a" onclick="setSigilColor('#c97a9a',this)"></div>
+            </div>
+            <input type="range" id="brush-size" min="1" max="20" value="3" style="width:80px;accent-color:var(--amber);">
+          </div>
+        </div>
+
+        <div class="grimoire-card" style="padding:20px;">
+          <div class="form-field">
+            <label class="form-label">Meaning & Method</label>
+            <textarea class="form-textarea" id="sig-meaning" style="min-height:90px;" placeholder="How did you create this sigil? What letters, symbols, or process did you use? What does it mean to you?"></textarea>
+          </div>
+          <div class="form-field">
+            <label class="form-label">How It Was Activated</label>
+            <textarea class="form-textarea" id="sig-activation" style="min-height:70px;" placeholder="Burning, burying, carrying, meditating on — how did you activate this sigil?"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="saveSigil()">✦ Save Sigil</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- REFLECTIONS -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="section-reflections">
+  <div class="container">
+    <div class="section-hero">
+      <span class="section-eyebrow">Your Path</span>
+      <h1 class="section-title">Reflections</h1>
+      <p class="section-sub">The space between the practice and the knowing</p>
+      <div class="candle-divider">✦</div>
+    </div>
+
+    <div class="side-layout">
+      <div class="side-panel">
+        <div class="side-panel-header">Past Reflections</div>
+        <div class="side-panel-list" id="reflections-list">
+          <div class="side-panel-empty">Your reflections will appear here. 📜</div>
+        </div>
+        <div class="side-panel-footer">
+          <button class="btn btn-primary" style="width:100%;" onclick="newReflection()">+ New Reflection</button>
+        </div>
+      </div>
+
+      <div class="grimoire-card" style="padding:28px 30px;">
+        <div class="form-row" style="margin-bottom:18px;">
+          <div class="form-field" style="margin-bottom:0;">
+            <label class="form-label">Date</label>
+            <input class="form-input" id="ref-date" type="text" placeholder="Month DD, YYYY">
+          </div>
+          <div class="form-field" style="margin-bottom:0;">
+            <label class="form-label">Moon Phase</label>
+            <select class="form-input" id="ref-moon">
+              <option value="">Select phase...</option>
+              <option>🌑 New Moon</option><option>🌒 Waxing Crescent</option>
+              <option>🌓 First Quarter</option><option>🌔 Waxing Gibbous</option>
+              <option>🌕 Full Moon</option><option>🌖 Waning Gibbous</option>
+              <option>🌗 Last Quarter</option><option>🌘 Waning Crescent</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">What's on your heart</label>
+          <textarea class="form-textarea" id="ref-heart" style="min-height:130px;" placeholder="Where is your practice right now? What are you learning about yourself and your path?"></textarea>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Dreams & Signs</label>
+          <textarea class="form-textarea" id="ref-dreams" style="min-height:100px;" placeholder="Anything from dreams, visions, or signs that feels significant right now..."></textarea>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Questions I'm Sitting With</label>
+          <textarea class="form-textarea" id="ref-questions" style="min-height:80px;" placeholder="What you don't yet know, what you're asking, what you're waiting to understand..."></textarea>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Gratitude to the Spirits</label>
+          <textarea class="form-textarea" id="ref-gratitude" style="min-height:70px;" placeholder="What you are thankful for, what has been given, what has been heard..."></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="saveReflection()">✦ Save Reflection</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// STAR / FIREFLY BACKGROUND
+// ══════════════════════════════════════════════════════
+const bgCanvas = document.getElementById('bg-canvas');
+const bgCtx = bgCanvas.getContext('2d');
+let particles = [], tick = 0;
+function resizeBg(){bgCanvas.width=window.innerWidth;bgCanvas.height=window.innerHeight;}
+resizeBg(); window.addEventListener('resize',()=>{resizeBg();initParticles();});
+function initParticles(){
+  particles=[];
+  // Stars
+  const ns=Math.floor(bgCanvas.width*bgCanvas.height/5000);
+  for(let i=0;i<ns;i++) particles.push({type:'star',x:Math.random()*bgCanvas.width,y:Math.random()*bgCanvas.height,r:Math.random()*0.9+0.1,o:Math.random()*0.4+0.05,ts:Math.random()*0.015+0.003,to:Math.random()*Math.PI*2,c:'200,180,100'});
+  // Fireflies
+  const nf=Math.min(30,Math.floor(bgCanvas.width/50));
+  for(let i=0;i<nf;i++) particles.push({type:'firefly',x:Math.random()*bgCanvas.width,y:Math.random()*bgCanvas.height,r:Math.random()*2+1,o:0,maxO:Math.random()*0.5+0.2,vx:(Math.random()-0.5)*0.4,vy:(Math.random()-0.5)*0.3,ts:Math.random()*0.02+0.005,to:Math.random()*Math.PI*2,phase:Math.random()*Math.PI*2,c:Math.random()<0.5?'180,220,80':'200,180,60'});
+}
+function animBg(){
+  bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height); tick+=0.016;
+  particles.forEach(p=>{
+    if(p.type==='star'){
+      const tw=Math.sin(tick*p.ts*60+p.to)*0.3+0.7;
+      bgCtx.beginPath();bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      bgCtx.fillStyle=`rgba(${p.c},${p.o*tw})`;bgCtx.fill();
+    } else {
+      const pulse=Math.sin(tick*p.ts*60+p.phase)*0.5+0.5;
+      p.o=pulse*p.maxO;
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=bgCanvas.width; if(p.x>bgCanvas.width)p.x=0;
+      if(p.y<0)p.y=bgCanvas.height; if(p.y>bgCanvas.height)p.y=0;
+      const glow=bgCtx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*6);
+      glow.addColorStop(0,`rgba(${p.c},${p.o})`);glow.addColorStop(1,`rgba(${p.c},0)`);
+      bgCtx.beginPath();bgCtx.arc(p.x,p.y,p.r*6,0,Math.PI*2);bgCtx.fillStyle=glow;bgCtx.fill();
+      bgCtx.beginPath();bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2);bgCtx.fillStyle=`rgba(${p.c},${p.o})`;bgCtx.fill();
+    }
+  });
+  requestAnimationFrame(animBg);
+}
+initParticles(); animBg();
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+function showSection(name,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-pill').forEach(b=>b.classList.remove('active'));
+  document.getElementById('section-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════════════════
+let DB = {spells:{},tradition:{know:'',learning:'',ancestors:'',loa:'',entries:{}},moon:{},correspondences_custom:{},correspondences_notes:{},manifestations:{},sigils:{},reflections:{}};
+
+function saveDB(){
+  try{localStorage.setItem('grimoire_db',JSON.stringify(DB));}catch(e){}
+  flashSaved();
+}
+function loadDB(){
+  try{const raw=localStorage.getItem('grimoire_db');if(raw)DB=JSON.parse(raw);}catch(e){}
+}
+let saveTimer=null;
+function schedSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveDB,800);}
+function flashSaved(){const el=document.getElementById('save-indicator');el.classList.add('visible');setTimeout(()=>el.classList.remove('visible'),1800);}
+function v(id){const el=document.getElementById(id);return el?el.value:'';}
+function sv(id,val){const el=document.getElementById(id);if(el&&val!=null)el.value=val;}
+function autoGrow(el){if(!el)return;el.style.height='auto';el.style.height=el.scrollHeight+'px';}
+document.querySelectorAll('textarea').forEach(ta=>{ta.addEventListener('input',()=>{autoGrow(ta);schedSave();});autoGrow(ta);});
+document.querySelectorAll('input[type=text],select').forEach(el=>el.addEventListener('input',schedSave));
+
+// ══════════════════════════════════════════════════════
+// SPELLS & RITUALS
+// ══════════════════════════════════════════════════════
+let currentSpellId=null;
+
+function newSpell(){
+  currentSpellId='s'+Date.now();
+  ['sp-title','sp-intention','sp-materials','sp-working','sp-result','sp-tag-input'].forEach(id=>sv(id,''));
+  sv('sp-type',''); sv('sp-moon','');
+  sv('sp-date',new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}));
+  document.getElementById('sp-tags').innerHTML='<input class="tag-input-field" id="sp-tag-input" type="text" placeholder="+ add tag">';
+  setupTagInput('sp-tag-input','sp-tags');
+  document.querySelectorAll('textarea').forEach(autoGrow);
+  renderSpellsList();
+}
+
+function saveSpell(){
+  if(!currentSpellId)currentSpellId='s'+Date.now();
+  DB.spells[currentSpellId]={
+    id:currentSpellId,title:v('sp-title'),type:v('sp-type'),date:v('sp-date'),
+    moon:v('sp-moon'),intention:v('sp-intention'),materials:v('sp-materials'),
+    working:v('sp-working'),result:v('sp-result'),
+    tags:getTagsFrom('sp-tags'),savedAt:new Date().toISOString()
+  };
+  saveDB();renderSpellsList();
+}
+
+function deleteSpell(){
+  if(!currentSpellId)return;
+  if(!confirm('Delete this working?'))return;
+  delete DB.spells[currentSpellId];
+  currentSpellId=null;
+  saveDB();renderSpellsList();newSpell();
+}
+
+function loadSpell(id){
+  currentSpellId=id;const e=DB.spells[id];if(!e)return;
+  sv('sp-title',e.title);sv('sp-type',e.type);sv('sp-date',e.date);sv('sp-moon',e.moon);
+  sv('sp-intention',e.intention);sv('sp-materials',e.materials);
+  sv('sp-working',e.working);sv('sp-result',e.result);
+  document.getElementById('sp-tags').innerHTML='<input class="tag-input-field" id="sp-tag-input" type="text" placeholder="+ add tag">';
+  (e.tags||[]).forEach(t=>addTag(t,'sp-tags'));
+  setupTagInput('sp-tag-input','sp-tags');
+  document.querySelectorAll('textarea').forEach(autoGrow);
+  renderSpellsList();
+}
+
+function renderSpellsList(){
+  const list=document.getElementById('spells-list');
+  const items=Object.values(DB.spells).sort((a,b)=>(b.savedAt||'').localeCompare(a.savedAt||''));
+  if(!items.length){list.innerHTML='<div class="side-panel-empty">Your workings will appear here.<br>Begin writing. 🕯️</div>';return;}
+  list.innerHTML='';
+  items.forEach(e=>{
+    const item=document.createElement('div');
+    item.className='side-panel-item'+(e.id===currentSpellId?' active':'');
+    item.innerHTML=`<div class="side-panel-item-title">${e.title||'Untitled'}</div><div class="side-panel-item-meta">${e.type||'Working'} · ${e.date||''}</div>`;
+    item.addEventListener('click',()=>loadSpell(e.id));
+    list.appendChild(item);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// TAGS UTILITY
+// ══════════════════════════════════════════════════════
+function addTag(text,containerId){
+  const area=document.getElementById(containerId);
+  const inputEl=area.querySelector('input');
+  const tag=document.createElement('span');
+  tag.className='entry-tag';
+  tag.innerHTML=`${text.trim()} <button onclick="this.closest('.entry-tag').remove();schedSave();">✕</button>`;
+  area.insertBefore(tag,inputEl);
+  schedSave();
+}
+function getTagsFrom(containerId){
+  return [...document.querySelectorAll(`#${containerId} .entry-tag`)].map(t=>t.childNodes[0].textContent.trim());
+}
+function setupTagInput(inputId,containerId){
+  const input=document.getElementById(inputId);
+  if(!input)return;
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===','){e.preventDefault();const val=e.target.value.trim().replace(',','');if(val){addTag(val,containerId);e.target.value='';}}
+  });
+}
+setupTagInput('sp-tag-input','sp-tags');
+
+// ══════════════════════════════════════════════════════
+// FAMILY TRADITION
+// ══════════════════════════════════════════════════════
+let currentTradId=null;
+
+function saveTradition(){
+  DB.tradition.know=v('trad-know');
+  DB.tradition.learning=v('trad-learning');
+  DB.tradition.ancestors=v('trad-ancestors');
+  DB.tradition.loa=v('trad-loa');
+  saveDB();
+}
+
+function newTradEntry(){
+  currentTradId='t'+Date.now();
+  sv('trad-title','');sv('trad-cat','');sv('trad-source','');sv('trad-notes','');
+  document.querySelectorAll('textarea').forEach(autoGrow);
+  renderTradList();
+}
+
+function saveTradEntry(){
+  if(!currentTradId)currentTradId='t'+Date.now();
+  if(!DB.tradition.entries)DB.tradition.entries={};
+  DB.tradition.entries[currentTradId]={
+    id:currentTradId,title:v('trad-title'),cat:v('trad-cat'),
+    source:v('trad-source'),notes:v('trad-notes'),savedAt:new Date().toISOString()
+  };
+  saveDB();renderTradList();
+}
+
+function loadTradEntry(id){
+  currentTradId=id;const e=(DB.tradition.entries||{})[id];if(!e)return;
+  sv('trad-title',e.title);sv('trad-cat',e.cat);sv('trad-source',e.source);sv('trad-notes',e.notes);
+  document.querySelectorAll('textarea').forEach(autoGrow);
+  renderTradList();
+}
+
+function renderTradList(){
+  const list=document.getElementById('trad-list');
+  const items=Object.values(DB.tradition.entries||{}).sort((a,b)=>(b.savedAt||'').localeCompare(a.savedAt||''));
+  if(!items.length){list.innerHTML='<div class="side-panel-empty">Add practices, recipes, prayers, or tools from your tradition. 🌿</div>';return;}
+  list.innerHTML='';
+  items.forEach(e=>{
+    const item=document.createElement('div');
+    item.className='side-panel-item'+(e.id===currentTradId?' active':'');
+    item.innerHTML=`<div class="side-panel-item-title">${e.title||'Untitled'}</div><div class="side-panel-item-meta">${e.cat||''}</div>`;
+    item.addEventListener('click',()=>loadTradEntry(e.id));
+    list.appendChild(item);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// MOON PHASES
+// ══════════════════════════════════════════════════════
+const MOON_DATA = {
+  'new':{icon:'🌑',name:'New Moon',keyword:'New Beginnings · Intentions · Planting Seeds',workings:'Setting intentions, starting new projects, spells for new beginnings, cleansing and purifying, planting spiritual seeds, calling in what you want to grow',avoid:'Banishing, ending things, heavy divination about existing situations'},
+  'waxing-crescent':{icon:'🌒',name:'Waxing Crescent',keyword:'Growth · Attraction · Calling In',workings:'Attraction spells, drawing love and abundance, building momentum, calling in opportunities, spells for increase',avoid:'Banishing, letting go, endings'},
+  'first-quarter':{icon:'🌓',name:'First Quarter',keyword:'Action · Decisions · Overcoming',workings:'Overcoming obstacles, decision spells, courage and strength workings, protection, pushing through resistance',avoid:'Passive waiting, surrender work'},
+  'waxing-gibbous':{icon:'🌔',name:'Waxing Gibbous',keyword:'Refinement · Patience · Trust',workings:'Refining intentions, patience spells, adjustment and fine-tuning of ongoing workings, gratitude practices',avoid:'Major new beginnings, banishing'},
+  'full':{icon:'🌕',name:'Full Moon',keyword:'Power · Manifestation · Completion',workings:'Your most powerful workings — manifestation, charging tools, divination, communication with spirits and ancestors, healing, love spells, releasing what is complete',avoid:'Nothing — full moon is the time of maximum power for all work'},
+  'waning-gibbous':{icon:'🌖',name:'Waning Gibbous',keyword:'Gratitude · Release · Sharing',workings:'Gratitude rituals, sharing blessings, beginning release work, giving back to spirits, light banishing',avoid:'Attraction and drawing work'},
+  'last-quarter':{icon:'🌗',name:'Last Quarter',keyword:'Letting Go · Banishing · Forgiveness',workings:'Banishing spells, breaking bad habits, cutting cords, forgiveness work, shadow work, cleansing negativity',avoid:'Attraction, new beginnings, love spells'},
+  'waning-crescent':{icon:'🌘',name:'Waning Crescent',keyword:'Rest · Surrender · Deep Intuition',workings:'Rest and restoration, deep meditation, dream work, ancestor communication, surrender to the divine, preparation for new moon',avoid:'Forcing outcomes, heavy physical spells'},
+};
+
+let currentMoonPhase='new';
+
+function selectMoonPhase(phase,el){
+  currentMoonPhase=phase;
+  document.querySelectorAll('.moon-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  const d=MOON_DATA[phase];
+  document.getElementById('moon-detail-icon').textContent=d.icon;
+  document.getElementById('moon-detail-name').textContent=d.name;
+  document.getElementById('moon-detail-keyword').textContent=d.keyword;
+  document.getElementById('moon-detail-workings').textContent=d.workings;
+  document.getElementById('moon-detail-avoid').textContent=d.avoid;
+  sv('moon-notes',(DB.moon[phase]||{}).notes||'');
+  autoGrow(document.getElementById('moon-notes'));
+}
+
+function saveMoonNotes(){
+  if(!DB.moon[currentMoonPhase])DB.moon[currentMoonPhase]={};
+  DB.moon[currentMoonPhase].notes=v('moon-notes');
+  saveDB();
+}
+
+// Init moon
+selectMoonPhase('new',document.querySelector('.moon-card[data-phase="new"]'));
+
+// ══════════════════════════════════════════════════════
+// CORRESPONDENCES DATA
+// ══════════════════════════════════════════════════════
+const CORR_DATA = [
+  // HERBS & ROOTS
+  {id:'rosemary',cat:'herb',symbol:'🌿',name:'Rosemary',props:'Protection, purification, memory, clarity, love. One of the most powerful protective herbs in Hoodoo tradition.',uses:'Burn for cleansing a space, carry for protection, use in floor washes, bathe in for clarity before divination.'},
+  {id:'lavender',cat:'herb',symbol:'💜',name:'Lavender',props:'Peace, calm, sleep, healing, purification, love, happiness.',uses:'Place under pillow for restful sleep and dreams, burn for cleansing, add to bath for calm and healing.'},
+  {id:'sage',cat:'herb',symbol:'🌱',name:'Sage',props:'Purification, wisdom, cleansing, protection, healing, clarity.',uses:'Burn to cleanse spaces of negative energy, brew as tea for clarity, include in protection sachets.'},
+  {id:'mugwort',cat:'herb',symbol:'🌾',name:'Mugwort',props:'Divination, dreams, psychic abilities, astral travel, protection during journeying.',uses:'Brew as tea before divination, burn as incense during scrying, place under pillow for prophetic dreams.'},
+  {id:'cinnamon',cat:'herb',symbol:'🟤',name:'Cinnamon',props:'Speed, success, love, money, power, luck. A cornerstone of Hoodoo tradition.',uses:'Blow on doorstep to draw money, add to spells to speed results, burn for success, use in love workings.'},
+  {id:'basil',cat:'herb',symbol:'🌿',name:'Basil',props:'Love, money, prosperity, protection, exorcism. Sacred in many traditions.',uses:'Keep in the home for prosperity, add to money spells, carry for luck, use in love sachets.'},
+  {id:'bay-laurel',cat:'herb',symbol:'🍃',name:'Bay Laurel',props:'Success, victory, psychic powers, healing, protection, purification.',uses:'Write wishes on bay leaves and burn, use in success spells, add to bath for protection.'},
+  {id:'cayenne',cat:'herb',symbol:'🌶️',name:'Cayenne Pepper',props:'Speed, hexbreaking, protection, adding heat and urgency to spells. Heavy use in Hoodoo.',uses:'Add to spells to increase speed and intensity, use in hot foots and crossing work, protection against enemies.'},
+  {id:'high-john',cat:'herb',symbol:'🫚',name:'High John the Conqueror Root',props:'Power, success, luck, love, money, strength, conquering all obstacles. A master root in Hoodoo.',uses:'Carry for confidence and power, anoint for strength, use in money and success workings.'},
+  {id:'five-finger-grass',cat:'herb',symbol:'🌿',name:'Five Finger Grass',props:'Money, luck, protection, love, health — one finger for each blessing.',uses:'Brew as floor wash, carry in a mojo bag, add to money spells.'},
+  // CRYSTALS
+  {id:'amethyst',cat:'crystal',symbol:'💜',name:'Amethyst',props:'Intuition, spiritual protection, calm, connection to higher realms, psychic ability, sobriety.',uses:'Hold during divination, place on altar, wear for protection from psychic attack, meditate with for clarity.'},
+  {id:'black-tourmaline',cat:'crystal',symbol:'⬛',name:'Black Tourmaline',props:'Protection, grounding, banishing negative energy, shielding from psychic attack.',uses:'Place at entry points to the home, carry for protection, use in protection grids.'},
+  {id:'selenite',cat:'crystal',symbol:'🤍',name:'Selenite',props:'Cleansing, clarity, connection to spirit guides, charging other crystals, angelic communication.',uses:'Never needs cleansing. Use to cleanse other crystals, place in spaces that feel heavy, use in spirit communication.'},
+  {id:'obsidian',cat:'crystal',symbol:'🖤',name:'Black Obsidian',props:'Truth, protection, shadow work, grounding, breaking illusions, scrying.',uses:'Use as a scrying mirror, hold during shadow work, carry for deep protection, place to absorb negativity.'},
+  {id:'rose-quartz',cat:'crystal',symbol:'🩷',name:'Rose Quartz',props:'Unconditional love, healing the heart, self-love, peace, compassion.',uses:'Carry for self-love, add to love spells, place in bedroom for peaceful relationships.'},
+  {id:'labradorite',cat:'crystal',symbol:'🔵',name:'Labradorite',props:'Magic, transformation, psychic abilities, protection of the aura, intuition, mystery.',uses:'Wear during divination and spiritual work, carry to strengthen psychic abilities, use in transformation spells.'},
+  {id:'citrine',cat:'crystal',symbol:'💛',name:'Citrine',props:'Abundance, success, manifestation, joy, creativity. A stone of the sun.',uses:'Place in your wallet or cash register, use in manifestation rituals, carry for positivity and success.'},
+  // ELEMENTS
+  {id:'fire',cat:'element',symbol:'🔥',name:'Fire',props:'Will, transformation, passion, courage, destruction and renewal, purification, the South. Associated with candle magic, the wand or athame.',uses:'Candle magic, burning petitions, hearth work, calling on fire spirits, purification by flame.'},
+  {id:'water',cat:'element',symbol:'💧',name:'Water',props:'Emotion, intuition, healing, the unconscious, the West, flow and surrender. Associated with the chalice.',uses:'Moon water, cleansing baths, scrying in water, healing work, dream magic.'},
+  {id:'earth',cat:'element',symbol:'🌍',name:'Earth',props:'Grounding, stability, abundance, the body, the North, manifestation in the physical. Associated with the pentacle.',uses:'Burying spells to manifest, working with soil, grounding after spiritual work, root magic.'},
+  {id:'air',cat:'element',symbol:'🌬️',name:'Air',props:'Mind, communication, travel, the East, new beginnings, clarity, breath and life force. Associated with the wand or sword.',uses:'Smoke cleansing, blowing intentions, working with feathers, incense, wind spells.'},
+  {id:'spirit',cat:'element',symbol:'✨',name:'Spirit',props:'The fifth element — the divine that weaves through all others. Connection, soul, the sacred, transcendence.',uses:'Calling on higher powers, soul work, mediumship, prayer, connection to Source.'},
+  // CANDLE COLOURS
+  {id:'white',cat:'color',symbol:'🕯️',name:'White Candle',props:'Purity, truth, peace, healing, blessing, cleansing, spiritual connection, can substitute for any other colour.',uses:'General blessing and purification, ancestor altar candles, spirit communication, house cleansing.'},
+  {id:'black-candle',cat:'color',symbol:'🖤',name:'Black Candle',props:'Banishing, uncrossing, protection, absorbing negativity, reversing, hexwork, shadow work.',uses:'Banishing negative energy or people, uncrossing yourself from jinxes, protection rituals.'},
+  {id:'red-candle',cat:'color',symbol:'❤️',name:'Red Candle',props:'Love, passion, strength, courage, lust, vitality, power, blood ties.',uses:'Love and passion spells, strength and courage work, honouring loa who like red (Ogou).'},
+  {id:'green-candle',cat:'color',symbol:'💚',name:'Green Candle',props:'Money, prosperity, growth, healing, luck, abundance, nature, fertility.',uses:'Money spells, prosperity work, business success, healing rituals.'},
+  {id:'blue-candle',cat:'color',symbol:'💙',name:'Blue Candle',props:'Peace, calm, healing, communication, wisdom, water, truth, protection.',uses:'Peace and calm spells, water rituals, healing, Yemaya/La Sirène work.'},
+  {id:'purple-candle',cat:'color',symbol:'💜',name:'Purple Candle',props:'Psychic power, spirituality, wisdom, divination, royalty, connection to spirit.',uses:'Psychic development, spiritual communication, divination rituals, crown chakra work.'},
+  {id:'yellow-candle',cat:'color',symbol:'💛',name:'Yellow Candle',props:'Success, confidence, mental clarity, travel, learning, luck, the sun, communication.',uses:'Success spells, clearing mental fog, travel protection, speaking your truth.'},
+  {id:'orange-candle',cat:'color',symbol:'🧡',name:'Orange Candle',props:'Creativity, ambition, justice, legal matters, opportunity, vitality.',uses:'Legal and justice work, creative projects, drawing opportunities.'},
+  {id:'pink-candle',cat:'color',symbol:'🩷',name:'Pink Candle',props:'Gentle love, friendship, self-love, romance, emotional healing, harmony.',uses:'Self-love workings, friendship, gentle and sweet love spells, emotional healing.'},
+];
+
+let currentCorrId = null;
+
+function buildCorrGrid(filter='all'){
+  const grid=document.getElementById('corr-grid');
+  grid.innerHTML='';
+  const standard=CORR_DATA.filter(c=>filter==='all'||c.cat===filter);
+  const custom=Object.values(DB.correspondences_custom||{}).filter(c=>filter==='all'||filter==='custom');
+  const all=[...standard,...custom];
+  if(!all.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;font-family:\'Cormorant Garamond\',serif;font-style:italic;color:var(--text-muted);padding:40px;">Nothing here yet. Add your own above. 🌿</div>';return;}
+  all.forEach((c,i)=>{
+    const el=document.createElement('div');
+    el.className='corr-card';
+    el.style.animationDelay=(i*0.04)+'s';
+    el.innerHTML=`<span class="corr-card-symbol">${c.symbol||'🌿'}</span><div class="corr-card-name">${c.name}</div><div class="corr-card-preview">${(c.props||'').substring(0,80)}...</div>`;
+    el.addEventListener('click',()=>openCorrModal(c));
+    grid.appendChild(el);
+  });
+}
+
+function filterCorr(f,btn){
+  document.querySelectorAll('#corr-filters .pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  buildCorrGrid(f);
+}
+
+function openCorrModal(c){
+  currentCorrId=c.id;
+  document.getElementById('corr-modal-symbol').textContent=c.symbol||'🌿';
+  document.getElementById('corr-modal-name').textContent=c.name;
+  document.getElementById('corr-modal-cat').textContent={herb:'Herb & Root',crystal:'Crystal',element:'Element',color:'Candle Colour'}[c.cat]||c.cat||'Custom';
+  document.getElementById('corr-modal-props').textContent=c.props||'';
+  document.getElementById('corr-modal-uses').textContent=c.uses||'';
+  document.getElementById('corr-modal-uses-block').style.display=c.uses?'block':'none';
+  sv('corr-modal-notes',(DB.correspondences_notes[c.id]||{}).notes||'');
+  autoGrow(document.getElementById('corr-modal-notes'));
+  document.getElementById('corr-modal').classList.add('open');
+}
+function closeCorrModal(e){if(!e||e.target===document.getElementById('corr-modal'))document.getElementById('corr-modal').classList.remove('open');}
+function saveCorrNotes(){if(!currentCorrId)return;DB.correspondences_notes[currentCorrId]={notes:v('corr-modal-notes')};saveDB();document.getElementById('corr-modal').classList.remove('open');}
+
+function addCustomCorr(){
+  const name=v('corr-name');if(!name)return;
+  const id='custom_'+Date.now();
+  const entry={id,name,cat:v('corr-cat').toLowerCase().replace(/ &/,'').replace(/ /,'_'),symbol:v('corr-symbol')||'🌿',props:v('corr-notes'),uses:'',custom:true};
+  if(!DB.correspondences_custom)DB.correspondences_custom={};
+  DB.correspondences_custom[id]=entry;
+  sv('corr-name','');sv('corr-symbol','');sv('corr-notes','');
+  saveDB();buildCorrGrid('custom');
+  document.querySelector('#corr-filters .pill.active')?.click();
+}
+
+// ══════════════════════════════════════════════════════
+// MANIFESTATIONS
+// ══════════════════════════════════════════════════════
+let currentManifId=null, currentManifStatus='calling';
+
+function setManifStatus(s,el){
+  currentManifStatus=s;
+  document.querySelectorAll('[data-status]').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function newManif(){
+  currentManifId='m'+Date.now();
+  ['man-title','man-text','man-actions','man-signs'].forEach(id=>sv(id,''));
+  sv('man-date',new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}));
+  currentManifStatus='calling';
+  document.querySelectorAll('[data-status]').forEach(p=>p.classList.toggle('active',p.dataset.status==='calling'));
+  document.querySelectorAll('textarea').forEach(autoGrow);
+  renderManifList();
+}
+
+function saveManif(){
+  if(!currentManifId)currentManifId='m'+Date.now();
+  DB.manifestations[currentManifId]={id:currentManifId,title:v('man-title'),date:v('man-date'),text:v('man-text'),actions:v('man-actions'),signs:v('man-signs'),status:currentManifStatus,savedAt:new Date().toISOString()};
+  saveDB();renderManifList();
+}
+
+function loadManif(id){
+  currentManifId=id;const e=DB.manifestations[id];if(!e)return;
+  sv('man-title',e.title);sv('man-date',e.date);sv('man-text',e.text);sv('man-actions',e.actions);sv('man-signs',e.signs);
+  currentManifStatus=e.status||'calling';
+  document.querySelectorAll('[data-status]').forEach(p=>p.classList.toggle('active',p.dataset.status===currentManifStatus));
+  document.querySelectorAll('textarea').forEach(autoGrow);
+  renderManifList();
+}
+
+function renderManifList(){
+  const list=document.getElementById('manif-list');
+  const items=Object.values(DB.manifestations).sort((a,b)=>(b.savedAt||'').localeCompare(a.savedAt||''));
+  if(!items.length){list.innerHTML='<div class="side-panel-empty">Your manifestations will live here. ✨</div>';return;}
+  list.innerHTML='';
+  const icons={'calling':'✨','unfolding':'🌱','received':'🌟'};
+  items.forEach(e=>{
+    const item=document.createElement('div');
+    item.className='side-panel-item'+(e.id===currentManifId?' active':'');
+    item.innerHTML=`<div class="side-panel-item-title">${icons[e.status]||'✨'} ${e.title||'Untitled'}</div><div class="side-panel-item-meta">${e.date||''}</div>`;
+    item.addEventListener('click',()=>loadManif(e.id));
+    list.appendChild(item);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// SIGILS CANVAS
+// ══════════════════════════════════════════════════════
+const sigilCanvas=document.getElementById('sigil-canvas');
+const sCtx=sigilCanvas.getContext('2d');
+let sigilTool='draw',sigilColor='#f5ead0',sigilDrawing=false;
+let sigilHistory=[];
+
+function setupSigilCanvas(){
+  sCtx.fillStyle='#0f0b06';sCtx.fillRect(0,0,sigilCanvas.width,sigilCanvas.height);
+  // Faint grid dots
+  sCtx.fillStyle='rgba(200,160,60,0.08)';
+  for(let x=20;x<sigilCanvas.width;x+=20) for(let y=20;y<sigilCanvas.height;y+=20){sCtx.beginPath();sCtx.arc(x,y,0.8,0,Math.PI*2);sCtx.fill();}
+}
+
+function sigilPos(e){
+  const r=sigilCanvas.getBoundingClientRect();
+  const clientX=e.touches?e.touches[0].clientX:e.clientX;
+  const clientY=e.touches?e.touches[0].clientY:e.clientY;
+  return{x:(clientX-r.left)*(sigilCanvas.width/r.width),y:(clientY-r.top)*(sigilCanvas.height/r.height)};
+}
+
+sigilCanvas.addEventListener('mousedown',e=>{sigilDrawing=true;const p=sigilPos(e);sCtx.beginPath();sCtx.moveTo(p.x,p.y);});
+sigilCanvas.addEventListener('mousemove',e=>{if(!sigilDrawing)return;const p=sigilPos(e);const size=parseInt(document.getElementById('brush-size').value);if(sigilTool==='draw'){sCtx.lineWidth=size;sCtx.strokeStyle=sigilColor;sCtx.lineCap='round';sCtx.lineJoin='round';sCtx.lineTo(p.x,p.y);sCtx.stroke();}else{sCtx.clearRect(p.x-size*3,p.y-size*3,size*6,size*6);}});
+sigilCanvas.addEventListener('mouseup',()=>{sigilDrawing=false;sCtx.beginPath();});
+sigilCanvas.addEventListener('mouseleave',()=>{sigilDrawing=false;});
+sigilCanvas.addEventListener('touchstart',e=>{e.preventDefault();sigilDrawing=true;const p=sigilPos(e);sCtx.beginPath();sCtx.moveTo(p.x,p.y);});
+sigilCanvas.addEventListener('touchmove',e=>{e.preventDefault();if(!sigilDrawing)return;const p=sigilPos(e);const size=parseInt(document.getElementById('brush-size').value);sCtx.lineWidth=size;sCtx.strokeStyle=sigilColor;sCtx.lineCap='round';sCtx.lineTo(p.x,p.y);sCtx.stroke();});
+sigilCanvas.addEventListener('touchend',()=>{sigilDrawing=false;});
+
+function setSigilTool(t){sigilTool=t;document.getElementById('draw-tool').classList.toggle('active',t==='draw');document.getElementById('erase-tool').classList.toggle('active',t==='erase');}
+function setSigilColor(c,el){sigilColor=c;document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active'));el.classList.add('active');}
+function clearSigilCanvas(){sCtx.fillStyle='#0f0b06';sCtx.fillRect(0,0,sigilCanvas.width,sigilCanvas.height);setupSigilCanvas();}
+setupSigilCanvas();
+
+let currentSigilId=null;
+
+function newSigil(){
+  currentSigilId='si'+Date.now();
+  sv('sig-title','');sv('sig-date',new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}));
+  sv('sig-meaning','');sv('sig-activation','');
+  clearSigilCanvas();
+  document.querySelectorAll('textarea').forEach(autoGrow);
+  renderSigilsList();
+}
+
+function saveSigil(){
+  if(!currentSigilId)currentSigilId='si'+Date.now();
+  DB.sigils[currentSigilId]={id:currentSigilId,title:v('sig-title'),date:v('sig-date'),meaning:v('sig-meaning'),activation:v('sig-activation'),drawing:sigilCanvas.toDataURL(),savedAt:new Date().toISOString()};
+  saveDB();renderSigilsList();
+}
+
+function loadSigil(id){
+  currentSigilId=id;const e=DB.sigils[id];if(!e)return;
+  sv('sig-title',e.title);sv('sig-date',e.date);sv('sig-meaning',e.meaning);sv('sig-activation',e.activation);
+  if(e.drawing){const img=new Image();img.onload=()=>{sCtx.clearRect(0,0,sigilCanvas.width,sigilCanvas.height);sCtx.drawImage(img,0,0);};img.src=e.drawing;}
+  document.querySelectorAll('textarea').forEach(autoGrow);
+  renderSigilsList();
+}
+
+function renderSigilsList(){
+  const list=document.getElementById('sigils-list');
+  const items=Object.values(DB.sigils).sort((a,b)=>(b.savedAt||'').localeCompare(a.savedAt||''));
+  if(!items.length){list.innerHTML='<div class="side-panel-empty">Your sigils will appear here. 🔮</div>';return;}
+  list.innerHTML='';
+  items.forEach(e=>{
+    const item=document.createElement('div');
+    item.className='side-panel-item'+(e.id===currentSigilId?' active':'');
+    item.innerHTML=`<div class="side-panel-item-title">${e.title||'Untitled Sigil'}</div><div class="side-panel-item-meta">${e.date||''}</div>`;
+    item.addEventListener('click',()=>loadSigil(e.id));
+    list.appendChild(item);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// REFLECTIONS
+// ══════════════════════════════════════════════════════
+let currentRefId=null;
+
+function newReflection(){
+  currentRefId='r'+Date.now();
+  ['ref-heart','ref-dreams','ref-questions','ref-gratitude'].forEach(id=>sv(id,''));
+  sv('ref-moon','');
+  sv('ref-date',new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}));
+  document.querySelectorAll('textarea').forEach(autoGrow);
+  renderReflectionsList();
+}
+
+function saveReflection(){
+  if(!currentRefId)currentRefId='r'+Date.now();
+  DB.reflections[currentRefId]={id:currentRefId,date:v('ref-date'),moon:v('ref-moon'),heart:v('ref-heart'),dreams:v('ref-dreams'),questions:v('ref-questions'),gratitude:v('ref-gratitude'),savedAt:new Date().toISOString()};
+  saveDB();renderReflectionsList();
+}
+
+function loadReflection(id){
+  currentRefId=id;const e=DB.reflections[id];if(!e)return;
+  sv('ref-date',e.date);sv('ref-moon',e.moon);sv('ref-heart',e.heart);sv('ref-dreams',e.dreams);sv('ref-questions',e.questions);sv('ref-gratitude',e.gratitude);
+  document.querySelectorAll('textarea').forEach(autoGrow);
+  renderReflectionsList();
+}
+
+function renderReflectionsList(){
+  const list=document.getElementById('reflections-list');
+  const items=Object.values(DB.reflections).sort((a,b)=>(b.savedAt||'').localeCompare(a.savedAt||''));
+  if(!items.length){list.innerHTML='<div class="side-panel-empty">Your reflections will appear here. 📜</div>';return;}
+  list.innerHTML='';
+  items.forEach(e=>{
+    const item=document.createElement('div');
+    item.className='side-panel-item'+(e.id===currentRefId?' active':'');
+    item.innerHTML=`<div class="side-panel-item-title">${e.date||'Undated'}</div><div class="side-panel-item-meta">${e.moon||''} ${e.heart?(e.heart.substring(0,30)+'...'):'No entry'}</div>`;
+    item.addEventListener('click',()=>loadReflection(e.id));
+    list.appendChild(item);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ══════════════════════════════════════════════════════
+function exportGrimoire(){
+  const data={grimoire_db:JSON.stringify(DB)};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='grimoire-backup-'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();URL.revokeObjectURL(a.href);
+}
+
+function importGrimoire(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{const data=JSON.parse(e.target.result);if(data.grimoire_db){DB=JSON.parse(data.grimoire_db);localStorage.setItem('grimoire_db',data.grimoire_db);initAll();alert('Grimoire imported successfully 🕯️');}}catch(err){alert('Something went wrong reading that file.');}
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+function initAll(){
+  // Load tradition notes
+  sv('trad-know',DB.tradition?.know||'');
+  sv('trad-learning',DB.tradition?.learning||'');
+  sv('trad-ancestors',DB.tradition?.ancestors||'');
+  sv('trad-loa',DB.tradition?.loa||'');
+  document.querySelectorAll('textarea').forEach(autoGrow);
+  // Render lists
+  renderSpellsList();
+  renderTradList();
+  renderManifList();
+  renderSigilsList();
+  renderReflectionsList();
+  buildCorrGrid('all');
+  // New entries if empty
+  if(!Object.keys(DB.spells).length) newSpell();
+  else { const first=Object.values(DB.spells).sort((a,b)=>(b.savedAt||'').localeCompare(a.savedAt||''))[0]; if(first) loadSpell(first.id); }
+  if(!Object.keys(DB.manifestations).length) newManif();
+  else { const first=Object.values(DB.manifestations).sort((a,b)=>(b.savedAt||'').localeCompare(a.savedAt||''))[0]; if(first) loadManif(first.id); }
+  if(!Object.keys(DB.reflections).length) newReflection();
+  else { const first=Object.values(DB.reflections).sort((a,b)=>(b.savedAt||'').localeCompare(a.savedAt||''))[0]; if(first) loadReflection(first.id); }
+}
+
+loadDB();
+initAll();
+</script>
+</body>
+</html>

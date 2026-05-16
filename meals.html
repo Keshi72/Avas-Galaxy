@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Kitchen · Ava's Galaxy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=EB+Garamond:ital,wght@0,400;1,400&family=Nunito:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --parchment: #faf5ec;
+  --parchment-mid: #f0e8d8;
+  --parchment-dark: #e0d4be;
+  --terra: #b85c38;
+  --terra-light: #d4845e;
+  --terra-pale: #f5e0d4;
+  --herb: #4a7a52;
+  --herb-light: #7aaa82;
+  --herb-pale: #d8edd8;
+  --gold: #9a7020;
+  --gold-light: #c4a048;
+  --gold-pale: #f5e8c0;
+  --cream-card: rgba(255,255,255,0.6);
+  --ink: #1e180e;
+  --ink-soft: #3a3020;
+  --muted: #8a7860;
+  --border: #e0d0b8;
+}
+
+body {
+  background: var(--parchment);
+  font-family: 'Nunito', sans-serif;
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ── TEXTURE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse at 10% 20%, rgba(184,92,56,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 80%, rgba(74,122,82,0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(154,112,32,0.04) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 50px 40px 90px;
+}
+
+/* ── NAV ── */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  margin-bottom: 40px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.back-link:hover { opacity: 1; }
+
+/* ── HEADER ── */
+.page-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.header-svg { margin-bottom: 16px; }
+
+.page-eyebrow {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--terra-light);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 6vw, 56px);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.05;
+  margin-bottom: 10px;
+}
+
+.page-subtitle {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.divider {
+  text-align: center;
+  color: var(--terra-light);
+  font-size: 18px;
+  letter-spacing: 8px;
+  margin: 36px 0;
+  opacity: 0.6;
+}
+
+/* ── WEEKLY SUMMARY BANNER ── */
+.week-banner {
+  background: var(--herb);
+  border-radius: 14px;
+  padding: 22px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 36px;
+  position: relative;
+  overflow: hidden;
+}
+.week-banner::before {
+  content: '';
+  position: absolute;
+  right: -40px; top: -40px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+}
+
+.week-banner-left h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 6px;
+}
+.week-banner-left .week-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 22px;
+  color: #f0f8f0;
+}
+
+.week-banner-right {
+  text-align: right;
+}
+.grocery-total-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  display: block;
+  margin-bottom: 4px;
+}
+.grocery-total {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #f0f8c8;
+}
+.grocery-sync-note {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 3px;
+}
+
+/* ── WEEK SELECTOR ── */
+.week-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.week-nav button {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 34px; height: 34px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.week-nav button:hover { background: var(--parchment-dark); color: var(--ink); }
+.week-nav .week-range {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  color: var(--muted);
+  min-width: 200px;
+  text-align: center;
+}
+
+/* ── MEAL GRID ── */
+.meal-grid {
+  display: grid;
+  grid-template-columns: 90px repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 40px;
+}
+
+.meal-grid-header {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  padding: 8px 4px;
+}
+.meal-grid-header.row-label {
+  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+}
+
+.day-header {
+  background: var(--parchment-mid);
+  border-radius: 8px;
+  padding: 8px 4px;
+  text-align: center;
+}
+.day-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--herb);
+  display: block;
+}
+.day-date {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.meal-cell {
+  background: var(--cream-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+.meal-cell:hover { border-color: var(--terra-light); background: rgba(255,255,255,0.8); }
+.meal-cell.has-meal { border-color: var(--parchment-dark); }
+.meal-cell.breakfast.has-meal { border-left: 3px solid var(--gold-light); }
+.meal-cell.lunch.has-meal     { border-left: 3px solid var(--herb-light); }
+.meal-cell.dinner.has-meal    { border-left: 3px solid var(--terra-light); }
+
+.meal-name {
+  font-family: 'EB Garamond', serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.3;
+  flex: 1;
+}
+.meal-cost {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--herb);
+}
+.meal-empty {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--parchment-dark);
+  margin: auto;
+}
+
+.meal-type-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: var(--muted);
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20,15,8,0.55);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  backdrop-filter: blur(3px);
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--parchment);
+  border-radius: 16px;
+  padding: 32px 36px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  transform: translateY(10px);
+  transition: transform 0.2s;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+
+.modal h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.modal-day {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.modal label {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.modal input {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.7);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: 'EB Garamond', serif;
+  font-size: 17px;
+  color: var(--ink);
+  margin-bottom: 18px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.modal input:focus { border-color: var(--terra-light); }
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+.btn {
+  flex: 1;
+  padding: 11px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.btn-primary { background: var(--herb); color: white; }
+.btn-primary:hover { background: var(--herb-light); }
+.btn-secondary { background: var(--parchment-mid); color: var(--muted); }
+.btn-secondary:hover { background: var(--parchment-dark); }
+.btn-danger { background: var(--terra-pale); color: var(--terra); flex: 0; padding: 11px 16px; }
+.btn-danger:hover { background: var(--terra); color: white; }
+
+/* ── SHOPPING LIST ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.section-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.section-line { flex: 1; height: 1px; background: var(--border); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+
+.shopping-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.shop-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--cream-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.shop-check {
+  width: 20px; height: 20px;
+  border-radius: 4px;
+  border: 1.5px solid var(--herb-light);
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.shop-check.checked { background: var(--herb-light); border-color: var(--herb); }
+.shop-text {
+  flex: 1;
+  font-family: 'EB Garamond', serif;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+.shop-text.done { text-decoration: line-through; color: var(--muted); }
+.shop-remove {
+  background: none; border: none; cursor: pointer;
+  color: var(--parchment-dark); font-size: 16px;
+  transition: color 0.15s;
+}
+.shop-remove:hover { color: var(--terra); }
+
+.add-item-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.add-item-input {
+  flex: 1;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.6);
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-family: 'EB Garamond', serif;
+  font-size: 16px;
+  color: var(--ink);
+  outline: none;
+}
+.add-item-input:focus { border-color: var(--herb-light); }
+.add-item-btn {
+  background: var(--herb-pale);
+  border: 1px solid var(--herb-light);
+  border-radius: 8px;
+  padding: 9px 16px;
+  cursor: pointer;
+  color: var(--herb);
+  font-size: 18px;
+  transition: all 0.15s;
+}
+.add-item-btn:hover { background: var(--herb); color: white; }
+
+/* rating buttons */
+.rating-btn {
+  flex: 1; padding: 7px 4px; border: 1px solid var(--border);
+  border-radius: 8px; background: rgba(255,255,255,0.4);
+  font-family: 'Nunito', sans-serif; font-size: 11px; color: var(--muted);
+  cursor: pointer; transition: all 0.15s; text-align: center; line-height: 1.3;
+}
+.rating-btn.selected { background: var(--herb-pale); border-color: var(--herb-light); color: var(--herb); font-weight: 600; }
+.meal-rating { font-size: 13px; margin-top: 2px; }
+
+/* ── RECIPE IDEAS ── */
+.recipe-card {
+  background: var(--cream-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 3px solid var(--terra-light);
+}
+.recipe-card:hover { border-color: var(--terra); background: rgba(255,255,255,0.8); }
+.recipe-name {
+  font-family: 'EB Garamond', serif;
+  font-size: 16px;
+  color: var(--ink-soft);
+  margin-bottom: 3px;
+}
+.recipe-meta {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ── NOTES ── */
+.notes-area {
+  background: var(--cream-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  width: 100%;
+  min-height: 100px;
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--muted);
+  resize: vertical;
+  outline: none;
+  line-height: 1.7;
+}
+
+/* ── FOOTER ── */
+.page-footer {
+  text-align: center;
+  padding-top: 50px;
+  margin-top: 30px;
+  border-top: 1px solid var(--border);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.treasury-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 10px 22px;
+  background: var(--gold-pale);
+  border: 1px solid var(--gold-light);
+  border-radius: 30px;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: normal;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: var(--gold);
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.treasury-link:hover { background: var(--gold); color: white; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a href="index.html" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Back to the galaxy
+  </a>
+
+  <!-- Header -->
+  <div class="page-header">
+    <svg class="header-svg" width="220" height="60" viewBox="0 0 220 60" fill="none">
+      <!-- herbs and botanicals -->
+      <path d="M30 55 Q40 30 55 18" stroke="#4a7a52" stroke-width="1.5" fill="none"/>
+      <ellipse cx="38" cy="38" rx="10" ry="5" fill="#7aaa82" opacity="0.5" transform="rotate(-30 38 38)"/>
+      <ellipse cx="48" cy="26" rx="9" ry="4.5" fill="#4a7a52" opacity="0.4" transform="rotate(-45 48 26)"/>
+      <ellipse cx="57" cy="16" rx="7" ry="3.5" fill="#7aaa82" opacity="0.6" transform="rotate(-20 57 16)"/>
+      <!-- rosehip cluster -->
+      <circle cx="72" cy="18" r="7" fill="#b85c38" opacity="0.7"/>
+      <circle cx="72" cy="18" r="3.5" fill="#d4845e"/>
+      <path d="M68 14 L72 11 L76 14" stroke="#4a7a52" stroke-width="1" fill="none"/>
+      <!-- wheat -->
+      <path d="M110 58 L110 20" stroke="#c4a048" stroke-width="1.2" fill="none"/>
+      <ellipse cx="110" cy="16" rx="4" ry="8" fill="#c4a048" opacity="0.5"/>
+      <ellipse cx="105" cy="22" rx="3.5" ry="7" fill="#c4a048" opacity="0.4" transform="rotate(20 105 22)"/>
+      <ellipse cx="115" cy="22" rx="3.5" ry="7" fill="#c4a048" opacity="0.4" transform="rotate(-20 115 22)"/>
+      <!-- right botanicals mirror -->
+      <path d="M190 55 Q180 30 165 18" stroke="#4a7a52" stroke-width="1.5" fill="none"/>
+      <ellipse cx="182" cy="38" rx="10" ry="5" fill="#7aaa82" opacity="0.5" transform="rotate(30 182 38)"/>
+      <ellipse cx="172" cy="26" rx="9" ry="4.5" fill="#4a7a52" opacity="0.4" transform="rotate(45 172 26)"/>
+      <ellipse cx="163" cy="16" rx="7" ry="3.5" fill="#7aaa82" opacity="0.6" transform="rotate(20 163 16)"/>
+      <circle cx="148" cy="18" r="7" fill="#b85c38" opacity="0.7"/>
+      <circle cx="148" cy="18" r="3.5" fill="#d4845e"/>
+      <path d="M144 14 L148 11 L152 14" stroke="#4a7a52" stroke-width="1" fill="none"/>
+      <!-- vine line -->
+      <path d="M85 50 Q110 42 135 50" stroke="#7aaa82" stroke-width="0.8" fill="none" opacity="0.5"/>
+    </svg>
+
+    <span class="page-eyebrow">Ava's Galaxy</span>
+    <h1 class="page-title">The Kitchen</h1>
+    <p class="page-subtitle">A log of what I actually ate — one honest meal at a time</p>
+  </div>
+
+  <!-- Week Banner -->
+  <div class="week-banner">
+    <div class="week-banner-left">
+      <h2>This Week</h2>
+      <div class="week-label" id="week-label">Loading...</div>
+    </div>
+    <div class="week-banner-right">
+      <span class="grocery-total-label">Logged meal spend</span>
+      <div class="grocery-total" id="grocery-total">$0.00</div>
+      <div class="grocery-sync-note">✦ synced to The Treasury</div>
+    </div>
+  </div>
+
+  <!-- Week Nav -->
+  <div class="week-nav">
+    <button id="prev-week">←</button>
+    <div class="week-range" id="week-range">Week of ...</div>
+    <button id="next-week">→</button>
+  </div>
+
+  <!-- Meal Grid -->
+  <div class="meal-grid" id="meal-grid">
+    <!-- Generated by JS -->
+  </div>
+
+  <div class="divider">· · 🌿 · ·</div>
+
+  <!-- Shopping List + Notes -->
+  <div class="two-col">
+    <div>
+      <div class="section-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" stroke="#4a7a52" stroke-width="1.5"/><rect x="9" y="3" width="6" height="4" rx="1" stroke="#4a7a52" stroke-width="1.5"/></svg>
+        <h2>Shopping List</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="shopping-list" id="shopping-list"></div>
+      <div class="add-item-row">
+        <input class="add-item-input" id="shop-input" placeholder="Add an ingredient..." />
+        <button class="add-item-btn" id="shop-add">+</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2a5 5 0 1 0 0 10A5 5 0 0 0 12 2z" stroke="#b85c38" stroke-width="1.5"/><path d="M12 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z" stroke="#b85c38" stroke-width="1.5"/></svg>
+        <h2>Kitchen Notes</h2>
+        <div class="section-line"></div>
+      </div>
+      <textarea class="notes-area" id="kitchen-notes" placeholder="Recipe ideas, dietary notes, things to try this week..."></textarea>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="page-footer">
+    <p>A meal made with intention is its own kind of magic.</p>
+    <a href="budget.html" class="treasury-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      View in The Treasury
+    </a>
+  </div>
+</div>
+
+<!-- Meal Edit Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3 id="modal-title">Log a Meal</h3>
+    <p class="modal-day" id="modal-subtitle">Monday · Breakfast</p>
+    <label>What did you eat?</label>
+    <input id="meal-name-input" placeholder="e.g. Teriyaki chicken rice bowl..." />
+    <label>Actual cost ($) — optional</label>
+    <input id="meal-cost-input" type="number" step="0.50" min="0" placeholder="0.00" />
+    <label>How was it?</label>
+    <div style="display:flex;gap:8px;margin-bottom:18px;" id="rating-row">
+      <button class="rating-btn" data-r="5" onclick="setRating(5)">😍 Loved</button>
+      <button class="rating-btn" data-r="4" onclick="setRating(4)">😊 Good</button>
+      <button class="rating-btn" data-r="3" onclick="setRating(3)">😐 Okay</button>
+      <button class="rating-btn" data-r="2" onclick="setRating(2)">😕 Meh</button>
+      <button class="rating-btn" data-r="1" onclick="setRating(1)">🤢 No</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+      <button class="btn btn-danger" id="modal-delete" style="display:none;">Delete</button>
+      <button class="btn btn-primary" id="modal-save">Log meal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const MEALS = ['breakfast','lunch','dinner'];
+const MEAL_LABELS = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' };
+const MEAL_EMOJI  = { breakfast: '☀️', lunch: '🌿', dinner: '🌙' };
+const RATINGS = { 5:'😍', 4:'😊', 3:'😐', 2:'😕', 1:'🤢' };
+const STORAGE_KEY = 'ava_kitchen';
+
+let weekOffset = 0;
+let currentRating = 0;
+let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+// data structure: { "2024-W12": { "Mon-breakfast": { name, cost }, ... }, shopping: [], notes: "" }
+
+function getWeekKey(offset = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() - d.getDay() + 1 + offset * 7); // Monday
+  const jan1 = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${String(week).padStart(2,'0')}`;
+}
+
+function getWeekDates(offset = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7) + offset * 7);
+  const dates = [];
+  for (let i = 0; i < 7; i++) {
+    const dd = new Date(d);
+    dd.setDate(d.getDate() + i);
+    dates.push(dd);
+  }
+  return dates;
+}
+
+function fmt(d) { return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); }
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); syncTreasury(); }
+
+function syncTreasury() {
+  // Push current week actual grocery total — no projection multiplier
+  const wk = getWeekKey(weekOffset);
+  const wkData = data[wk] || {};
+  let total = 0;
+  Object.values(wkData).forEach(v => { if (v && v.cost) total += parseFloat(v.cost) || 0; });
+  localStorage.setItem('ava_treasury_groceries', JSON.stringify({
+    weekly: total.toFixed(2),
+    monthly: total.toFixed(2),
+    weekKey: getWeekKey(0),
+    meals: wkData,
+    updatedAt: new Date().toISOString()
+  }));
+}
+
+function renderWeekLabel() {
+  const dates = getWeekDates(weekOffset);
+  const wk = getWeekKey(weekOffset);
+  document.getElementById('week-label').textContent = wk.replace('-', ' · Week ');
+  document.getElementById('week-range').textContent =
+    `${fmt(dates[0])} — ${fmt(dates[6])}`;
+  // update banner total
+  const wkData = data[wk] || {};
+  let total = 0;
+  Object.values(wkData).forEach(v => { if (v && v.cost) total += parseFloat(v.cost) || 0; });
+  document.getElementById('grocery-total').textContent = `$${total.toFixed(2)}`;
+}
+
+function renderGrid() {
+  const wk = getWeekKey(weekOffset);
+  const wkData = data[wk] || {};
+  const dates = getWeekDates(weekOffset);
+  const grid = document.getElementById('meal-grid');
+  grid.innerHTML = '';
+
+  // Corner cell
+  const corner = document.createElement('div');
+  grid.appendChild(corner);
+
+  // Day headers
+  DAYS.forEach((day, i) => {
+    const h = document.createElement('div');
+    h.className = 'day-header';
+    h.innerHTML = `<span class="day-name">${day}</span><span class="day-date">${fmt(dates[i])}</span>`;
+    grid.appendChild(h);
+  });
+
+  // Meal rows
+  MEALS.forEach(meal => {
+    // Row label
+    const lbl = document.createElement('div');
+    lbl.className = 'meal-type-label';
+    lbl.innerHTML = `${MEAL_EMOJI[meal]} ${MEAL_LABELS[meal]}`;
+    grid.appendChild(lbl);
+
+    DAYS.forEach(day => {
+      const key = `${day}-${meal}`;
+      const entry = wkData[key];
+      const cell = document.createElement('div');
+      cell.className = `meal-cell ${meal} ${entry ? 'has-meal' : ''}`;
+      if (entry) {
+        cell.innerHTML = `
+          <div class="meal-name">${entry.name}</div>
+          ${entry.rating ? `<div class="meal-rating">${RATINGS[entry.rating] || ''}</div>` : ''}
+          ${entry.cost ? `<div class="meal-cost">$${parseFloat(entry.cost).toFixed(2)}</div>` : ''}
+        `;
+      } else {
+        cell.innerHTML = `<span class="meal-empty">+ log</span>`;
+      }
+      cell.addEventListener('click', () => openModal(day, meal, key, entry));
+      grid.appendChild(cell);
+    });
+  });
+}
+
+let currentKey = null;
+function setRating(r) {
+  currentRating = r;
+  document.querySelectorAll('.rating-btn').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.dataset.r) === r);
+  });
+}
+
+function openModal(day, meal, key, entry) {
+  currentKey = key;
+  currentRating = entry ? (entry.rating || 0) : 0;
+  document.getElementById('modal-title').textContent = entry ? 'Edit Log' : 'Log a Meal';
+  document.getElementById('modal-subtitle').textContent = `${['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][DAYS.indexOf(day)] || day} · ${MEAL_LABELS[meal]}`;
+  document.getElementById('meal-name-input').value = entry ? entry.name : '';
+  document.getElementById('meal-cost-input').value = entry ? entry.cost : '';
+  document.querySelectorAll('.rating-btn').forEach(b => b.classList.toggle('selected', parseInt(b.dataset.r) === currentRating));
+  document.getElementById('modal-delete').style.display = entry ? 'block' : 'none';
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('meal-name-input').focus();
+}
+
+document.getElementById('modal-cancel').addEventListener('click', () => {
+  document.getElementById('modal-overlay').classList.remove('open');
+});
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
+});
+
+document.getElementById('modal-save').addEventListener('click', () => {
+  const name = document.getElementById('meal-name-input').value.trim();
+  const cost = document.getElementById('meal-cost-input').value;
+  if (!name) return;
+  const wk = getWeekKey(weekOffset);
+  if (!data[wk]) data[wk] = {};
+  data[wk][currentKey] = { name, cost, rating: currentRating };
+  save(); renderGrid(); renderWeekLabel();
+  document.getElementById('modal-overlay').classList.remove('open');
+});
+
+document.getElementById('modal-delete').addEventListener('click', () => {
+  const wk = getWeekKey(weekOffset);
+  if (data[wk]) delete data[wk][currentKey];
+  save(); renderGrid(); renderWeekLabel();
+  document.getElementById('modal-overlay').classList.remove('open');
+});
+
+document.getElementById('meal-name-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('modal-save').click();
+});
+
+// Week nav
+document.getElementById('prev-week').addEventListener('click', () => { weekOffset--; renderWeekLabel(); renderGrid(); });
+document.getElementById('next-week').addEventListener('click', () => { weekOffset++; renderWeekLabel(); renderGrid(); });
+
+// Shopping list
+function renderShoppingList() {
+  const list = data.shopping || [];
+  const el = document.getElementById('shopping-list');
+  el.innerHTML = '';
+  list.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'shop-item';
+    row.innerHTML = `
+      <div class="shop-check ${item.done ? 'checked' : ''}" data-i="${i}">
+        ${item.done ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>' : ''}
+      </div>
+      <span class="shop-text ${item.done ? 'done' : ''}">${item.text}</span>
+      <button class="shop-remove" data-i="${i}">×</button>
+    `;
+    el.appendChild(row);
+  });
+  el.querySelectorAll('.shop-check').forEach(el => {
+    el.addEventListener('click', () => {
+      const i = parseInt(el.dataset.i);
+      data.shopping[i].done = !data.shopping[i].done;
+      save(); renderShoppingList();
+    });
+  });
+  el.querySelectorAll('.shop-remove').forEach(el => {
+    el.addEventListener('click', () => {
+      data.shopping.splice(parseInt(el.dataset.i), 1);
+      save(); renderShoppingList();
+    });
+  });
+}
+
+document.getElementById('shop-add').addEventListener('click', () => {
+  const val = document.getElementById('shop-input').value.trim();
+  if (!val) return;
+  if (!data.shopping) data.shopping = [];
+  data.shopping.push({ text: val, done: false });
+  document.getElementById('shop-input').value = '';
+  save(); renderShoppingList();
+});
+document.getElementById('shop-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('shop-add').click();
+});
+
+// Notes
+const notesEl = document.getElementById('kitchen-notes');
+notesEl.value = data.notes || '';
+notesEl.addEventListener('input', () => { data.notes = notesEl.value; save(); });
+
+// Init
+renderWeekLabel();
+renderGrid();
+renderShoppingList();
+syncTreasury();
+</script>
+</body>
+</html>
