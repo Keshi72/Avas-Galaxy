@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✦ The Training Grounds</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06060f;
+    --bg2: #0d0d1f;
+    --bg3: #12122a;
+    --gold: #c9a84c;
+    --gold2: #e8c97a;
+    --gold-dim: rgba(201,168,76,0.18);
+    --gold-glow: rgba(201,168,76,0.07);
+    --rose: #c4748a;
+    --rose-dim: rgba(196,116,138,0.15);
+    --sage: #7a9e8e;
+    --sage-dim: rgba(122,158,142,0.12);
+    --sage-bright: rgba(122,158,142,0.4);
+    --blue: #7a9ebf;
+    --blue-dim: rgba(122,158,191,0.15);
+    --cream: #f0e8d8;
+    --muted: rgba(240,232,216,0.48);
+    --border: rgba(201,168,76,0.18);
+    --border-bright: rgba(201,168,76,0.42);
+    --font-head: 'Cinzel', serif;
+    --font-body: 'Cormorant Garamond', serif;
+    --font-text: 'EB Garamond', serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── STARFIELD ── */
+  #stars { position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 15% 25%, rgba(122,158,142,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 85% 65%, rgba(122,158,191,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 50% 80%, rgba(201,168,76,0.04) 0%, transparent 60%),
+      var(--bg);
+  }
+  .star { position: absolute; border-radius: 50%; background: #fff;
+    animation: twinkle var(--d,3s) ease-in-out infinite var(--del,0s); }
+  @keyframes twinkle {
+    0%,100% { opacity: var(--o1,.3); transform: scale(1); }
+    50% { opacity: var(--o2,.9); transform: scale(1.4); }
+  }
+
+  /* ── LAYOUT ── */
+  .page { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+  .back { display: inline-flex; align-items: center; gap: .4rem;
+    font-family: var(--font-head); font-size: .63rem; letter-spacing: .12em;
+    color: var(--gold); text-decoration: none; opacity: .65; transition: opacity .2s; margin-bottom: 2.5rem; }
+  .back:hover { opacity: 1; }
+
+  /* ── HEADER ── */
+  .header { text-align: center; margin-bottom: 2.8rem; }
+  .orn { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem; }
+  .orn-line { height: 1px; width: 55px; }
+  .orn-line.l { background: linear-gradient(90deg, transparent, var(--gold)); }
+  .orn-line.r { background: linear-gradient(90deg, var(--gold), transparent); }
+  .title { font-family: var(--font-head); font-size: clamp(1.7rem,5vw,2.7rem);
+    font-weight: 400; letter-spacing: .15em; color: var(--gold2);
+    text-shadow: 0 0 40px rgba(201,168,76,0.28); margin-bottom: .5rem; }
+  .subtitle { font-family: var(--font-body); font-style: italic; color: var(--muted); font-size: 1.05rem; letter-spacing: .05em; }
+
+  /* ── TODAY BANNER ── */
+  .today-banner {
+    border: 1px solid var(--border-bright);
+    border-radius: 4px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 2rem;
+    background: var(--gold-glow);
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .today-day { font-family: var(--font-head); font-size: .65rem; letter-spacing: .15em; color: var(--gold); }
+  .today-session { font-family: var(--font-body); font-style: italic; font-size: 1.15rem; color: var(--cream); margin-top: .2rem; }
+  .today-badge {
+    font-family: var(--font-head); font-size: .55rem; letter-spacing: .1em;
+    padding: .35rem .8rem; border-radius: 2px;
+  }
+  .badge-tone { background: var(--rose-dim); color: var(--rose); border: 1px solid rgba(196,116,138,0.35); }
+  .badge-flow { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(122,158,191,0.35); }
+  .badge-walk { background: var(--sage-dim); color: var(--sage); border: 1px solid var(--sage-bright); }
+  .badge-rest { background: rgba(255,255,255,0.04); color: var(--muted); border: 1px solid var(--border); }
+
+  /* ── TABS ── */
+  .tabs { display: flex; flex-wrap: wrap; gap: .45rem; justify-content: center; margin-bottom: 2.3rem; }
+  .tab-btn { font-family: var(--font-head); font-size: .58rem; letter-spacing: .12em;
+    padding: .48rem 1.05rem; background: transparent;
+    border: 1px solid var(--border); color: var(--muted);
+    cursor: pointer; transition: all .22s; border-radius: 2px; }
+  .tab-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .tab-btn.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold2); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeIn .3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+
+  /* ── CARD ── */
+  .card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 4px; padding: 1.4rem 1.5rem; margin-bottom: 1.1rem; }
+  .card-title { font-family: var(--font-head); font-size: .68rem; letter-spacing: .12em; color: var(--gold); margin-bottom: 1rem;
+    display: flex; align-items: center; gap: .6rem; }
+  .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── EXERCISE CARDS ── */
+  .ex-list { display: flex; flex-direction: column; gap: .55rem; }
+  .ex-item {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: .8rem 1rem; border: 1px solid var(--border); border-radius: 3px;
+    background: rgba(255,255,255,0.02); transition: all .2s; cursor: pointer;
+  }
+  .ex-item:hover { border-color: var(--gold); background: var(--gold-glow); }
+  .ex-item.done { background: var(--sage-dim); border-color: rgba(122,158,142,0.4); }
+  .ex-item.done .ex-name { text-decoration: line-through; color: var(--muted); }
+  .ex-check {
+    width: 18px; height: 18px; min-width: 18px; border: 1px solid var(--border-bright); border-radius: 2px;
+    display: flex; align-items: center; justify-content: center; font-size: .7rem; color: var(--sage);
+    margin-top: 2px; transition: all .2s;
+  }
+  .ex-item.done .ex-check { background: var(--sage-dim); border-color: var(--sage); }
+  .ex-body { flex: 1; }
+  .ex-name { font-family: var(--font-body); font-size: 1.05rem; color: var(--cream); }
+  .ex-detail { font-family: var(--font-text); font-style: italic; font-size: .85rem; color: var(--muted); margin-top: .15rem; line-height: 1.5; }
+  .ex-target {
+    font-family: var(--font-head); font-size: .5rem; letter-spacing: .1em;
+    padding: .18rem .45rem; border-radius: 2px; white-space: nowrap; margin-top: .35rem; display: inline-block;
+  }
+  .target-core { background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid var(--border); }
+  .target-glute { background: var(--rose-dim); color: var(--rose); border: 1px solid rgba(196,116,138,0.3); }
+  .target-arms { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(122,158,191,0.3); }
+  .target-full { background: var(--sage-dim); color: var(--sage); border: 1px solid var(--sage-bright); }
+
+  /* ── TIMER ── */
+  .timer-wrap { text-align: center; padding: 1.5rem; }
+  .timer-display {
+    font-family: var(--font-head); font-size: 3.5rem; letter-spacing: .1em;
+    color: var(--gold2); text-shadow: 0 0 30px rgba(201,168,76,0.3);
+    margin-bottom: .8rem; min-height: 4.5rem; display: flex; align-items: center; justify-content: center;
+  }
+  .timer-label { font-family: var(--font-body); font-style: italic; font-size: 1rem; color: var(--muted); margin-bottom: 1.2rem; }
+  .timer-btns { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; }
+  .timer-btn {
+    font-family: var(--font-head); font-size: .58rem; letter-spacing: .12em;
+    padding: .55rem 1.2rem; border: 1px solid var(--border-bright); border-radius: 2px;
+    background: transparent; color: var(--gold); cursor: pointer; transition: all .2s;
+  }
+  .timer-btn:hover { background: var(--gold-dim); }
+  .timer-btn.primary { background: var(--gold-dim); }
+  .timer-btn.danger { border-color: rgba(196,116,138,0.4); color: var(--rose); }
+  .timer-btn.danger:hover { background: var(--rose-dim); }
+  .timer-presets { display: flex; gap: .4rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+  .preset-btn {
+    font-family: var(--font-head); font-size: .52rem; letter-spacing: .1em;
+    padding: .3rem .7rem; border: 1px solid var(--border); border-radius: 2px;
+    background: transparent; color: var(--muted); cursor: pointer; transition: all .2s;
+  }
+  .preset-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ── ROUNDS ── */
+  .round-tracker { display: flex; align-items: center; gap: .7rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .round-label { font-family: var(--font-head); font-size: .6rem; letter-spacing: .1em; color: var(--muted); }
+  .round-dots { display: flex; gap: .5rem; }
+  .round-dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid var(--border-bright); background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .55rem; color: var(--muted); cursor: pointer; transition: all .2s;
+    font-family: var(--font-head);
+  }
+  .round-dot.done { background: var(--gold-dim); border-color: var(--gold); color: var(--gold2); }
+
+  /* ── PROGRESS BAR ── */
+  .prog-wrap { background: rgba(255,255,255,0.05); border-radius: 4px; height: 5px; margin: .7rem 0; overflow: hidden; }
+  .prog-bar { height: 100%; background: linear-gradient(90deg, var(--sage), var(--gold)); border-radius: 4px; transition: width .4s ease; }
+  .prog-label { font-family: var(--font-head); font-size: .58rem; letter-spacing: .1em; color: var(--muted); text-align: right; margin-bottom: .25rem; }
+
+  /* ── FLOW / STRETCH ── */
+  .flow-item {
+    padding: .9rem 1rem;
+    border-left: 2px solid var(--blue);
+    background: var(--blue-dim);
+    border-radius: 0 3px 3px 0;
+    margin-bottom: .6rem;
+  }
+  .flow-name { font-family: var(--font-body); font-size: 1.05rem; color: var(--cream); }
+  .flow-note { font-family: var(--font-text); font-style: italic; font-size: .85rem; color: var(--muted); margin-top: .2rem; line-height: 1.5; }
+  .flow-time { font-family: var(--font-head); font-size: .52rem; letter-spacing: .1em; color: var(--blue); margin-top: .3rem; }
+
+  /* ── WALK ── */
+  .walk-item {
+    padding: .9rem 1rem;
+    border-left: 2px solid var(--sage);
+    background: var(--sage-dim);
+    border-radius: 0 3px 3px 0;
+    margin-bottom: .6rem;
+  }
+  .walk-name { font-family: var(--font-body); font-size: 1.05rem; color: var(--cream); }
+  .walk-note { font-family: var(--font-text); font-style: italic; font-size: .85rem; color: var(--muted); margin-top: .2rem; line-height: 1.5; }
+
+  /* ── STREAK ── */
+  .streak-grid { display: flex; flex-wrap: wrap; gap: .35rem; }
+  .streak-dot {
+    width: 28px; height: 28px; border-radius: 3px;
+    border: 1px solid var(--border); background: transparent;
+    cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .6rem; color: transparent;
+  }
+  .streak-dot:hover { border-color: var(--gold); }
+  .streak-dot.done { background: var(--gold-dim); border-color: var(--gold); color: var(--gold2); }
+  .streak-dot.done::after { content: '✦'; }
+  .streak-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .8rem; flex-wrap: wrap; gap: .5rem; }
+  .streak-count { font-family: var(--font-head); font-size: .65rem; letter-spacing: .1em; color: var(--gold); }
+  .streak-reset { font-family: var(--font-head); font-size: .52rem; letter-spacing: .1em;
+    padding: .3rem .7rem; border: 1px solid var(--border); border-radius: 2px;
+    background: transparent; color: var(--muted); cursor: pointer; transition: all .2s; }
+  .streak-reset:hover { border-color: var(--rose); color: var(--rose); }
+  .week-labels { display: flex; gap: .35rem; margin-bottom: .3rem; }
+  .week-label { width: 28px; text-align: center; font-family: var(--font-head); font-size: .42rem; letter-spacing: .08em; color: var(--muted); }
+
+  /* ── INFO BLOCK ── */
+  .info-block {
+    padding: .85rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 3px; background: var(--gold-glow);
+    margin-bottom: .6rem;
+  }
+  .info-title { font-family: var(--font-head); font-size: .6rem; letter-spacing: .1em; color: var(--gold); margin-bottom: .35rem; }
+  .info-text { font-family: var(--font-text); font-size: .93rem; color: var(--cream); line-height: 1.65; }
+  .info-em { font-style: italic; color: var(--muted); font-size: .85rem; margin-top: .2rem; display: block; }
+
+  /* ── RULE BLOCK ── */
+  .rule-block { padding: .85rem 1rem; border-left: 2px solid var(--gold); background: var(--gold-glow); border-radius: 0 3px 3px 0; margin-bottom: .7rem; }
+  .rule-title { font-family: var(--font-head); font-size: .6rem; letter-spacing: .1em; color: var(--gold); margin-bottom: .35rem; }
+  .rule-text { font-family: var(--font-text); font-size: .93rem; color: var(--cream); line-height: 1.65; }
+
+  /* ── NUTRITION TIP ── */
+  .nutrition-tip {
+    text-align: center;
+    font-family: var(--font-body); font-style: italic;
+    font-size: 1rem; color: var(--muted);
+    padding: 1rem 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--gold-glow);
+    line-height: 1.7;
+  }
+  .nutrition-tip strong { font-style: normal; color: var(--gold2); font-family: var(--font-head); font-size: .65rem; letter-spacing: .1em; display: block; margin-bottom: .3rem; }
+
+  /* ── RESET BTN ── */
+  .reset-session {
+    width: 100%; margin-top: .5rem;
+    font-family: var(--font-head); font-size: .6rem; letter-spacing: .12em;
+    padding: .7rem; border: 1px solid var(--border); border-radius: 3px;
+    background: transparent; color: var(--muted); cursor: pointer; transition: all .2s;
+  }
+  .reset-session:hover { border-color: var(--rose); color: var(--rose); }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  @media (max-width: 520px) {
+    .streak-dot, .week-label { width: 24px; height: 24px; }
+    .streak-dot { font-size: .5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div class="page">
+  <a class="back" href="index.html">← Return to the Galaxy</a>
+
+  <header class="header">
+    <div class="orn">
+      <div class="orn-line l"></div>
+      <span style="color:var(--gold);font-size:1rem;">✦</span>
+      <div class="orn-line r"></div>
+    </div>
+    <h1 class="title">THE TRAINING GROUNDS</h1>
+    <p class="subtitle">toning · flexibility · daily energy · all at home</p>
+  </header>
+
+  <!-- TODAY BANNER -->
+  <div class="today-banner" id="today-banner">
+    <div>
+      <div class="today-day" id="today-day">LOADING</div>
+      <div class="today-session" id="today-session">—</div>
+    </div>
+    <div class="today-badge" id="today-badge">REST</div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('tone',this)">✦ TONE SESSION</button>
+    <button class="tab-btn" onclick="switchTab('flow',this)">FLOW SESSION</button>
+    <button class="tab-btn" onclick="switchTab('walk',this)">WALK DAY</button>
+    <button class="tab-btn" onclick="switchTab('timer',this)">REST TIMER</button>
+    <button class="tab-btn" onclick="switchTab('streak',this)">STREAK</button>
+    <button class="tab-btn" onclick="switchTab('notes',this)">NOTES</button>
+  </div>
+
+  <!-- ══ TONE SESSION TAB ══ -->
+  <div class="tab-panel active" id="tab-tone">
+
+    <div class="card">
+      <div class="card-title">MONDAY & FRIDAY · 25 MINUTES · 3 ROUNDS</div>
+
+      <div class="round-tracker">
+        <div class="round-label">ROUNDS COMPLETE</div>
+        <div class="round-dots">
+          <div class="round-dot" id="r1" onclick="toggleRound(1)">1</div>
+          <div class="round-dot" id="r2" onclick="toggleRound(2)">2</div>
+          <div class="round-dot" id="r3" onclick="toggleRound(3)">3</div>
+        </div>
+      </div>
+
+      <div class="prog-label" id="tone-prog-label">0 of 8 done</div>
+      <div class="prog-wrap"><div class="prog-bar" id="tone-prog-bar" style="width:0%"></div></div>
+
+      <div class="ex-list" id="tone-list">
+        <div class="ex-item" onclick="toggleEx(this,'t1')" data-id="t1">
+          <div class="ex-check">✦</div>
+          <div class="ex-body">
+            <div class="ex-name">Wall Push-Ups</div>
+            <div class="ex-detail">12 reps · hands shoulder-width on wall, body straight. Lower chest toward wall, push back. Easier than floor push-ups — progress to incline when ready.</div>
+            <span class="ex-target target-arms">ARMS & CHEST</span>
+          </div>
+        </div>
+
+        <div class="ex-item" onclick="toggleEx(this,'t2')" data-id="t2">
+          <div class="ex-check">✦</div>
+          <div class="ex-body">
+            <div class="ex-name">Tricep Dips</div>
+            <div class="ex-detail">10 reps · use a sturdy chair. Hands grip edge, feet flat on floor, lower yourself by bending elbows to 90°. Targets the back of the arms directly.</div>
+            <span class="ex-target target-arms">ARMS — TRICEPS</span>
+          </div>
+        </div>
+
+        <div class="ex-item" onclick="toggleEx(this,'t3')" data-id="t3">
+          <div class="ex-check">✦</div>
+          <div class="ex-body">
+            <div class="ex-name">Glute Bridges</div>
+            <div class="ex-detail">15 reps · lie on back, feet flat and hip-width. Drive hips up, squeeze glutes at the top. Hold 2 seconds. Lower slowly. One of the most effective exercises for toning thighs and glutes.</div>
+            <span class="ex-target target-glute">GLUTES & THIGHS</span>
+          </div>
+        </div>
+
+        <div class="ex-item" onclick="toggleEx(this,'t4')" data-id="t4">
+          <div class="ex-check">✦</div>
+          <div class="ex-body">
+            <div class="ex-name">Sumo Squats</div>
+            <div class="ex-detail">12 reps · feet wider than hips, toes slightly out. Lower until thighs are parallel. Drive through heels. Targets inner thighs specifically — one of your goal areas.</div>
+            <span class="ex-target target-glute">THIGHS & GLUTES</span>
+          </div>
+        </div>
+
+        <div class="ex-item" onclick="toggleEx(this,'t5')" data-id="t5">
+          <div class="ex-check">✦</div>
+          <div class="ex-body">
+            <div class="ex-name">Dead Bug</div>
+            <div class="ex-detail">8 reps per side · lie on back, arms pointing up, knees at 90° above hips. Lower opposite arm and leg toward floor without arching your back. Slow and controlled. The best deep core exercise for a flat stomach.</div>
+            <span class="ex-target target-core">DEEP CORE</span>
+          </div>
+        </div>
+
+        <div class="ex-item" onclick="toggleEx(this,'t6')" data-id="t6">
+          <div class="ex-check">✦</div>
+          <div class="ex-body">
+            <div class="ex-name">Bird Dog</div>
+            <div class="ex-detail">10 reps per side · on all fours, spine neutral. Extend opposite arm and leg, hold 2 seconds, return. Creates a long, stable core — the foundation for the "toned" look rather than just strong.</div>
+            <span class="ex-target target-core">CORE & BALANCE</span>
+          </div>
+        </div>
+
+        <div class="ex-item" onclick="toggleEx(this,'t7')" data-id="t7">
+          <div class="ex-check">✦</div>
+          <div class="ex-body">
+            <div class="ex-name">Lateral Leg Raises</div>
+            <div class="ex-detail">12 reps per side · lie on your side, lift top leg to hip height and lower slowly. Targets outer thigh and hip. Add inner-thigh raises (bottom leg) for the inner thigh specifically.</div>
+            <span class="ex-target target-glute">THIGHS — OUTER & INNER</span>
+          </div>
+        </div>
+
+        <div class="ex-item" onclick="toggleEx(this,'t8')" data-id="t8">
+          <div class="ex-check">✦</div>
+          <div class="ex-body">
+            <div class="ex-name">Plank Hold</div>
+            <div class="ex-detail">20–30 seconds (build to 45s) · forearms on floor, body in a straight line. Don't hold your breath — breathe steadily. If full plank is too hard start with a knee plank and progress.</div>
+            <span class="ex-target target-full">FULL BODY — CORE FOCUS</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="reset-session" onclick="resetTone()">↺ RESET SESSION</button>
+    </div>
+
+    <div class="nutrition-tip">
+      <strong>POST-WORKOUT WINDOW</strong>
+      Eat protein within 30 minutes of finishing — Greek yoghurt, a boiled egg, or a banana with peanut butter. This is when your muscles absorb it best.
+    </div>
+
+    <div class="card" style="margin-top:1rem">
+      <div class="card-title">THE ONE RULE</div>
+      <div class="rule-block">
+        <div class="rule-title">CHANGE CLOTHES BEFORE YOU SIT DOWN</div>
+        <div class="rule-text">The moment work ends at 5pm — change into workout clothes before you do anything else. Before sitting down, before checking your phone, before eating. Sitting down first in day clothes is where the workout intention dies every single time. Clothes on = workout happening.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FLOW SESSION TAB ══ -->
+  <div class="tab-panel" id="tab-flow">
+
+    <div class="card">
+      <div class="card-title">WEDNESDAY · 20 MINUTES · FLEXIBILITY & RESET</div>
+      <p style="font-family:var(--font-text);font-style:italic;font-size:.9rem;color:var(--muted);line-height:1.7;margin-bottom:1rem;">
+        Wednesday flow is the most important session of your week for how you feel day-to-day. Sitting at a desk compresses your spine and tightens your hip flexors — this 20 minutes undoes the damage and resets your nervous system. No mat needed. Just your floor.
+      </p>
+
+      <div class="flow-item">
+        <div class="flow-name">Child's Pose</div>
+        <div class="flow-note">Kneel, sit back toward heels, arms extended forward, forehead on the floor. Breathe deeply — feel your lower back expand. Decompresses the spine after sitting.</div>
+        <div class="flow-time">90 SECONDS · 3 SLOW BREATHS</div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-name">Cat-Cow</div>
+        <div class="flow-note">On all fours — inhale and arch your back (cow), exhale and round your spine (cat). Slow and fluid. Restores mobility to every vertebra in your spine. Feel each segment move.</div>
+        <div class="flow-time">8 ROUNDS · BREATH-LED</div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-name">Low Lunge Hip Flexor Stretch</div>
+        <div class="flow-note">One knee on floor, other foot forward. Sink your hips forward and down. Hold. Switch sides. This one stretch counters the damage of an entire week of sitting. The hip flexors are what cause low back pain, poor posture, and low energy.</div>
+        <div class="flow-time">60 SECONDS EACH SIDE</div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-name">Seated Forward Fold</div>
+        <div class="flow-note">Sit with legs extended, hinge from the hips and reach toward your feet. Don't force it — go to your edge and breathe. Stretches the entire back of the legs and decompresses the lower spine.</div>
+        <div class="flow-time">90 SECONDS</div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-name">Supine Twist</div>
+        <div class="flow-note">Lie on your back, draw one knee to chest and let it fall across your body. Arms wide. Look away from the knee. Wrings out tension from the lower back and spine. A deeply satisfying release.</div>
+        <div class="flow-time">60 SECONDS EACH SIDE</div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-name">Figure-Four Glute Stretch</div>
+        <div class="flow-note">Lie on back, cross one ankle over the opposite knee, flex the foot. Draw both legs toward you. Targets the piriformis — the deep glute muscle that gets tight from sitting and contributes to back pain.</div>
+        <div class="flow-time">60 SECONDS EACH SIDE</div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-name">Shoulder & Neck Release</div>
+        <div class="flow-note">Seated or lying. Gently drop one ear toward shoulder, hold. Roll neck slowly. Interlace hands behind head and gently nod forward. WFH tension lives here — release it before it becomes a headache.</div>
+        <div class="flow-time">2 MINUTES · SLOW</div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-name">Legs Up the Wall</div>
+        <div class="flow-note">Lie with your sitting bones against the wall, legs resting straight up. Close your eyes. This is your Wednesday cool-down. Reduces leg swelling, calms the nervous system, reduces cortisol. Stay as long as feels good.</div>
+        <div class="flow-time">3–5 MINUTES</div>
+      </div>
+    </div>
+
+    <div class="info-block">
+      <div class="info-title">WEDNESDAY INTENTION</div>
+      <div class="info-text">Wednesday flow is not a workout. It's maintenance and nervous system reset. You don't need to sweat. You don't need to feel like you "did something." The goal is to end the session feeling longer, looser, and calmer than when you started.</div>
+    </div>
+  </div>
+
+  <!-- ══ WALK TAB ══ -->
+  <div class="tab-panel" id="tab-walk">
+
+    <div class="card">
+      <div class="card-title">SATURDAY · 30 MINUTES · OUTSIDE</div>
+      <p style="font-family:var(--font-text);font-style:italic;font-size:.9rem;color:var(--muted);line-height:1.7;margin-bottom:1rem;">
+        Your Saturday walk is the most underrated part of this plan. Walking outside regulates cortisol, improves mood, aids digestion, supports your skin, and builds baseline cardiovascular fitness without stressing your body. It also gets you out of the apartment — important when you WFH alone all week.
+      </p>
+
+      <div class="walk-item">
+        <div class="walk-name">Before you leave</div>
+        <div class="walk-note">Drink a glass of water. Put on a playlist, podcast, or just let yourself have silence. Wear comfortable shoes — bare feet or grippy socks are fine indoors but your feet need support outside. Bring water if it's warm.</div>
+      </div>
+
+      <div class="walk-item">
+        <div class="walk-name">The walk itself</div>
+        <div class="walk-note">No pace goal. No heart rate goal. Walk at whatever speed feels natural and sustainable for 30 minutes. You can stop and look at things. That's allowed. The goal is 30 minutes outside, not 30 minutes of exercise.</div>
+      </div>
+
+      <div class="walk-item">
+        <div class="walk-name">Notice beautiful things</div>
+        <div class="walk-note">This is the AuDHD-specific intention for your walk. Notice textures, light, plants, architecture — whatever catches your eye. It engages the exploratory part of your brain that WFH can starve and it genuinely makes the walk feel easier and more restorative.</div>
+      </div>
+
+      <div class="walk-item">
+        <div class="walk-name">When you get back</div>
+        <div class="walk-note">Drink water. If you're in Austin, you've just done your neighbourhood exploring too. Note any streets or spots you want to come back to. Your Saturday walk will slowly become a way of knowing your city.</div>
+      </div>
+    </div>
+
+    <div class="info-block">
+      <div class="info-title">WHY OUTSIDE SPECIFICALLY</div>
+      <div class="info-text">Outdoor walking in natural light suppresses cortisol and raises serotonin in a way that indoor walking doesn't. For AuDHD and delayed sleep phase specifically — morning or afternoon outdoor light helps regulate your body clock. Even on overcast days. The light through cloud is still 10x stronger than indoor lighting.</div>
+    </div>
+
+    <div class="info-block" style="margin-top:.6rem">
+      <div class="info-title">PROGRESS YOUR WALK OVER TIME</div>
+      <div class="info-text">Month 1–2 · 30 minutes, any pace<br>Month 3–4 · 35 minutes, add one gentle hill or incline if available<br>Month 5–6 · try a 45-minute walk once a month<br>When you're in Austin · explore a new neighbourhood each Saturday</div>
+    </div>
+  </div>
+
+  <!-- ══ REST TIMER TAB ══ -->
+  <div class="tab-panel" id="tab-timer">
+
+    <div class="card">
+      <div class="card-title">REST TIMER · between exercises & rounds</div>
+
+      <div class="timer-wrap">
+        <div class="timer-display" id="timer-display">0:40</div>
+        <div class="timer-label" id="timer-label">Rest between exercises</div>
+
+        <div class="timer-presets">
+          <button class="preset-btn" onclick="setTimer(30)">30s</button>
+          <button class="preset-btn" onclick="setTimer(40)">40s</button>
+          <button class="preset-btn" onclick="setTimer(45)">45s</button>
+          <button class="preset-btn" onclick="setTimer(60)">60s</button>
+          <button class="preset-btn" onclick="setTimer(90)">90s</button>
+          <button class="preset-btn" onclick="setTimer(120)">2m</button>
+        </div>
+
+        <div class="timer-btns">
+          <button class="timer-btn primary" id="timer-start" onclick="startTimer()">START</button>
+          <button class="timer-btn" id="timer-pause" onclick="pauseTimer()" style="display:none">PAUSE</button>
+          <button class="timer-btn danger" onclick="resetTimer()">RESET</button>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:.5rem">
+        <div class="card-title" style="margin-bottom:.7rem">REST GUIDE</div>
+        <div class="info-block">
+          <div class="info-title">BETWEEN EXERCISES</div>
+          <div class="info-text">30–45 seconds. Long enough to catch your breath, short enough to keep your heart rate up and the session within 25 minutes.</div>
+        </div>
+        <div class="info-block">
+          <div class="info-title">BETWEEN ROUNDS</div>
+          <div class="info-text">60–90 seconds. Your muscles need slightly more recovery between full rounds. Use this time to drink water and shake out your limbs.</div>
+        </div>
+        <div class="info-block">
+          <div class="info-title">IF YOU NEED MORE</div>
+          <div class="info-text">Take it. The plan is a guide not a rule. A workout where you rested longer and finished is better than one you abandoned because you pushed too hard.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STREAK TAB ══ -->
+  <div class="tab-panel" id="tab-streak">
+
+    <div class="card">
+      <div class="card-title">12-WEEK TRAINING STREAK</div>
+
+      <div class="streak-header">
+        <div class="streak-count" id="streak-count">0 sessions complete</div>
+        <button class="streak-reset" onclick="resetStreak()">↺ RESET STREAK</button>
+      </div>
+
+      <div class="week-labels" id="week-labels"></div>
+      <div class="streak-grid" id="streak-grid"></div>
+
+      <div style="margin-top:1rem">
+        <div class="prog-label" id="streak-prog-label">0 of 36 sessions</div>
+        <div class="prog-wrap"><div class="prog-bar" id="streak-prog-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">WEEKLY SCHEDULE</div>
+
+      <div class="info-block">
+        <div class="info-title">MONDAY · TONE</div>
+        <div class="info-text">25-minute tone session · 5:30pm · tick the first dot of each week</div>
+      </div>
+      <div class="info-block">
+        <div class="info-title">WEDNESDAY · FLOW</div>
+        <div class="info-text">20-minute flow & stretch · any time after work · second dot</div>
+      </div>
+      <div class="info-block">
+        <div class="info-title">FRIDAY · TONE</div>
+        <div class="info-text">25-minute tone session · 5:30pm · third dot of each week</div>
+      </div>
+    </div>
+
+    <div class="nutrition-tip">
+      <strong>THE REAL SECRET TO TONING</strong>
+      Exercise creates the shape. Protein builds it. Getting enough protein — Greek yoghurt, eggs, chicken, lentils — is what allows your muscles to change visibly. Without it, the exercise still happens but the results are slow. You don't need to count anything. Just make sure every meal has a protein source.
+    </div>
+  </div>
+
+  <!-- ══ NOTES TAB ══ -->
+  <div class="tab-panel" id="tab-notes">
+
+    <div class="card">
+      <div class="card-title">TRAINING NOTES · log how sessions feel</div>
+      <textarea id="notes-field"
+        style="width:100%;min-height:200px;background:transparent;border:1px solid var(--border);border-radius:3px;padding:.8rem;
+               font-family:var(--font-text);font-size:.95rem;color:var(--cream);line-height:1.7;resize:vertical;outline:none;"
+        placeholder="How did today's session feel? What was hard, what felt good, what you want to remember…"
+        oninput="saveNotes()"></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-title">PROGRESS NOTES · track changes you notice</div>
+      <textarea id="progress-field"
+        style="width:100%;min-height:160px;background:transparent;border:1px solid var(--border);border-radius:3px;padding:.8rem;
+               font-family:var(--font-text);font-size:.95rem;color:var(--cream);line-height:1.7;resize:vertical;outline:none;"
+        placeholder="Things you notice changing — energy levels, how clothes fit, what's getting easier…"
+        oninput="saveProgress()"></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-title">YOUR GOALS · why this matters</div>
+      <div class="rule-block">
+        <div class="rule-title">WHAT AVA IS WORKING TOWARD</div>
+        <div class="rule-text">Toning arms, stomach, and thighs · building flexibility and daily energy · feeling comfortable and confident in her dresses and skirts · building sustainable habits that survive a move to Austin and a radiology programme · taking care of her body while she takes care of everything else.</div>
+      </div>
+      <div class="info-block" style="margin-top:.6rem">
+        <div class="info-title">THE TIMELINE THAT'S REAL</div>
+        <div class="info-text">Visible toning with consistent home workouts: 8–12 weeks to notice, 16–20 weeks for others to notice. The plan is 12 weeks (36 sessions). You will feel different before you look different. The feeling comes first — trust it.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ── STARS ──
+(function(){
+  const c = document.getElementById('stars');
+  for(let i=0;i<130;i++){
+    const s=document.createElement('div'); s.className='star';
+    const sz=Math.random()*2+0.3;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;
+      --d:${2+Math.random()*4.5}s;--del:${-Math.random()*6}s;
+      --o1:${0.1+Math.random()*0.3};--o2:${0.5+Math.random()*0.5}`;
+    c.appendChild(s);
+  }
+})();
+
+// ── TABS ──
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── TODAY BANNER ──
+(function(){
+  const days=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+  const d=new Date().getDay();
+  const dayName=days[d];
+  let session,badge,cls;
+  if(d===1||d===5){session='Tone Session · 5:30pm · 25 minutes';badge='TONE DAY';cls='badge-tone';}
+  else if(d===3){session='Flow & Stretch · any time after work · 20 minutes';badge='FLOW DAY';cls='badge-flow';}
+  else if(d===6){session='Walk Day · 30 minutes outside · any time';badge='WALK DAY';cls='badge-walk';}
+  else{session='Rest & Recover · let your body do its work';badge='REST DAY';cls='badge-rest';}
+  document.getElementById('today-day').textContent=dayName;
+  document.getElementById('today-session').textContent=session;
+  const b=document.getElementById('today-badge');
+  b.textContent=badge; b.className='today-badge '+cls;
+
+  // Switch to relevant tab
+  if(d===1||d===5) document.querySelector('[onclick*="tone"]').click();
+  else if(d===3) document.querySelector('[onclick*="flow"]').click();
+  else if(d===6) document.querySelector('[onclick*="walk"]').click();
+})();
+
+// ── TONE SESSION ──
+const TONE_KEY='ava_tone_session';
+const ROUND_KEY='ava_tone_rounds';
+
+function loadToneDone(){try{return JSON.parse(localStorage.getItem(TONE_KEY)||'[]');}catch{return[];}}
+function saveToneDone(a){localStorage.setItem(TONE_KEY,JSON.stringify(a));}
+function loadRounds(){try{return JSON.parse(localStorage.getItem(ROUND_KEY)||'[]');}catch{return[];}}
+function saveRounds(a){localStorage.setItem(ROUND_KEY,JSON.stringify(a));}
+
+function toggleEx(el,id){
+  let done=loadToneDone();
+  if(done.includes(id)){done=done.filter(x=>x!==id);el.classList.remove('done');el.querySelector('.ex-check').textContent='✦';}
+  else{done.push(id);el.classList.add('done');el.querySelector('.ex-check').textContent='✓';}
+  saveToneDone(done);updateToneProgress();
+}
+function updateToneProgress(){
+  const done=loadToneDone();const total=8;const c=done.length;
+  document.getElementById('tone-prog-label').textContent=`${c} of ${total} done`;
+  document.getElementById('tone-prog-bar').style.width=(c/total*100)+'%';
+}
+function toggleRound(n){
+  let rounds=loadRounds();const id='r'+n;
+  if(rounds.includes(id)){rounds=rounds.filter(x=>x!==id);document.getElementById(id).classList.remove('done');}
+  else{rounds.push(id);document.getElementById(id).classList.add('done');}
+  saveRounds(rounds);
+}
+function resetTone(){
+  saveToneDone([]);saveRounds([]);
+  document.querySelectorAll('.ex-item').forEach(el=>{el.classList.remove('done');el.querySelector('.ex-check').textContent='✦';});
+  document.querySelectorAll('.round-dot').forEach(d=>d.classList.remove('done'));
+  updateToneProgress();
+}
+function initTone(){
+  const done=loadToneDone();const rounds=loadRounds();
+  document.querySelectorAll('.ex-item').forEach(el=>{
+    if(done.includes(el.dataset.id)){el.classList.add('done');el.querySelector('.ex-check').textContent='✓';}
+  });
+  rounds.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('done');});
+  updateToneProgress();
+}
+initTone();
+
+// ── REST TIMER ──
+let timerSecs=40,timerRunning=false,timerInterval=null;
+function fmt(s){return`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
+function renderTimer(){document.getElementById('timer-display').textContent=fmt(timerSecs);}
+function setTimer(s){
+  clearInterval(timerInterval);timerRunning=false;timerSecs=s;renderTimer();
+  document.getElementById('timer-start').style.display='';
+  document.getElementById('timer-pause').style.display='none';
+  document.getElementById('timer-label').textContent=s<=60?'Rest between exercises':'Rest between rounds';
+}
+function startTimer(){
+  if(timerSecs<=0)return;
+  timerRunning=true;
+  document.getElementById('timer-start').style.display='none';
+  document.getElementById('timer-pause').style.display='';
+  timerInterval=setInterval(()=>{
+    timerSecs--;renderTimer();
+    if(timerSecs<=0){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-label').textContent='✦ Rest complete';
+      document.getElementById('timer-start').style.display='';
+      document.getElementById('timer-pause').style.display='none';}
+  },1000);
+}
+function pauseTimer(){
+  clearInterval(timerInterval);timerRunning=false;
+  document.getElementById('timer-start').style.display='';
+  document.getElementById('timer-pause').style.display='none';
+}
+function resetTimer(){
+  clearInterval(timerInterval);timerRunning=false;timerSecs=40;renderTimer();
+  document.getElementById('timer-start').style.display='';
+  document.getElementById('timer-pause').style.display='none';
+  document.getElementById('timer-label').textContent='Rest between exercises';
+}
+renderTimer();
+
+// ── STREAK ──
+const STREAK_KEY='ava_workout_streak';
+const TOTAL_DOTS=36;
+
+function loadStreak(){try{return JSON.parse(localStorage.getItem(STREAK_KEY)||'[]');}catch{return[];}}
+function saveStreak(a){localStorage.setItem(STREAK_KEY,JSON.stringify(a));}
+
+function buildStreak(){
+  const labels=['M','W','F'];
+  const labelsEl=document.getElementById('week-labels');
+  labelsEl.innerHTML='';
+  // 12 weeks × 3 sessions = 36; show week numbers then 3 dots per week
+  // Build label row
+  for(let w=0;w<12;w++){
+    const wl=document.createElement('div');
+    wl.style.cssText='font-family:var(--font-head);font-size:.42rem;letter-spacing:.05em;color:var(--muted);width:28px;text-align:center;';
+    wl.textContent='W'+(w+1);
+    labelsEl.appendChild(wl);
+    // add 2 spacers for the 3 dots per week visual
+    for(let i=0;i<2;i++){
+      const sp=document.createElement('div');sp.style.cssText='width:28px;';labelsEl.appendChild(sp);
+    }
+  }
+
+  const grid=document.getElementById('streak-grid');
+  grid.innerHTML='';
+  const done=loadStreak();
+  for(let i=0;i<TOTAL_DOTS;i++){
+    const dot=document.createElement('div');
+    dot.className='streak-dot'+(done.includes(i)?' done':'');
+    dot.title=`Week ${Math.floor(i/3)+1} · ${['Mon','Wed','Fri'][i%3]}`;
+    dot.onclick=()=>toggleStreak(i);
+    grid.appendChild(dot);
+  }
+  updateStreakCount();
+}
+
+function toggleStreak(i){
+  let done=loadStreak();
+  if(done.includes(i))done=done.filter(x=>x!==i);
+  else done.push(i);
+  saveStreak(done);buildStreak();
+}
+function resetStreak(){if(!confirm('Reset all streak dots?'))return;saveStreak([]);buildStreak();}
+function updateStreakCount(){
+  const done=loadStreak();const c=done.length;
+  document.getElementById('streak-count').textContent=`${c} of ${TOTAL_DOTS} sessions complete`;
+  document.getElementById('streak-prog-label').textContent=`${c} of ${TOTAL_DOTS} sessions`;
+  document.getElementById('streak-prog-bar').style.width=(c/TOTAL_DOTS*100)+'%';
+}
+buildStreak();
+
+// ── NOTES ──
+function saveNotes(){localStorage.setItem('ava_workout_notes',document.getElementById('notes-field').value);}
+function saveProgress(){localStorage.setItem('ava_workout_progress',document.getElementById('progress-field').value);}
+(function(){
+  const n=localStorage.getItem('ava_workout_notes');if(n)document.getElementById('notes-field').value=n;
+  const p=localStorage.getItem('ava_workout_progress');if(p)document.getElementById('progress-field').value=p;
+})();
+</script>
+</body>
+</html>

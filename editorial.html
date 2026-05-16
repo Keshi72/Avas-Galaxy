@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✦ The Editorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06060f;
+    --gold: #c9a84c;
+    --gold2: #e8c97a;
+    --gold-dim: rgba(201,168,76,0.16);
+    --gold-glow: rgba(201,168,76,0.07);
+    --rose: #c4748a;
+    --rose-dim: rgba(196,116,138,0.14);
+    --sage: #7a9e8e;
+    --sage-dim: rgba(122,158,142,0.12);
+    --blue: #7a9ebf;
+    --blue-dim: rgba(122,158,191,0.14);
+    --lavender: #a08ec0;
+    --lav-dim: rgba(160,142,192,0.14);
+    --cream: #f0e8d8;
+    --muted: rgba(240,232,216,0.45);
+    --border: rgba(201,168,76,0.17);
+    --border-b: rgba(201,168,76,0.4);
+    --fh: 'Cinzel', serif;
+    --fb: 'Cormorant Garamond', serif;
+    --ft: 'EB Garamond', serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--cream); font-family: var(--fb); min-height: 100vh; overflow-x: hidden; }
+
+  /* STARS */
+  #stars { position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 10% 20%, rgba(196,116,138,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 90% 70%, rgba(160,142,192,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 60% at 50% 90%, rgba(201,168,76,0.04) 0%, transparent 60%),
+      var(--bg); }
+  .star { position: absolute; border-radius: 50%; background: #fff;
+    animation: twinkle var(--d,3s) ease-in-out infinite var(--del,0s); }
+  @keyframes twinkle { 0%,100%{opacity:var(--o1,.3);transform:scale(1);}50%{opacity:var(--o2,.9);transform:scale(1.4);} }
+
+  /* LAYOUT */
+  .page { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+  .back { display: inline-flex; align-items: center; gap: .4rem;
+    font-family: var(--fh); font-size: .62rem; letter-spacing: .12em;
+    color: var(--gold); text-decoration: none; opacity: .65; transition: opacity .2s; margin-bottom: 2.5rem; }
+  .back:hover { opacity: 1; }
+
+  /* HEADER */
+  .header { text-align: center; margin-bottom: 2.8rem; }
+  .orn { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem; }
+  .orn-l { height: 1px; width: 55px; background: linear-gradient(90deg, transparent, var(--gold)); }
+  .orn-r { height: 1px; width: 55px; background: linear-gradient(90deg, var(--gold), transparent); }
+  .title { font-family: var(--fh); font-size: clamp(1.8rem,5vw,2.9rem); font-weight: 400;
+    letter-spacing: .17em; color: var(--gold2); text-shadow: 0 0 40px rgba(201,168,76,0.3); margin-bottom: .5rem; }
+  .subtitle { font-family: var(--fb); font-style: italic; color: var(--muted); font-size: 1.05rem; letter-spacing: .05em; }
+
+  /* TABS */
+  .tabs { display: flex; flex-wrap: wrap; gap: .45rem; justify-content: center; margin-bottom: 2.5rem; }
+  .tab-btn { font-family: var(--fh); font-size: .58rem; letter-spacing: .12em;
+    padding: .48rem 1.1rem; background: transparent;
+    border: 1px solid var(--border); color: var(--muted);
+    cursor: pointer; transition: all .22s; border-radius: 2px; }
+  .tab-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .tab-btn.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold2); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeUp .32s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;} }
+
+  /* CARDS */
+  .card { background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 4px; padding: 1.4rem 1.5rem; margin-bottom: 1.2rem; }
+  .card-title { font-family: var(--fh); font-size: .68rem; letter-spacing: .12em; color: var(--gold); margin-bottom: 1rem;
+    display: flex; align-items: center; gap: .6rem; }
+  .card-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ─────────────────────────────── */
+  /* LOOKBOOK */
+  /* ─────────────────────────────── */
+  .lookbook-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .look-card {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.02);
+    transition: all .25s;
+    cursor: pointer;
+  }
+  .look-card:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+  .look-img {
+    width: 100%; aspect-ratio: 3/4; object-fit: cover;
+    background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(196,116,138,0.06));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; color: var(--border); user-select: none;
+  }
+  .look-img img { width: 100%; height: 100%; object-fit: cover; }
+  .look-info { padding: 1rem; }
+  .look-date { font-family: var(--fh); font-size: .52rem; letter-spacing: .12em; color: var(--muted); margin-bottom: .3rem; }
+  .look-title { font-family: var(--fb); font-size: 1.15rem; color: var(--cream); margin-bottom: .35rem; }
+  .look-occasion { font-family: var(--ft); font-style: italic; font-size: .88rem; color: var(--muted); margin-bottom: .5rem; }
+  .look-tags { display: flex; flex-wrap: wrap; gap: .3rem; }
+  .look-tag {
+    font-family: var(--fh); font-size: .47rem; letter-spacing: .09em;
+    padding: .18rem .45rem; border-radius: 2px;
+  }
+  .tag-cottage { background:rgba(122,158,142,0.15);color:var(--sage);border:1px solid rgba(122,158,142,0.3); }
+  .tag-princess { background:var(--rose-dim);color:var(--rose);border:1px solid rgba(196,116,138,0.3); }
+  .tag-boho { background:var(--gold-dim);color:var(--gold);border:1px solid var(--border); }
+  .tag-romantic { background:var(--lav-dim);color:var(--lavender);border:1px solid rgba(160,142,192,0.3); }
+  .tag-classy { background:var(--blue-dim);color:var(--blue);border:1px solid rgba(122,158,191,0.3); }
+  .tag-earthy { background:rgba(180,140,100,0.15);color:#c8a060;border:1px solid rgba(180,140,100,0.3); }
+  .look-delete {
+    font-family: var(--fh); font-size: .48rem; letter-spacing: .1em;
+    padding: .25rem .55rem; border: 1px solid rgba(196,116,138,0.3);
+    border-radius: 2px; background: transparent; color: var(--rose);
+    cursor: pointer; float: right; margin-left: .5rem; transition: all .2s;
+  }
+  .look-delete:hover { background: var(--rose-dim); }
+
+  /* ADD LOOK FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+  .form-field { display: flex; flex-direction: column; gap: .3rem; }
+  .form-field.full { grid-column: 1 / -1; }
+  label { font-family: var(--fh); font-size: .55rem; letter-spacing: .1em; color: var(--muted); }
+  input[type=text], input[type=date], textarea, select {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 3px;
+    color: var(--cream); font-family: var(--ft); font-size: .95rem;
+    padding: .55rem .75rem; outline: none; transition: border-color .2s; width: 100%;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--gold); }
+  select option { background: #111; }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+  /* PHOTO UPLOAD */
+  .photo-drop {
+    border: 1px dashed var(--border-b); border-radius: 3px;
+    padding: 2rem 1rem; text-align: center; cursor: pointer;
+    transition: all .2s; background: var(--gold-glow);
+    position: relative; overflow: hidden;
+  }
+  .photo-drop:hover { border-color: var(--gold); background: var(--gold-dim); }
+  .photo-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .photo-drop-text { font-family: var(--fb); font-style: italic; font-size: .95rem; color: var(--muted); }
+  .photo-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 2px; display: none; }
+
+  /* TAG CHECKBOXES */
+  .tag-checks { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .tag-check-label {
+    font-family: var(--fh); font-size: .52rem; letter-spacing: .1em;
+    padding: .28rem .65rem; border: 1px solid var(--border);
+    border-radius: 2px; cursor: pointer; transition: all .2s; color: var(--muted);
+    user-select: none;
+  }
+  .tag-check-label:has(input:checked) { border-color: var(--gold); color: var(--gold2); background: var(--gold-dim); }
+  .tag-check-label input { display: none; }
+
+  /* SUBMIT BTN */
+  .submit-btn {
+    font-family: var(--fh); font-size: .62rem; letter-spacing: .13em;
+    padding: .7rem 2rem; border: 1px solid var(--border-b);
+    border-radius: 3px; background: var(--gold-dim); color: var(--gold2);
+    cursor: pointer; transition: all .2s; display: block; margin-top: .5rem; width: 100%;
+  }
+  .submit-btn:hover { background: rgba(201,168,76,0.28); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center; padding: 3rem 1rem;
+    font-family: var(--fb); font-style: italic; color: var(--muted); font-size: 1.05rem;
+    border: 1px dashed var(--border); border-radius: 4px;
+  }
+  .empty-star { font-size: 1.5rem; color: var(--border); display: block; margin-bottom: .5rem; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(6,6,15,0.92);
+    z-index: 1000; display: none; align-items: center; justify-content: center;
+    padding: 1rem; backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #0d0d1f; border: 1px solid var(--border-b);
+    border-radius: 6px; width: 100%; max-width: 680px; max-height: 90vh;
+    overflow-y: auto; padding: 2rem;
+    animation: fadeUp .25s ease;
+  }
+  .modal-close {
+    float: right; background: transparent; border: none; color: var(--muted);
+    font-size: 1.3rem; cursor: pointer; transition: color .2s; margin-bottom: 1rem; display: block;
+  }
+  .modal-close:hover { color: var(--rose); }
+  .modal-look-img { width: 100%; max-height: 420px; object-fit: cover; border-radius: 3px; margin-bottom: 1.2rem; }
+  .modal-title { font-family: var(--fb); font-size: 1.6rem; color: var(--cream); margin-bottom: .3rem; }
+  .modal-date { font-family: var(--fh); font-size: .55rem; letter-spacing: .12em; color: var(--muted); margin-bottom: .8rem; }
+  .modal-section { margin-top: 1rem; }
+  .modal-section-title { font-family: var(--fh); font-size: .6rem; letter-spacing: .1em; color: var(--gold); margin-bottom: .4rem; }
+  .modal-text { font-family: var(--ft); font-size: 1rem; line-height: 1.75; color: var(--cream); }
+  .modal-pieces { list-style: none; }
+  .modal-pieces li { font-family: var(--ft); font-size: .95rem; color: var(--cream); padding: .25rem 0; border-bottom: 1px solid var(--border); line-height: 1.5; }
+  .modal-pieces li::before { content: '✦'; color: var(--gold); font-size: .5rem; margin-right: .5rem; }
+
+  /* ─────────────────────────────── */
+  /* THINK PIECES */
+  /* ─────────────────────────────── */
+  .think-list { display: flex; flex-direction: column; gap: .8rem; margin-bottom: 1.5rem; }
+  .think-card {
+    border: 1px solid var(--border); border-radius: 4px; padding: 1.3rem 1.5rem;
+    background: rgba(255,255,255,0.02); transition: all .25s; cursor: pointer;
+  }
+  .think-card:hover { border-color: var(--gold); background: var(--gold-glow); }
+  .think-date { font-family: var(--fh); font-size: .52rem; letter-spacing: .12em; color: var(--muted); margin-bottom: .35rem; }
+  .think-title { font-family: var(--fb); font-size: 1.3rem; color: var(--cream); margin-bottom: .3rem; line-height: 1.4; }
+  .think-excerpt { font-family: var(--ft); font-style: italic; font-size: .9rem; color: var(--muted); line-height: 1.65; margin-bottom: .6rem; }
+  .think-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .4rem; }
+  .think-mood {
+    font-family: var(--fh); font-size: .52rem; letter-spacing: .1em;
+    padding: .2rem .55rem; border-radius: 2px;
+  }
+  .mood-musing { background:var(--lav-dim);color:var(--lavender);border:1px solid rgba(160,142,192,0.3); }
+  .mood-love { background:var(--rose-dim);color:var(--rose);border:1px solid rgba(196,116,138,0.3); }
+  .mood-critique { background:var(--blue-dim);color:var(--blue);border:1px solid rgba(122,158,191,0.3); }
+  .mood-discovery { background:var(--gold-dim);color:var(--gold);border:var(--border); }
+  .mood-rant { background:rgba(200,160,80,0.15);color:#d4a844;border:1px solid rgba(200,160,80,0.3); }
+
+  /* THINK EDITOR */
+  .think-editor textarea {
+    min-height: 220px; font-family: var(--ft); font-size: 1rem; line-height: 1.8;
+  }
+  .think-editor input[type=text] { font-family: var(--fb); font-size: 1.15rem; }
+
+  /* THINK MODAL */
+  .think-modal-title { font-family: var(--fb); font-size: 1.7rem; color: var(--cream); line-height: 1.3; margin-bottom: .4rem; }
+  .think-modal-meta { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
+  .think-modal-body { font-family: var(--ft); font-size: 1.05rem; line-height: 1.85; color: var(--cream); white-space: pre-wrap; }
+
+  /* ─────────────────────────────── */
+  /* MOOD BOARD */
+  /* ─────────────────────────────── */
+  .board-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: .7rem; margin-bottom: 1.5rem;
+  }
+  .board-card {
+    border: 1px solid var(--border); border-radius: 3px; overflow: hidden;
+    background: rgba(255,255,255,0.02); transition: all .2s; cursor: pointer; position: relative;
+  }
+  .board-card:hover { border-color: var(--gold); transform: scale(1.01); }
+  .board-img {
+    width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, rgba(201,168,76,0.06), rgba(160,142,192,0.06));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; color: var(--border); object-fit: cover;
+  }
+  .board-img img { width: 100%; height: 100%; object-fit: cover; }
+  .board-caption { padding: .6rem .7rem; }
+  .board-caption-text { font-family: var(--ft); font-style: italic; font-size: .85rem; color: var(--muted); line-height: 1.4; }
+  .board-vibe {
+    font-family: var(--fh); font-size: .47rem; letter-spacing: .09em;
+    padding: .15rem .4rem; border-radius: 2px; margin-top: .35rem; display: inline-block;
+  }
+  .board-del { position: absolute; top: .4rem; right: .4rem; background: rgba(6,6,15,0.8);
+    border: 1px solid rgba(196,116,138,0.3); border-radius: 2px; color: var(--rose);
+    font-size: .65rem; padding: .15rem .35rem; cursor: pointer; opacity: 0; transition: opacity .2s;
+    font-family: var(--fh); letter-spacing: .05em; }
+  .board-card:hover .board-del { opacity: 1; }
+
+  /* FILTER ROW */
+  .filter-row { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1.2rem; align-items: center; }
+  .filter-label { font-family: var(--fh); font-size: .55rem; letter-spacing: .1em; color: var(--muted); margin-right: .2rem; }
+  .filter-btn {
+    font-family: var(--fh); font-size: .52rem; letter-spacing: .1em;
+    padding: .28rem .65rem; border: 1px solid var(--border); border-radius: 2px;
+    background: transparent; color: var(--muted); cursor: pointer; transition: all .2s;
+  }
+  .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .filter-btn.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold2); }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  @media(max-width:580px){
+    .form-grid { grid-template-columns: 1fr; }
+    .form-field.full { grid-column: auto; }
+    .lookbook-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media(max-width:380px){
+    .lookbook-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div class="page">
+  <a class="back" href="index.html">← Return to the Galaxy</a>
+
+  <header class="header">
+    <div class="orn">
+      <div class="orn-l"></div>
+      <span style="color:var(--gold);font-size:1rem;">✦</span>
+      <div class="orn-r"></div>
+    </div>
+    <h1 class="title">THE EDITORIAL</h1>
+    <p class="subtitle">lookbook · think pieces · mood board · style journal</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('lookbook',this)">✦ LOOKBOOK</button>
+    <button class="tab-btn" onclick="switchTab('think',this)">THINK PIECES</button>
+    <button class="tab-btn" onclick="switchTab('board',this)">MOOD BOARD</button>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- LOOKBOOK TAB -->
+  <!-- ══════════════════════════════ -->
+  <div class="tab-panel active" id="tab-lookbook">
+
+    <!-- FILTER -->
+    <div class="filter-row" id="look-filter-row">
+      <span class="filter-label">FILTER</span>
+      <button class="filter-btn active" onclick="filterLooks('all',this)">ALL</button>
+      <button class="filter-btn" onclick="filterLooks('cottage',this)">COTTAGECORE</button>
+      <button class="filter-btn" onclick="filterLooks('princess',this)">PRINCESSCORE</button>
+      <button class="filter-btn" onclick="filterLooks('boho',this)">BOHO</button>
+      <button class="filter-btn" onclick="filterLooks('romantic',this)">ROMANTIC</button>
+      <button class="filter-btn" onclick="filterLooks('classy',this)">CLASSY</button>
+    </div>
+
+    <!-- GRID -->
+    <div class="lookbook-grid" id="look-grid"></div>
+    <div class="empty-state" id="look-empty" style="display:none">
+      <span class="empty-star">✦</span>
+      Your lookbook is waiting. Document your first look below.
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ADD FORM -->
+    <div class="card">
+      <div class="card-title">ADD A LOOK</div>
+      <div class="form-grid">
+
+        <div class="form-field full">
+          <label>PHOTO</label>
+          <div class="photo-drop" id="look-drop">
+            <input type="file" accept="image/*" id="look-photo-input" onchange="previewLookPhoto(this)">
+            <img class="photo-preview" id="look-photo-preview">
+            <div class="photo-drop-text" id="look-drop-text">tap to upload a photo of your look ✦</div>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>LOOK TITLE</label>
+          <input type="text" id="look-title-in" placeholder="e.g. First Day of Spring">
+        </div>
+        <div class="form-field">
+          <label>DATE</label>
+          <input type="date" id="look-date-in">
+        </div>
+        <div class="form-field">
+          <label>OCCASION</label>
+          <input type="text" id="look-occasion-in" placeholder="e.g. WFH, market, outing">
+        </div>
+        <div class="form-field">
+          <label>MOOD</label>
+          <input type="text" id="look-mood-in" placeholder="e.g. soft, confident, dreamy">
+        </div>
+
+        <div class="form-field full">
+          <label>PIECES WORN</label>
+          <textarea id="look-pieces-in" placeholder="List the pieces — one per line&#10;e.g. Smocked linen midi dress — thrifted&#10;Tan strappy sandals — Vinted&#10;Pearl drop earrings — Etsy" rows="4"></textarea>
+        </div>
+
+        <div class="form-field full">
+          <label>STYLING NOTES</label>
+          <textarea id="look-notes-in" placeholder="How did it feel? What worked? What would you change? Did anyone compliment it?" rows="3"></textarea>
+        </div>
+
+        <div class="form-field full">
+          <label>AESTHETIC TAGS</label>
+          <div class="tag-checks">
+            <label class="tag-check-label"><input type="checkbox" value="cottage"> COTTAGECORE</label>
+            <label class="tag-check-label"><input type="checkbox" value="princess"> PRINCESSCORE</label>
+            <label class="tag-check-label"><input type="checkbox" value="boho"> BOHO</label>
+            <label class="tag-check-label"><input type="checkbox" value="romantic"> ROMANTIC</label>
+            <label class="tag-check-label"><input type="checkbox" value="classy"> CLASSY</label>
+            <label class="tag-check-label"><input type="checkbox" value="earthy"> EARTHY</label>
+          </div>
+        </div>
+      </div>
+      <button class="submit-btn" onclick="addLook()">✦ SAVE LOOK TO LOOKBOOK</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- THINK PIECES TAB -->
+  <!-- ══════════════════════════════ -->
+  <div class="tab-panel" id="tab-think">
+
+    <div class="think-list" id="think-list"></div>
+    <div class="empty-state" id="think-empty" style="display:none">
+      <span class="empty-star">✦</span>
+      Your think pieces live here. Write your first one below.
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="card think-editor">
+      <div class="card-title">WRITE A THINK PIECE</div>
+      <div class="form-grid">
+        <div class="form-field full">
+          <label>TITLE</label>
+          <input type="text" id="think-title-in" placeholder="e.g. Why I Stopped Buying Polyester Forever">
+        </div>
+        <div class="form-field">
+          <label>DATE</label>
+          <input type="date" id="think-date-in">
+        </div>
+        <div class="form-field">
+          <label>TYPE</label>
+          <select id="think-mood-in">
+            <option value="musing">Musing</option>
+            <option value="love">Love Letter</option>
+            <option value="critique">Critique</option>
+            <option value="discovery">Discovery</option>
+            <option value="rant">Rant</option>
+          </select>
+        </div>
+        <div class="form-field full">
+          <label>YOUR PIECE</label>
+          <textarea id="think-body-in" rows="10" placeholder="Write freely. This is your space — unfiltered, unedited, completely yours. Fashion criticism, brand discoveries, thoughts on sustainability, how an outfit made you feel, why you love what you love…"></textarea>
+        </div>
+      </div>
+      <button class="submit-btn" onclick="addThink()">✦ PUBLISH TO THE EDITORIAL</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- MOOD BOARD TAB -->
+  <!-- ══════════════════════════════ -->
+  <div class="tab-panel" id="tab-board">
+
+    <div class="filter-row" id="board-filter-row">
+      <span class="filter-label">FILTER</span>
+      <button class="filter-btn active" onclick="filterBoard('all',this)">ALL</button>
+      <button class="filter-btn" onclick="filterBoard('cottage',this)">COTTAGECORE</button>
+      <button class="filter-btn" onclick="filterBoard('princess',this)">PRINCESSCORE</button>
+      <button class="filter-btn" onclick="filterBoard('boho',this)">BOHO</button>
+      <button class="filter-btn" onclick="filterBoard('romantic',this)">ROMANTIC</button>
+      <button class="filter-btn" onclick="filterBoard('classy',this)">CLASSY</button>
+    </div>
+
+    <div class="board-grid" id="board-grid"></div>
+    <div class="empty-state" id="board-empty" style="display:none">
+      <span class="empty-star">✦</span>
+      Your mood board is empty. Add images that inspire your aesthetic.
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="card">
+      <div class="card-title">ADD TO MOOD BOARD</div>
+      <div class="form-grid">
+        <div class="form-field full">
+          <label>IMAGE</label>
+          <div class="photo-drop" id="board-drop">
+            <input type="file" accept="image/*" id="board-photo-input" onchange="previewBoardPhoto(this)">
+            <img class="photo-preview" id="board-photo-preview">
+            <div class="photo-drop-text" id="board-drop-text">tap to upload an inspiration image ✦</div>
+          </div>
+        </div>
+        <div class="form-field full">
+          <label>CAPTION</label>
+          <input type="text" id="board-caption-in" placeholder="e.g. The Zaha Camellia dress — everything I want">
+        </div>
+        <div class="form-field">
+          <label>SOURCE / BRAND</label>
+          <input type="text" id="board-source-in" placeholder="e.g. Cleobella, Depop find, Pinterest">
+        </div>
+        <div class="form-field">
+          <label>VIBE TAG</label>
+          <select id="board-vibe-in">
+            <option value="cottage">Cottagecore</option>
+            <option value="princess">Princesscore</option>
+            <option value="boho">Boho</option>
+            <option value="romantic">Romantic</option>
+            <option value="classy">Classy</option>
+            <option value="earthy">Earthy</option>
+          </select>
+        </div>
+      </div>
+      <button class="submit-btn" onclick="addBoard()">✦ PIN TO MOOD BOARD</button>
+    </div>
+  </div>
+</div><!-- /page -->
+
+<!-- LOOK DETAIL MODAL -->
+<div class="modal-overlay" id="look-modal" onclick="closeModal('look-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal('look-modal')">✕</button>
+    <img class="modal-look-img" id="ml-img" style="display:none">
+    <div class="modal-date" id="ml-date"></div>
+    <div class="modal-title" id="ml-title"></div>
+    <div style="margin:.5rem 0;" id="ml-tags"></div>
+    <div class="modal-section" id="ml-occasion-wrap">
+      <div class="modal-section-title">OCCASION</div>
+      <div class="modal-text" id="ml-occasion"></div>
+    </div>
+    <div class="modal-section" id="ml-mood-wrap">
+      <div class="modal-section-title">MOOD</div>
+      <div class="modal-text" id="ml-mood"></div>
+    </div>
+    <div class="modal-section" id="ml-pieces-wrap">
+      <div class="modal-section-title">PIECES</div>
+      <ul class="modal-pieces" id="ml-pieces"></ul>
+    </div>
+    <div class="modal-section" id="ml-notes-wrap">
+      <div class="modal-section-title">STYLING NOTES</div>
+      <div class="modal-text" id="ml-notes"></div>
+    </div>
+  </div>
+</div>
+
+<!-- THINK PIECE MODAL -->
+<div class="modal-overlay" id="think-modal" onclick="closeModal('think-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal('think-modal')">✕</button>
+    <div class="think-modal-title" id="tm-title"></div>
+    <div class="think-modal-meta">
+      <span class="modal-date" id="tm-date"></span>
+      <span class="think-mood" id="tm-mood"></span>
+    </div>
+    <div class="think-modal-body" id="tm-body"></div>
+  </div>
+</div>
+
+<script>
+/* ── STARS ── */
+(function(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<140;i++){
+    const s=document.createElement('div');s.className='star';
+    const sz=Math.random()*2.1+0.3;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;
+      --d:${2+Math.random()*5}s;--del:${-Math.random()*6}s;
+      --o1:${0.1+Math.random()*0.3};--o2:${0.5+Math.random()*0.5}`;
+    c.appendChild(s);
+  }
+})();
+
+/* ── TABS ── */
+function switchTab(n,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── MODAL ── */
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+/* ── STORAGE ── */
+const LS={
+  get:k=>{try{return JSON.parse(localStorage.getItem(k)||'[]');}catch{return[];}},
+  set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
+};
+
+/* ── HELPERS ── */
+const TAG_CLASSES={cottage:'tag-cottage',princess:'tag-princess',boho:'tag-boho',romantic:'tag-romantic',classy:'tag-classy',earthy:'tag-earthy'};
+const TAG_LABELS={cottage:'COTTAGECORE',princess:'PRINCESSCORE',boho:'BOHO',romantic:'ROMANTIC',classy:'CLASSY',earthy:'EARTHY'};
+const MOOD_CLASSES={musing:'mood-musing',love:'mood-love',critique:'mood-critique',discovery:'mood-discovery',rant:'mood-rant'};
+const MOOD_LABELS={musing:'MUSING',love:'LOVE LETTER',critique:'CRITIQUE',discovery:'DISCOVERY',rant:'RANT'};
+
+function fmtDate(s){if(!s)return'';const d=new Date(s+'T12:00:00');return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});}
+
+/* ══════════════════════════════ */
+/* LOOKBOOK */
+/* ══════════════════════════════ */
+let lookFilter='all';
+let lookPhotoData=null;
+
+function previewLookPhoto(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    lookPhotoData=e.target.result;
+    const prev=document.getElementById('look-photo-preview');
+    prev.src=lookPhotoData;prev.style.display='block';
+    document.getElementById('look-drop-text').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function addLook(){
+  const title=document.getElementById('look-title-in').value.trim();
+  if(!title){alert('Give your look a title ✦');return;}
+  const tags=[...document.querySelectorAll('#tab-lookbook .tag-check-label input:checked')].map(i=>i.value);
+  const look={
+    id:Date.now(),
+    title,
+    date:document.getElementById('look-date-in').value,
+    occasion:document.getElementById('look-occasion-in').value.trim(),
+    mood:document.getElementById('look-mood-in').value.trim(),
+    pieces:document.getElementById('look-pieces-in').value.trim(),
+    notes:document.getElementById('look-notes-in').value.trim(),
+    tags,
+    photo:lookPhotoData||null
+  };
+  const looks=LS.get('ava_looks');looks.unshift(look);LS.set('ava_looks',looks);
+  renderLooks();resetLookForm();
+}
+
+function resetLookForm(){
+  ['look-title-in','look-date-in','look-occasion-in','look-mood-in','look-pieces-in','look-notes-in'].forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('#tab-lookbook .tag-check-label input').forEach(i=>i.checked=false);
+  document.getElementById('look-photo-preview').style.display='none';
+  document.getElementById('look-drop-text').style.display='';
+  lookPhotoData=null;
+}
+
+function deleteLook(id,e){
+  e.stopPropagation();
+  let looks=LS.get('ava_looks');looks=looks.filter(l=>l.id!==id);LS.set('ava_looks',looks);renderLooks();
+}
+
+function openLook(look){
+  document.getElementById('ml-title').textContent=look.title;
+  document.getElementById('ml-date').textContent=fmtDate(look.date);
+  const imgEl=document.getElementById('ml-img');
+  if(look.photo){imgEl.src=look.photo;imgEl.style.display='block';}else{imgEl.style.display='none';}
+  // tags
+  const tagsEl=document.getElementById('ml-tags');
+  tagsEl.innerHTML=look.tags.map(t=>`<span class="look-tag ${TAG_CLASSES[t]||''}">${TAG_LABELS[t]||t}</span>`).join(' ');
+  document.getElementById('ml-occasion').textContent=look.occasion||'—';
+  document.getElementById('ml-mood').textContent=look.mood||'—';
+  // pieces
+  const piecesEl=document.getElementById('ml-pieces');piecesEl.innerHTML='';
+  if(look.pieces){
+    look.pieces.split('\n').filter(Boolean).forEach(p=>{
+      const li=document.createElement('li');li.textContent=p;piecesEl.appendChild(li);
+    });
+  }
+  document.getElementById('ml-notes').textContent=look.notes||'—';
+  document.getElementById('look-modal').classList.add('open');
+}
+
+function filterLooks(tag,btn){
+  lookFilter=tag;
+  document.querySelectorAll('#look-filter-row .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLooks();
+}
+
+function renderLooks(){
+  const looks=LS.get('ava_looks');
+  const filtered=lookFilter==='all'?looks:looks.filter(l=>l.tags.includes(lookFilter));
+  const grid=document.getElementById('look-grid');
+  const empty=document.getElementById('look-empty');
+  grid.innerHTML='';
+  if(!filtered.length){empty.style.display='';return;}
+  empty.style.display='none';
+  filtered.forEach(look=>{
+    const card=document.createElement('div');card.className='look-card';
+    card.innerHTML=`
+      <div class="look-img">${look.photo?`<img src="${look.photo}" alt="${look.title}">`:'✦'}</div>
+      <div class="look-info">
+        <div class="look-date">${fmtDate(look.date)}</div>
+        <button class="look-delete" onclick="deleteLook(${look.id},event)">✕</button>
+        <div class="look-title">${look.title}</div>
+        <div class="look-occasion">${look.occasion||''}</div>
+        <div class="look-tags">${look.tags.map(t=>`<span class="look-tag ${TAG_CLASSES[t]||''}">${TAG_LABELS[t]||t}</span>`).join('')}</div>
+      </div>`;
+    card.addEventListener('click',()=>openLook(look));
+    grid.appendChild(card);
+  });
+}
+
+/* ══════════════════════════════ */
+/* THINK PIECES */
+/* ══════════════════════════════ */
+function addThink(){
+  const title=document.getElementById('think-title-in').value.trim();
+  const body=document.getElementById('think-body-in').value.trim();
+  if(!title||!body){alert('Your think piece needs a title and some words ✦');return;}
+  const piece={
+    id:Date.now(),
+    title,
+    date:document.getElementById('think-date-in').value,
+    mood:document.getElementById('think-mood-in').value,
+    body
+  };
+  const pieces=LS.get('ava_thinks');pieces.unshift(piece);LS.set('ava_thinks',pieces);
+  renderThinks();
+  document.getElementById('think-title-in').value='';
+  document.getElementById('think-body-in').value='';
+  document.getElementById('think-date-in').value='';
+}
+
+function openThink(piece){
+  document.getElementById('tm-title').textContent=piece.title;
+  document.getElementById('tm-date').textContent=fmtDate(piece.date);
+  const m=document.getElementById('tm-mood');
+  m.textContent=MOOD_LABELS[piece.mood]||piece.mood;
+  m.className='think-mood '+(MOOD_CLASSES[piece.mood]||'');
+  document.getElementById('tm-body').textContent=piece.body;
+  document.getElementById('think-modal').classList.add('open');
+}
+
+function deleteThink(id,e){
+  e.stopPropagation();
+  let pieces=LS.get('ava_thinks');pieces=pieces.filter(p=>p.id!==id);LS.set('ava_thinks',pieces);renderThinks();
+}
+
+function renderThinks(){
+  const pieces=LS.get('ava_thinks');
+  const list=document.getElementById('think-list');
+  const empty=document.getElementById('think-empty');
+  list.innerHTML='';
+  if(!pieces.length){empty.style.display='';return;}
+  empty.style.display='none';
+  pieces.forEach(p=>{
+    const excerpt=p.body.slice(0,180).trim()+(p.body.length>180?'…':'');
+    const card=document.createElement('div');card.className='think-card';
+    card.innerHTML=`
+      <div class="think-date">${fmtDate(p.date)}</div>
+      <div class="think-title">${p.title}</div>
+      <div class="think-excerpt">${excerpt}</div>
+      <div class="think-footer">
+        <span class="think-mood ${MOOD_CLASSES[p.mood]||''}">${MOOD_LABELS[p.mood]||p.mood}</span>
+        <button class="look-delete" onclick="deleteThink(${p.id},event)">✕</button>
+      </div>`;
+    card.addEventListener('click',()=>openThink(p));
+    list.appendChild(card);
+  });
+}
+
+/* ══════════════════════════════ */
+/* MOOD BOARD */
+/* ══════════════════════════════ */
+let boardFilter='all';
+let boardPhotoData=null;
+
+function previewBoardPhoto(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    boardPhotoData=e.target.result;
+    const prev=document.getElementById('board-photo-preview');
+    prev.src=boardPhotoData;prev.style.display='block';
+    document.getElementById('board-drop-text').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function addBoard(){
+  const caption=document.getElementById('board-caption-in').value.trim();
+  if(!caption&&!boardPhotoData){alert('Add an image or caption ✦');return;}
+  const pin={
+    id:Date.now(),
+    caption,
+    source:document.getElementById('board-source-in').value.trim(),
+    vibe:document.getElementById('board-vibe-in').value,
+    photo:boardPhotoData||null
+  };
+  const pins=LS.get('ava_board');pins.unshift(pin);LS.set('ava_board',pins);
+  renderBoard();
+  document.getElementById('board-caption-in').value='';
+  document.getElementById('board-source-in').value='';
+  document.getElementById('board-photo-preview').style.display='none';
+  document.getElementById('board-drop-text').style.display='';
+  boardPhotoData=null;
+}
+
+function deletePin(id,e){
+  e.stopPropagation();
+  let pins=LS.get('ava_board');pins=pins.filter(p=>p.id!==id);LS.set('ava_board',pins);renderBoard();
+}
+
+function filterBoard(tag,btn){
+  boardFilter=tag;
+  document.querySelectorAll('#board-filter-row .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderBoard();
+}
+
+function renderBoard(){
+  const pins=LS.get('ava_board');
+  const filtered=boardFilter==='all'?pins:pins.filter(p=>p.vibe===boardFilter);
+  const grid=document.getElementById('board-grid');
+  const empty=document.getElementById('board-empty');
+  grid.innerHTML='';
+  if(!filtered.length){empty.style.display='';return;}
+  empty.style.display='none';
+  filtered.forEach(pin=>{
+    const card=document.createElement('div');card.className='board-card';
+    card.innerHTML=`
+      <div class="board-img">${pin.photo?`<img src="${pin.photo}" alt="${pin.caption}">`:'✦'}</div>
+      <div class="board-caption">
+        <div class="board-caption-text">${pin.caption||''}</div>
+        ${pin.source?`<div style="font-family:var(--fh);font-size:.45rem;letter-spacing:.09em;color:var(--muted);margin-top:.3rem;">${pin.source}</div>`:''}
+        <span class="board-vibe look-tag ${TAG_CLASSES[pin.vibe]||''}">${TAG_LABELS[pin.vibe]||pin.vibe}</span>
+      </div>
+      <button class="board-del" onclick="deletePin(${pin.id},event)">✕</button>`;
+    grid.appendChild(card);
+  });
+}
+
+/* ── DEFAULTS ── */
+document.getElementById('look-date-in').value=new Date().toISOString().split('T')[0];
+document.getElementById('think-date-in').value=new Date().toISOString().split('T')[0];
+
+/* ── INIT ── */
+renderLooks();renderThinks();renderBoard();
+</script>
+</body>
+</html>

@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✦ The Wardrobe</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06060f;
+    --bg2: #0d0d1f;
+    --bg3: #12122a;
+    --gold: #c9a84c;
+    --gold2: #e8c97a;
+    --gold-dim: rgba(201,168,76,0.18);
+    --gold-glow: rgba(201,168,76,0.08);
+    --rose: #c4748a;
+    --rose-dim: rgba(196,116,138,0.15);
+    --sage: #7a9e8e;
+    --sage-dim: rgba(122,158,142,0.15);
+    --blue: #7a9ebf;
+    --cream: #f0e8d8;
+    --muted: rgba(240,232,216,0.5);
+    --border: rgba(201,168,76,0.2);
+    --border-bright: rgba(201,168,76,0.45);
+    --font-head: 'Cinzel', serif;
+    --font-body: 'Cormorant Garamond', serif;
+    --font-text: 'EB Garamond', serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── STARFIELD ── */
+  #stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse 80% 60% at 20% 30%, rgba(122,158,191,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 70%, rgba(196,116,138,0.07) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 50% at 50% 50%, rgba(201,168,76,0.04) 0%, transparent 70%),
+                var(--bg);
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: white;
+    animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: var(--o1, 0.4); transform: scale(1); }
+    50% { opacity: var(--o2, 1); transform: scale(1.3); }
+  }
+
+  /* ── LAYOUT ── */
+  .page {
+    position: relative; z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 5rem;
+  }
+
+  /* ── BACK LINK ── */
+  .back {
+    display: inline-flex; align-items: center; gap: .4rem;
+    font-family: var(--font-head);
+    font-size: .65rem; letter-spacing: .12em;
+    color: var(--gold); text-decoration: none;
+    opacity: .7; transition: opacity .2s;
+    margin-bottom: 2.5rem;
+  }
+  .back:hover { opacity: 1; }
+
+  /* ── HEADER ── */
+  .header { text-align: center; margin-bottom: 3rem; }
+  .header-ornament {
+    display: flex; align-items: center; justify-content: center; gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .ornament-line {
+    height: 1px; width: 60px;
+    background: linear-gradient(90deg, transparent, var(--gold));
+  }
+  .ornament-line.right { background: linear-gradient(90deg, var(--gold), transparent); }
+  .ornament-star { color: var(--gold); font-size: 1.1rem; }
+  .title {
+    font-family: var(--font-head);
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 400; letter-spacing: .15em;
+    color: var(--gold2);
+    text-shadow: 0 0 40px rgba(201,168,76,0.3);
+    margin-bottom: .5rem;
+  }
+  .subtitle {
+    font-family: var(--font-body);
+    font-style: italic;
+    color: var(--muted);
+    font-size: 1.1rem;
+    letter-spacing: .05em;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex; flex-wrap: wrap; gap: .5rem;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+  }
+  .tab-btn {
+    font-family: var(--font-head);
+    font-size: .6rem; letter-spacing: .12em;
+    padding: .5rem 1.1rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .25s;
+    border-radius: 2px;
+  }
+  .tab-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .tab-btn.active {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+    color: var(--gold2);
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeIn .3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* ── CARD ── */
+  .card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 1.2rem;
+  }
+  .card-title {
+    font-family: var(--font-head);
+    font-size: .7rem; letter-spacing: .12em;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: .6rem;
+  }
+  .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── CAPSULE WARDROBE ── */
+  .phase-label {
+    font-family: var(--font-head);
+    font-size: .55rem; letter-spacing: .15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin: 1.2rem 0 .6rem;
+  }
+  .wardrobe-item {
+    display: flex; align-items: flex-start; gap: .8rem;
+    padding: .65rem .8rem;
+    border-radius: 3px;
+    margin-bottom: .4rem;
+    transition: background .2s;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .wardrobe-item:hover { background: var(--gold-glow); border-color: var(--border); }
+  .wardrobe-item.owned {
+    background: rgba(122,158,142,0.08);
+    border-color: rgba(122,158,142,0.3);
+  }
+  .wardrobe-item.owned .item-name { text-decoration: line-through; color: var(--muted); }
+  .item-check {
+    width: 16px; height: 16px; min-width: 16px;
+    border: 1px solid var(--border-bright);
+    border-radius: 2px; margin-top: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .7rem; color: var(--sage);
+    transition: all .2s;
+  }
+  .wardrobe-item.owned .item-check { background: var(--sage-dim); border-color: var(--sage); }
+  .item-info { flex: 1; }
+  .item-name {
+    font-family: var(--font-body); font-size: 1rem;
+    color: var(--cream); transition: color .2s;
+  }
+  .item-note {
+    font-family: var(--font-text); font-style: italic;
+    font-size: .82rem; color: var(--muted); margin-top: .15rem;
+  }
+  .item-phase {
+    font-family: var(--font-head);
+    font-size: .5rem; letter-spacing: .1em;
+    padding: .2rem .5rem;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .phase-1 { background: var(--rose-dim); color: var(--rose); border: 1px solid rgba(196,116,138,0.3); }
+  .phase-2 { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--border); }
+
+  .progress-wrap {
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px; height: 6px;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sage), var(--gold));
+    border-radius: 4px;
+    transition: width .4s ease;
+  }
+  .progress-label {
+    font-family: var(--font-head);
+    font-size: .6rem; letter-spacing: .1em;
+    color: var(--muted); text-align: right;
+    margin-bottom: .3rem;
+  }
+
+  /* ── COLOUR PALETTE ── */
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: .8rem;
+    margin-top: .5rem;
+  }
+  .swatch {
+    border-radius: 4px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .swatch-color {
+    height: 70px;
+    width: 100%;
+  }
+  .swatch-label {
+    padding: .5rem .6rem;
+    background: rgba(0,0,0,0.3);
+  }
+  .swatch-name {
+    font-family: var(--font-head);
+    font-size: .55rem; letter-spacing: .1em;
+    color: var(--cream); display: block;
+  }
+  .swatch-note {
+    font-family: var(--font-text); font-style: italic;
+    font-size: .72rem; color: var(--muted); display: block;
+    margin-top: .1rem;
+  }
+  .palette-rule {
+    margin-top: 1rem;
+    font-family: var(--font-text); font-style: italic;
+    color: var(--muted); font-size: .95rem;
+    text-align: center;
+    padding: .8rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--gold-glow);
+  }
+
+  /* ── STYLE RULES ── */
+  .rule-block {
+    padding: .9rem 1rem;
+    border-left: 2px solid var(--gold);
+    background: var(--gold-glow);
+    border-radius: 0 3px 3px 0;
+    margin-bottom: .8rem;
+  }
+  .rule-title {
+    font-family: var(--font-head);
+    font-size: .65rem; letter-spacing: .1em;
+    color: var(--gold); margin-bottom: .4rem;
+  }
+  .rule-text {
+    font-family: var(--font-text);
+    font-size: .95rem; color: var(--cream);
+    line-height: 1.6;
+  }
+  .rule-sub {
+    font-family: var(--font-text); font-style: italic;
+    font-size: .85rem; color: var(--muted);
+    margin-top: .3rem;
+  }
+  .do-dont {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    margin-top: .5rem;
+  }
+  .do-col, .dont-col { padding: .8rem; border-radius: 3px; }
+  .do-col { background: rgba(122,158,142,0.08); border: 1px solid rgba(122,158,142,0.3); }
+  .dont-col { background: rgba(196,116,138,0.08); border: 1px solid rgba(196,116,138,0.2); }
+  .col-head {
+    font-family: var(--font-head);
+    font-size: .55rem; letter-spacing: .12em;
+    margin-bottom: .5rem;
+  }
+  .do-col .col-head { color: var(--sage); }
+  .dont-col .col-head { color: var(--rose); }
+  .col-list {
+    list-style: none;
+    font-family: var(--font-text);
+    font-size: .88rem; color: var(--cream);
+    line-height: 2;
+  }
+  .col-list li::before { margin-right: .4rem; }
+  .do-col li::before { content: '✦'; color: var(--sage); font-size: .6rem; }
+  .dont-col li::before { content: '✕'; color: var(--rose); font-size: .6rem; }
+
+  /* ── OUTFIT FORMULA ── */
+  .formula-step {
+    display: flex; gap: 1rem; align-items: flex-start;
+    padding: .8rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    margin-bottom: .6rem;
+    background: var(--gold-glow);
+  }
+  .formula-num {
+    font-family: var(--font-head);
+    font-size: 1.2rem; color: var(--gold);
+    min-width: 28px; text-align: center;
+    line-height: 1.4;
+  }
+  .formula-text { font-family: var(--font-text); font-size: .95rem; color: var(--cream); line-height: 1.6; }
+  .formula-em { font-style: italic; color: var(--muted); display: block; font-size: .85rem; margin-top: .15rem; }
+
+  /* ── BRANDS ── */
+  .brand-tier {
+    margin-bottom: 1.5rem;
+  }
+  .tier-label {
+    font-family: var(--font-head);
+    font-size: .6rem; letter-spacing: .15em;
+    margin-bottom: .7rem;
+    padding-bottom: .4rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .tier-thrift .tier-label { color: var(--sage); }
+  .tier-budget .tier-label { color: var(--blue); }
+  .tier-invest .tier-label { color: var(--gold); }
+  .brand-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: .6rem;
+  }
+  .brand-card {
+    padding: .75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: rgba(255,255,255,0.02);
+    transition: all .2s;
+  }
+  .brand-card:hover { border-color: var(--gold); background: var(--gold-glow); }
+  .brand-name {
+    font-family: var(--font-head);
+    font-size: .65rem; letter-spacing: .08em;
+    color: var(--cream); margin-bottom: .3rem;
+  }
+  .brand-note {
+    font-family: var(--font-text); font-style: italic;
+    font-size: .82rem; color: var(--muted); line-height: 1.5;
+  }
+  .brand-tag {
+    display: inline-block;
+    font-family: var(--font-head);
+    font-size: .48rem; letter-spacing: .1em;
+    padding: .15rem .4rem;
+    border-radius: 2px;
+    margin-top: .4rem;
+  }
+  .tag-thrift { background: rgba(122,158,142,0.15); color: var(--sage); border: 1px solid rgba(122,158,142,0.3); }
+  .tag-budget { background: rgba(122,158,191,0.15); color: var(--blue); border: 1px solid rgba(122,158,191,0.3); }
+  .tag-invest { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--border); }
+  .tag-closed { background: rgba(196,116,138,0.1); color: var(--rose); border: 1px solid rgba(196,116,138,0.3); }
+
+  /* ── DEPOP ── */
+  .search-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: .5rem;
+    margin-top: .5rem;
+  }
+  .search-tag {
+    font-family: var(--font-text); font-style: italic;
+    font-size: .9rem; color: var(--cream);
+    padding: .5rem .8rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--gold-glow);
+    cursor: pointer;
+    transition: all .2s;
+    text-align: center;
+    user-select: all;
+  }
+  .search-tag:hover { border-color: var(--gold); color: var(--gold2); }
+  .search-tip {
+    font-family: var(--font-text); font-style: italic;
+    font-size: .88rem; color: var(--muted);
+    padding: .8rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    margin-top: .8rem;
+    line-height: 1.7;
+  }
+
+  /* ── WISHLIST LINK ── */
+  .closet-link {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 1.5rem;
+    border: 1px solid var(--border-bright);
+    border-radius: 4px;
+    background: var(--gold-glow);
+    text-decoration: none;
+    transition: all .25s;
+    margin-top: .5rem;
+  }
+  .closet-link:hover { background: var(--gold-dim); border-color: var(--gold); }
+  .closet-link-text { font-family: var(--font-head); font-size: .7rem; letter-spacing: .1em; color: var(--gold2); }
+  .closet-link-sub { font-family: var(--font-text); font-style: italic; font-size: .85rem; color: var(--muted); margin-top: .2rem; }
+  .closet-link-arrow { color: var(--gold); font-size: 1.2rem; }
+
+  /* ── FABRIC RULE ── */
+  .fabric-rule {
+    text-align: center;
+    font-family: var(--font-head);
+    font-size: .7rem; letter-spacing: .15em;
+    color: var(--cream);
+    padding: 1.2rem;
+    border: 1px solid var(--border-bright);
+    border-radius: 4px;
+    background: linear-gradient(135deg, var(--gold-glow), rgba(122,158,142,0.05));
+    margin-bottom: 1.2rem;
+  }
+  .fabric-rule span { color: var(--gold2); }
+
+  /* ── CERT TAGS ── */
+  .cert-row {
+    display: flex; flex-wrap: wrap; gap: .5rem;
+    margin-top: .5rem;
+  }
+  .cert {
+    font-family: var(--font-head);
+    font-size: .55rem; letter-spacing: .1em;
+    padding: .3rem .7rem;
+    border: 1px solid var(--border-bright);
+    border-radius: 2px;
+    color: var(--gold);
+    background: var(--gold-dim);
+  }
+
+  /* ── ACCESSORIES ── */
+  .acc-section { margin-bottom: 1rem; }
+  .acc-title {
+    font-family: var(--font-head);
+    font-size: .6rem; letter-spacing: .1em;
+    color: var(--gold); margin-bottom: .5rem;
+  }
+  .acc-item {
+    font-family: var(--font-text); font-size: .95rem;
+    color: var(--cream); line-height: 1.9;
+  }
+  .acc-item em { color: var(--muted); font-style: italic; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  @media (max-width: 560px) {
+    .do-dont { grid-template-columns: 1fr; }
+    .palette-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div class="page">
+
+  <a class="back" href="index.html">← Return to the Galaxy</a>
+
+  <header class="header">
+    <div class="header-ornament">
+      <div class="ornament-line"></div>
+      <span class="ornament-star">✦</span>
+      <div class="ornament-line right"></div>
+    </div>
+    <h1 class="title">THE WARDROBE</h1>
+    <p class="subtitle">cottagecore · romantic · boho · classy princess</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('capsule', this)">✦ CAPSULE</button>
+    <button class="tab-btn" onclick="switchTab('style', this)">STYLE RULES</button>
+    <button class="tab-btn" onclick="switchTab('palette', this)">PALETTE</button>
+    <button class="tab-btn" onclick="switchTab('brands', this)">BRANDS</button>
+    <button class="tab-btn" onclick="switchTab('depop', this)">DEPOP GUIDE</button>
+    <button class="tab-btn" onclick="switchTab('accessories', this)">ACCESSORIES</button>
+  </div>
+
+  <!-- ══ CAPSULE TAB ══ -->
+  <div class="tab-panel active" id="tab-capsule">
+
+    <div class="fabric-rule">
+      The One Rule: <span>100% linen, cotton, Tencel, or merino?</span> Yes → consider it. Anything else → skip it.
+    </div>
+
+    <div class="card">
+      <div class="card-title">CAPSULE PROGRESS</div>
+      <div class="progress-label" id="progress-label">0 of 20 pieces owned</div>
+      <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">PHASE 1 · MONTHS 1–6 · FOUNDATION</div>
+
+      <div class="phase-label">Dresses & Skirts · your core</div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w1">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Smocked Midi Dress · floral or botanical print</div>
+          <div class="item-note">Smocked bodice adjusts to your hourglass — your most flattering silhouette. 100% cotton or linen. Aim for Camellia or Celestia colourways on Depop.</div>
+        </div>
+        <div class="item-phase phase-1">PH 1</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w2">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Wrap Midi Dress · solid or subtle print</div>
+          <div class="item-note">Self-adjusting waist — perfect for your shape. Linen or organic cotton. Can dress up or down. Thrift first.</div>
+        </div>
+        <div class="item-phase phase-1">PH 1</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w3">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Flowy Ankle Skirt · linen or cotton</div>
+          <div class="item-note">Pairs with every top. Ankle length adds height. Look for a waistband you can tuck into to show your waist.</div>
+        </div>
+        <div class="item-phase phase-1">PH 1</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w4">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Linen Midi Dress · earthy or neutral tone</div>
+          <div class="item-note">Your daily wear piece. Cream, sage, or dusty blue. Wrinkles are character in linen — embrace it.</div>
+        </div>
+        <div class="item-phase phase-1">PH 1</div>
+      </div>
+
+      <div class="phase-label">Tops · layering & flexibility</div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w5">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Fitted Cotton Tank Tops × 3</div>
+          <div class="item-note">Fitted (not loose) — essential for floor exercises too. White, cream, sage. PACT or GOTS certified.</div>
+        </div>
+        <div class="item-phase phase-1">PH 1</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w6">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Linen or Cotton Blouse · peasant or puff sleeve</div>
+          <div class="item-note">Puff sleeves draw the eye upward — great for petite frames. White or cream first. Thought Clothing or Quince.</div>
+        </div>
+        <div class="item-phase phase-1">PH 1</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w7">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Organic Cotton Cardigan · oversized</div>
+          <div class="item-note">Your layering piece. Cream or sage. Belted at the waist to maintain your silhouette — never leave it open and boxy.</div>
+        </div>
+        <div class="item-phase phase-1">PH 1</div>
+      </div>
+
+      <div class="phase-label">Innerwear · the smart purchase</div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w8">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Period Underwear × 6 · Modibodi or TomboyX</div>
+          <div class="item-note">~$70 upfront. PFAS-free certified. Pays for itself in 2–3 months vs disposables. High-waist style doubles as shapewear under dresses.</div>
+        </div>
+        <div class="item-phase phase-1">PH 1</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w9">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Cotton Bralettes × 3</div>
+          <div class="item-note">Nude, white, black. GOTS certified cotton. Comfortable under fitted tops — your skin will thank you vs synthetic bras.</div>
+        </div>
+        <div class="item-phase phase-1">PH 1</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w10">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Silk or Satin Slip Dress · layering piece</div>
+          <div class="item-note">Prevents fabric riding up on skirts. Also wearable as a dress alone. Cream or ivory. Look secondhand — Vinted or Depop.</div>
+        </div>
+        <div class="item-phase phase-1">PH 1</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">PHASE 2 · MONTHS 7–12 · THE DREAM PIECES</div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w11">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Cleobella Dress · Camellia or Celestia print</div>
+          <div class="item-note">Your aspirational piece. Search Depop by name. The Zaha Ankle Dress in Camellia is your most "you" piece. Puff sleeves + smocked bodice = perfect for your shape.</div>
+        </div>
+        <div class="item-phase phase-2">PH 2</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w12">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Faithfull the Brand Dress</div>
+          <div class="item-note">Eco-friendly linen and organic cotton. Romantic floral prints. Very your aesthetic. Check Depop for 40–60% off retail.</div>
+        </div>
+        <div class="item-phase phase-2">PH 2</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w13">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Christy Dawn Dress · archive sale or secondhand</div>
+          <div class="item-note">Ethically made in LA, natural fabrics. End-of-season sale or RealReal/Poshmark. Very Camellia energy. Hold for a piece you truly love.</div>
+        </div>
+        <div class="item-phase phase-2">PH 2</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w14">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Merino Wool Wrap or Cardi · winter layering</div>
+          <div class="item-note">Quince for best value. Warm, breathable, naturally anti-odour. Blush or cream. The only synthetic-free way to layer warmly.</div>
+        </div>
+        <div class="item-phase phase-2">PH 2</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w15">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Dôen or LoveShackFancy Blouse · secondhand only</div>
+          <div class="item-note">Dream brands. Search by name on Depop, The RealReal, Poshmark. Never full price — their secondhand market is thriving and well-maintained.</div>
+        </div>
+        <div class="item-phase phase-2">PH 2</div>
+      </div>
+
+      <div class="phase-label">Austin Edition · when you move</div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w16">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Girlfriend Collective Workout Set</div>
+          <div class="item-note">Recycled plastic bottles, certified sustainable activewear. High-waist leggings + fitted top. Replaces your current workout pieces properly.</div>
+        </div>
+        <div class="item-phase phase-2">PH 2</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w17">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Midi Skirt · silk or Tencel, printed</div>
+          <div class="item-note">Your elevated basics skirt once you're happy with your silhouette. Pairs with tanks and blouses. Bias-cut skirts are incredibly flattering on hourglass frames.</div>
+        </div>
+        <div class="item-phase phase-2">PH 2</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w18">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Embroidered or Artisan Detail Top</div>
+          <div class="item-note">Anita Dongre or Jaypore. Hand embroidery, natural cotton. The piece that elevates everything else. One beautiful artisan piece goes a long way.</div>
+        </div>
+        <div class="item-phase phase-2">PH 2</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w19">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Farm Rio Statement Dress · responsible materials range</div>
+          <div class="item-note">Check the "Responsible Materials" filter on their website. ECOVERO or natural fibre pieces only. Their prints are joyful and very Ava.</div>
+        </div>
+        <div class="item-phase phase-2">PH 2</div>
+      </div>
+
+      <div class="wardrobe-item" onclick="toggleItem(this)" data-id="w20">
+        <div class="item-check">✦</div>
+        <div class="item-info">
+          <div class="item-name">Cleobella Blouse · artisan print</div>
+          <div class="item-note">For mixing and matching with your skirts. Their handblock-printed cotton blouses are timeless and size more flexibly than dresses.</div>
+        </div>
+        <div class="item-phase phase-2">PH 2</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STYLE RULES TAB ══ -->
+  <div class="tab-panel" id="tab-style">
+
+    <div class="card">
+      <div class="card-title">YOUR SHAPE · PETITE HOURGLASS</div>
+      <p style="font-family:var(--font-text);font-style:italic;color:var(--muted);font-size:.95rem;line-height:1.7;margin-bottom:1rem;">
+        Under 5'2" · defined waist · balanced chest and hips · your waist is your best feature. Every rule below serves one goal: show the waist, elongate the leg, and keep proportion balanced.
+      </p>
+
+      <div class="do-dont">
+        <div class="do-col">
+          <div class="col-head">WEAR</div>
+          <ul class="col-list">
+            <li>Smocked & shirred bodices</li>
+            <li>Wrap dresses & skirts</li>
+            <li>Empire waist cuts</li>
+            <li>V-necklines</li>
+            <li>Midi & ankle lengths</li>
+            <li>Puff & bishop sleeves</li>
+            <li>Belted cardigans</li>
+            <li>High-waist skirts</li>
+            <li>Monochromatic dressing</li>
+            <li>Vertical prints & florals</li>
+          </ul>
+        </div>
+        <div class="dont-col">
+          <div class="col-head">AVOID</div>
+          <ul class="col-list">
+            <li>Boxy, shapeless cuts</li>
+            <li>Wide horizontal stripes</li>
+            <li>Drop-waist dresses</li>
+            <li>Maxi lengths with low waist</li>
+            <li>Heavy top + heavy bottom</li>
+            <li>Oversized everything at once</li>
+            <li>Cropped jackets (shortens)</li>
+            <li>Stiff structured fabrics</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">SILHOUETTE RULES · PETITE HEIGHT</div>
+
+      <div class="rule-block">
+        <div class="rule-title">SHOE COLOUR = HEM COLOUR</div>
+        <div class="rule-text">Match your shoe colour to your hem or as close as possible. This creates an unbroken line and visually adds 2–3 inches to your height. Nude shoes under a cream dress. Tan sandals under linen.</div>
+      </div>
+
+      <div class="rule-block">
+        <div class="rule-title">SIZE UP, ALTER THE WAIST</div>
+        <div class="rule-text">Always size to your largest measurement (usually chest or hips). Take a waist alteration — ~$15 and it transforms the fit entirely. Budget this into any purchase you love.</div>
+        <div class="rule-sub">Note: smocked bodices and wrap styles self-adjust — no tailoring needed.</div>
+      </div>
+
+      <div class="rule-block">
+        <div class="rule-title">THE SLIP TRICK</div>
+        <div class="rule-text">A $10 slip underneath any dress prevents fabric riding up on thighs and clinging to skin. Solves the hem twist problem. Keeps everything falling correctly all day.</div>
+      </div>
+
+      <div class="rule-block">
+        <div class="rule-title">MIDI IS YOUR SWEET SPOT</div>
+        <div class="rule-text">Midi (below knee, above ankle) is both your most flattering length and your most on-aesthetic length. It covers your thighs while you're working toward your goals, hits cottagecore perfectly, and creates the vertical line that adds height.</div>
+      </div>
+
+      <div class="rule-block">
+        <div class="rule-title">PUFF SLEEVES WORK FOR YOU</div>
+        <div class="rule-text">Volume at the shoulder draws the eye upward and creates the illusion of height. For petite frames, puff sleeves are a friend — not a foe. Pair with a fitted bodice so the waist reads clearly.</div>
+      </div>
+
+      <div class="rule-block">
+        <div class="rule-title">ONE STATEMENT, ONE NEUTRAL</div>
+        <div class="rule-text">If the dress is the statement, keep shoes and bag neutral. If the bag is the statement, let the dress be simpler. Never more than one statement at once — for a petite frame it competes with your silhouette.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">OUTFIT FORMULA · DAILY DRESSING</div>
+
+      <div class="formula-step">
+        <div class="formula-num">1</div>
+        <div class="formula-text">Choose a dress or skirt that shows or defines your waist
+          <span class="formula-em">Smocked, wrap, or empire waist. This is your anchor piece.</span>
+        </div>
+      </div>
+      <div class="formula-step">
+        <div class="formula-num">2</div>
+        <div class="formula-text">Pick a shoe colour that matches or complements the hem
+          <span class="formula-em">Same tone family. Nude, tan, white, or matching colour.</span>
+        </div>
+      </div>
+      <div class="formula-step">
+        <div class="formula-num">3</div>
+        <div class="formula-text">Add one piece of delicate gold or pearl jewellery
+          <span class="formula-em">Layered necklaces or small earrings. Not both at full volume.</span>
+        </div>
+      </div>
+      <div class="formula-step">
+        <div class="formula-num">4</div>
+        <div class="formula-text">Choose a bag in a natural or neutral texture
+          <span class="formula-em">Wicker, linen, leather, or cotton canvas. Small to medium size.</span>
+        </div>
+      </div>
+      <div class="formula-step">
+        <div class="formula-num">5</div>
+        <div class="formula-text">Add one hair accessory if the outfit feels plain
+          <span class="formula-em">Satin ribbon, pearl clip, or tortoiseshell claw. Never more than two.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PALETTE TAB ══ -->
+  <div class="tab-panel" id="tab-palette">
+
+    <div class="card">
+      <div class="card-title">YOUR SIGNATURE PALETTE</div>
+      <p style="font-family:var(--font-text);font-style:italic;color:var(--muted);font-size:.92rem;margin-bottom:1rem;">
+        Warm, soft, and organic. Every piece you buy should live within these tones — this is what makes a wardrobe feel cohesive rather than chaotic.
+      </p>
+
+      <div class="palette-grid">
+        <div class="swatch">
+          <div class="swatch-color" style="background:linear-gradient(135deg,#f2e0d8,#e8c5b8)"></div>
+          <div class="swatch-label">
+            <span class="swatch-name">BLUSH ROSE</span>
+            <span class="swatch-note">Your signature warm</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:linear-gradient(135deg,#f0e8d8,#e8dcc8)"></div>
+          <div class="swatch-label">
+            <span class="swatch-name">CREAM IVORY</span>
+            <span class="swatch-note">Your neutral base</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:linear-gradient(135deg,#b8cfc5,#9ab8aa)"></div>
+          <div class="swatch-label">
+            <span class="swatch-name">DUSTY SAGE</span>
+            <span class="swatch-note">Your earthy cool</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:linear-gradient(135deg,#b8c8d8,#98b0c8)"></div>
+          <div class="swatch-label">
+            <span class="swatch-name">DUSTY BLUE</span>
+            <span class="swatch-note">Celestia colourway</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:linear-gradient(135deg,#c89878,#b88060)"></div>
+          <div class="swatch-label">
+            <span class="swatch-name">TERRACOTTA</span>
+            <span class="swatch-note">Your earthy accent</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:linear-gradient(135deg,#e8d0b8,#d8b898)"></div>
+          <div class="swatch-label">
+            <span class="swatch-name">WARM SAND</span>
+            <span class="swatch-note">Neutral transition</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:linear-gradient(135deg,#d4b8c0,#c0a0a8)"></div>
+          <div class="swatch-label">
+            <span class="swatch-name">MAUVE ROSE</span>
+            <span class="swatch-note">Camellia colourway</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:linear-gradient(135deg,#d8c8a8,#c8b890)"></div>
+          <div class="swatch-label">
+            <span class="swatch-name">WARM LINEN</span>
+            <span class="swatch-note">The fabric tone</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:linear-gradient(135deg,#606878,#484f60)"></div>
+          <div class="swatch-label">
+            <span class="swatch-name">DUSTY INK</span>
+            <span class="swatch-note">Your one dark</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="palette-rule">
+        Combine: one base (cream / sand / linen) · one colour (blush, sage, blue, terracotta) · one print if the other two are solid
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">CLEOBELLA PRINTS TO HUNT</div>
+      <p style="font-family:var(--font-text);font-size:.92rem;color:var(--muted);font-style:italic;line-height:1.7;margin-bottom:.8rem;">
+        Search these exact names on Depop, Vinted, The RealReal, and Poshmark. These are your identified prints — pieces you've already responded to.
+      </p>
+      <div class="search-grid">
+        <div class="search-tag">Camellia print</div>
+        <div class="search-tag">Celestia print</div>
+        <div class="search-tag">Silva print</div>
+        <div class="search-tag">Cleobella Zaha</div>
+        <div class="search-tag">Cleobella Trina</div>
+        <div class="search-tag">Cleobella Mena</div>
+        <div class="search-tag">Cleobella Mariana</div>
+        <div class="search-tag">Cleobella Suvi</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ BRANDS TAB ══ -->
+  <div class="tab-panel" id="tab-brands">
+
+    <div class="card">
+      <div class="card-title">BRAND DIRECTORY</div>
+
+      <div class="brand-tier tier-thrift">
+        <div class="tier-label">THRIFT FIRST · buy secondhand on Depop, Vinted, Poshmark, The RealReal</div>
+        <div class="brand-grid">
+          <div class="brand-card">
+            <div class="brand-name">CLEOBELLA</div>
+            <div class="brand-note">Your perfect style. Handblock printed cotton & linen, artisan-made. Search by print name. Worth every thrift hunt.</div>
+            <span class="brand-tag tag-thrift">THRIFT FIRST</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">CHRISTY DAWN</div>
+            <div class="brand-note">Ethically made in LA, natural fabrics, inclusive sizing. Well-made so pre-loved pieces look almost new. Check archive sale too.</div>
+            <span class="brand-tag tag-thrift">THRIFT FIRST</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">FAITHFULL THE BRAND</div>
+            <div class="brand-note">Linen, organic cotton, recycled materials. Ethically made. Boho-romantic aesthetic. Active and verified.</div>
+            <span class="brand-tag tag-thrift">THRIFT FIRST</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">DÔEN</div>
+            <div class="brand-note">Romantic prairie meets California. Beautiful natural fabrics. Expensive new — Depop and The RealReal only for now.</div>
+            <span class="brand-tag tag-thrift">THRIFT FIRST</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">LOVESHACKFANCY</div>
+            <div class="brand-note">Princesscore incarnate. Ruffles, lace, floral. Expensive new. Search Depop specifically — huge following means lots of resale.</div>
+            <span class="brand-tag tag-thrift">THRIFT FIRST</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">SPELL</div>
+            <div class="brand-note">Boho artisan. Has own secondhand platform "Respell" on their website. Search there first before Depop.</div>
+            <span class="brand-tag tag-thrift">THRIFT FIRST</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">FARM RIO</div>
+            <div class="brand-note">Joyful prints, responsible materials range. Use "Responsible Materials" filter on website. Check fabric label per piece — some pieces are ECOVERO not natural fibre.</div>
+            <span class="brand-tag tag-thrift">THRIFT FIRST</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="brand-tier tier-budget" style="margin-top:1.2rem">
+        <div class="tier-label">BUY NEW ON A BUDGET · certified sustainable, affordable</div>
+        <div class="brand-grid">
+          <div class="brand-card">
+            <div class="brand-name">PACT</div>
+            <div class="brand-note">GOTS certified organic cotton. Net zero carbon, compostable packaging. Most budget-friendly genuinely certified option.</div>
+            <span class="brand-tag tag-budget">BUY NEW</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">QUINCE</div>
+            <div class="brand-note">Organic cotton, cashmere, linen. Luxury quality at fraction of price. Especially for cardigans and layering pieces.</div>
+            <span class="brand-tag tag-budget">BUY NEW</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">THOUGHT CLOTHING</div>
+            <div class="brand-note">GOTS and OEKO-TEX certified. Romantic prints, natural fabrics. Very cottagecore aesthetic. UK brand — check Depop too.</div>
+            <span class="brand-tag tag-budget">BUY NEW</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">LUCY & YAK</div>
+            <div class="brand-note">Organic and natural fabrics, ethical manufacturing. Playful and colourful. Best for dungarees, blouses, and casual pieces.</div>
+            <span class="brand-tag tag-budget">BUY NEW</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="brand-tier tier-invest" style="margin-top:1.2rem">
+        <div class="tier-label">PHASE 2 INVESTMENTS · worth it when budget allows</div>
+        <div class="brand-grid">
+          <div class="brand-card">
+            <div class="brand-name">ARNHEM CLOTHING</div>
+            <div class="brand-note">Unique prints, eco-friendly materials, ethical suppliers. Off-beat cuts and artisan details. Watch for sales.</div>
+            <span class="brand-tag tag-invest">PHASE 2</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">BEDRA VINTAGE</div>
+            <div class="brand-note">Romantic, well-made, pockets, certified eco fabrics, made to order only. A genuinely intentional brand.</div>
+            <span class="brand-tag tag-invest">PHASE 2</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">ANITA DONGRE</div>
+            <div class="brand-note">Indian designer. Hand block printed cotton & linen. Artisan quality comparable to Cleobella.</div>
+            <span class="brand-tag tag-invest">PHASE 2</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">JAYPORE</div>
+            <div class="brand-note">Indian marketplace of handcrafted clothing. Block printed fabrics, natural dyes. More affordable than Cleobella with similar artisan energy.</div>
+            <span class="brand-tag tag-invest">PHASE 2</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">PROS & CONS</div>
+            <div class="brand-note">Canadian slow fashion. Romantic feminine details, organic ECOVERO, OEKO-TEX certified dyes. Similar energy to Christy Dawn at lower prices.</div>
+            <span class="brand-tag tag-invest">PHASE 2</span>
+          </div>
+          <div class="brand-card">
+            <div class="brand-name">GIRLFRIEND COLLECTIVE</div>
+            <div class="brand-note">Recycled plastic bottle activewear. Certified sustainable. Your Phase 2 workout set — better quality than Primark basics once you're committed.</div>
+            <span class="brand-tag tag-invest">PHASE 2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">CERTIFICATIONS TO TRUST</div>
+      <p style="font-family:var(--font-text);font-style:italic;font-size:.88rem;color:var(--muted);margin-bottom:.8rem;">If a brand says "eco-friendly" or "conscious collection" with none of these — assume it's marketing.</p>
+      <div class="cert-row">
+        <div class="cert">GOTS</div>
+        <div class="cert">OEKO-TEX STANDARD 100</div>
+        <div class="cert">BLUESIGN</div>
+        <div class="cert">ECOVERO</div>
+        <div class="cert">FAIR TRADE</div>
+        <div class="cert">B CORP</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DEPOP GUIDE TAB ══ -->
+  <div class="tab-panel" id="tab-depop">
+
+    <div class="card">
+      <div class="card-title">DEPOP SEARCH TERMS · by category</div>
+
+      <div class="phase-label">Dresses · your core hunt</div>
+      <div class="search-grid">
+        <div class="search-tag">cottagecore linen dress</div>
+        <div class="search-tag">vintage floral cotton midi</div>
+        <div class="search-tag">smocked boho dress</div>
+        <div class="search-tag">botanical print midi</div>
+        <div class="search-tag">romantic floral midi</div>
+        <div class="search-tag">puff sleeve cotton dress</div>
+        <div class="search-tag">wrap dress floral</div>
+        <div class="search-tag">cottagecore ankle dress</div>
+      </div>
+
+      <div class="phase-label" style="margin-top:1rem">By Brand · search exactly</div>
+      <div class="search-grid">
+        <div class="search-tag">Cleobella dress</div>
+        <div class="search-tag">Cleobella blouse</div>
+        <div class="search-tag">Camellia print dress</div>
+        <div class="search-tag">Celestia print</div>
+        <div class="search-tag">Faithfull dress</div>
+        <div class="search-tag">Christy Dawn dress</div>
+        <div class="search-tag">Dôen blouse</div>
+        <div class="search-tag">LoveShackFancy dress</div>
+        <div class="search-tag">Spell dress</div>
+        <div class="search-tag">Farm Rio dress</div>
+        <div class="search-tag">Arnhem dress</div>
+      </div>
+
+      <div class="phase-label" style="margin-top:1rem">Fabric Filter · always check the tag</div>
+      <div class="search-grid">
+        <div class="search-tag">100% linen dress</div>
+        <div class="search-tag">organic cotton midi</div>
+        <div class="search-tag">vintage cotton blouse</div>
+        <div class="search-tag">linen skirt floral</div>
+        <div class="search-tag">Tencel midi dress</div>
+        <div class="search-tag">natural fibre boho</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">AUDHD SHOPPING RULES</div>
+
+      <div class="search-tip">
+        <strong style="font-family:var(--font-head);font-size:.6rem;letter-spacing:.1em;color:var(--gold);">THE PARKING LOT RULE</strong><br>
+        When you see something you want — screenshot it and save to your notes app under "Wardrobe Parking Lot." Do not buy. Review the folder once a month on your designated shopping day. Most of it won't feel urgent by then. The few that still feel right — those are the ones worth buying.
+      </div>
+
+      <div class="search-tip" style="margin-top:.6rem">
+        <strong style="font-family:var(--font-head);font-size:.6rem;letter-spacing:.1em;color:var(--gold);">THE 48-HOUR RULE</strong><br>
+        If you've found something you want to buy — close the tab. If you're still thinking about it in 48 hours, it's genuinely worth buying. Hyperfocus wants it now. Your future self wants you to wait 48 hours.
+      </div>
+
+      <div class="search-tip" style="margin-top:.6rem">
+        <strong style="font-family:var(--font-head);font-size:.6rem;letter-spacing:.1em;color:var(--gold);">BROWSE IN SHORT SESSIONS</strong><br>
+        Set a 20-minute timer before opening Depop. When it goes off — close the app. No open-ended scrolling. This prevents the spiral that ends in buying three things you don't need or buying nothing because you're overwhelmed.
+      </div>
+
+      <div class="search-tip" style="margin-top:.6rem">
+        <strong style="font-family:var(--font-head);font-size:.6rem;letter-spacing:.1em;color:var(--gold);">ASK THREE QUESTIONS BEFORE BUYING</strong><br>
+        1. Is the fabric natural? (Check the label in the photos)<br>
+        2. Does it show or define my waist?<br>
+        3. Would I wear this in the next 30 days?<br>
+        If any answer is no — parking lot, not cart.
+      </div>
+    </div>
+
+    <a class="closet-link" href="closet.html">
+      <div>
+        <div class="closet-link-text">✦ THE CLOSET & WISHLIST</div>
+        <div class="closet-link-sub">Log pieces you own · track your wishlist · build outfits</div>
+      </div>
+      <div class="closet-link-arrow">→</div>
+    </a>
+  </div>
+
+  <!-- ══ ACCESSORIES TAB ══ -->
+  <div class="tab-panel" id="tab-accessories">
+
+    <div class="card">
+      <div class="card-title">SHOES · your aesthetic with comfort</div>
+
+      <div class="formula-step">
+        <div class="formula-num">✦</div>
+        <div class="formula-text">Small block heel or kitten heel · 1.5–2 inches
+          <span class="formula-em">Adds height without instability. Chunky enough to walk comfortably all day. Your sweet spot. Look for pointed or almond toe for elegance.</span>
+        </div>
+      </div>
+      <div class="formula-step">
+        <div class="formula-num">✦</div>
+        <div class="formula-text">Strappy flat sandal · leather or vegan leather
+          <span class="formula-em">Wear with confidence — your outfits do the height work. Tan, nude, or white. Minimise ankle straps to avoid visually cutting off the leg.</span>
+        </div>
+      </div>
+      <div class="formula-step">
+        <div class="formula-num">✦</div>
+        <div class="formula-text">Mary Jane with a small heel · Charlie Stone style
+          <span class="formula-em">Vintage-inspired, very cottagecore, all-day comfort. Their "almost flat" design is engineered for wearability. Search their sale section first.</span>
+        </div>
+      </div>
+      <div class="formula-step">
+        <div class="formula-num">✦</div>
+        <div class="formula-text">Ballet flat or pointed-toe flat
+          <span class="formula-em">For days when heels aren't right. Pointed toe elongates the foot and adds the height effect of a heel. Leather or suede only — not plastic.</span>
+        </div>
+      </div>
+
+      <div class="search-tip" style="margin-top:.8rem">
+        <strong style="font-family:var(--font-head);font-size:.6rem;letter-spacing:.1em;color:var(--gold);">SHOE BRANDS TO EXPLORE</strong><br>
+        Charlie Stone · vintage-inspired, cottagecore comfort · check sale section<br>
+        Nisolo · ethically made leather · Depop for deals<br>
+        Quince · leather flats and sandals at affordable prices<br>
+        Vinted / Depop · search "block heel strappy" or "leather kitten heel" for secondhand gems
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">JEWELLERY · delicate and intentional</div>
+
+      <div class="acc-section">
+        <div class="acc-title">GOLD LAYER FORMULA</div>
+        <div class="acc-item">Thin chain necklace (14–18") <em>your base layer</em></div>
+        <div class="acc-item">Longer pendant or locket (22–24") <em>the statement layer</em></div>
+        <div class="acc-item">Small stud or pearl drop earrings <em>always, daily</em></div>
+        <div class="acc-item">One delicate ring or none <em>don't overload the fingers</em></div>
+      </div>
+
+      <div class="acc-section">
+        <div class="acc-title">PEARL MOMENTS</div>
+        <div class="acc-item">Irregular pearl necklace <em>baroque pearls, very 2025–26, very you</em></div>
+        <div class="acc-item">Pearl drop earrings <em>classic but never boring</em></div>
+        <div class="acc-item">Pearl + gold mixed <em>wear together freely</em></div>
+      </div>
+
+      <div class="search-tip">
+        <strong style="font-family:var(--font-head);font-size:.6rem;letter-spacing:.1em;color:var(--gold);">BRANDS</strong><br>
+        Missoma · best value quality, botanical and pearl pieces<br>
+        Mejuri · clean gold, everyday wear<br>
+        Etsy · handmade pearl and botanical pieces, often very affordable<br>
+        Vinted / Depop · vintage gold jewellery (always real gold — check hallmarks)
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">HAIR ACCESSORIES · the final detail</div>
+
+      <div class="acc-item">Satin ribbon · tied at the nape or around a bun <em>very cottagecore, very princess</em></div>
+      <div class="acc-item" style="margin-top:.5rem">Pearl clip or barrette · at the temple or crown <em>understated, elegant</em></div>
+      <div class="acc-item" style="margin-top:.5rem">Tortoiseshell claw clip · effortless and timeless <em>your daily workhorse</em></div>
+      <div class="acc-item" style="margin-top:.5rem">Floral or botanical headband <em>cottagecore energy, wear with your linen dresses</em></div>
+      <div class="acc-item" style="margin-top:.5rem">Thin gold headband <em>princesscore moment — very you</em></div>
+
+      <div class="search-tip" style="margin-top:.8rem">
+        The rule: one hair accessory per outfit. If you have a statement necklace, keep the hair simple. If the dress is quiet, you can do more with the hair.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">BAGS · natural, elegant, intentional</div>
+
+      <div class="formula-step">
+        <div class="formula-num">✦</div>
+        <div class="formula-text">Wicker or rattan bag · small to medium
+          <span class="formula-em">The most on-aesthetic bag for your style. Kayu (fair trade, Filipino artisans) is your brand. Search Depop for secondhand wicker bags.</span>
+        </div>
+      </div>
+      <div class="formula-step">
+        <div class="formula-num">✦</div>
+        <div class="formula-text">Leather crossbody · tan or cream
+          <span class="formula-em">Your everyday practical bag. Small enough to not overwhelm a petite frame. Depop or Vinted for real leather secondhand.</span>
+        </div>
+      </div>
+      <div class="formula-step">
+        <div class="formula-num">✦</div>
+        <div class="formula-text">Cotton canvas tote · plain or botanical print
+          <span class="formula-em">Your errand bag. Ethical, cheap, replaceable. Look for GOTS certified cotton — Pact makes a simple one.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ── STARFIELD ──
+(function() {
+  const container = document.getElementById('stars');
+  for (let i = 0; i < 140; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.2 + 0.4;
+    s.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      --d:${2.5+Math.random()*4}s;
+      --delay:${-Math.random()*5}s;
+      --o1:${0.15+Math.random()*0.3};
+      --o2:${0.6+Math.random()*0.4};
+    `;
+    container.appendChild(s);
+  }
+})();
+
+// ── TABS ──
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── CAPSULE WARDROBE ──
+const STORAGE_KEY = 'ava_wardrobe_items';
+
+function loadOwned() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+}
+function saveOwned(arr) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+
+function toggleItem(el) {
+  const id = el.dataset.id;
+  let owned = loadOwned();
+  if (owned.includes(id)) {
+    owned = owned.filter(x => x !== id);
+    el.classList.remove('owned');
+    el.querySelector('.item-check').textContent = '✦';
+  } else {
+    owned.push(id);
+    el.classList.add('owned');
+    el.querySelector('.item-check').textContent = '✓';
+  }
+  saveOwned(owned);
+  updateProgress();
+}
+
+function updateProgress() {
+  const owned = loadOwned();
+  const total = document.querySelectorAll('.wardrobe-item').length;
+  const count = owned.length;
+  const pct = Math.round((count / total) * 100);
+  document.getElementById('progress-label').textContent = `${count} of ${total} pieces owned`;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function initWardrobe() {
+  const owned = loadOwned();
+  document.querySelectorAll('.wardrobe-item').forEach(el => {
+    if (owned.includes(el.dataset.id)) {
+      el.classList.add('owned');
+      el.querySelector('.item-check').textContent = '✓';
+    }
+  });
+  updateProgress();
+}
+
+initWardrobe();
+</script>
+</body>
+</html>
