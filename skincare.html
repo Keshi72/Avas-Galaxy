@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✦ The Ritual</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#06060f;--gold:#c9a84c;--gold2:#e8c97a;
+    --gold-dim:rgba(201,168,76,0.18);--gold-glow:rgba(201,168,76,0.07);
+    --rose:#c4748a;--rose-dim:rgba(196,116,138,0.15);
+    --sage:#7a9e8e;--sage-dim:rgba(122,158,142,0.12);--sage-bright:rgba(122,158,142,0.4);
+    --blue:#7a9ebf;--blue-dim:rgba(122,158,191,0.15);
+    --cream:#f0e8d8;--muted:rgba(240,232,216,0.48);
+    --border:rgba(201,168,76,0.18);--border-bright:rgba(201,168,76,0.42);
+    --font-head:'Cinzel',serif;--font-body:'Cormorant Garamond',serif;--font-text:'EB Garamond',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--cream);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;}
+  #stars{position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(ellipse 70% 50% at 15% 25%,rgba(122,158,142,.07) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 65%,rgba(122,158,191,.06) 0%,transparent 55%),var(--bg);}
+  .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite var(--del,0s);}
+  @keyframes twinkle{0%,100%{opacity:var(--o1,.3)}50%{opacity:var(--o2,.9)}}
+  .page{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+  .back{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-head);font-size:.63rem;letter-spacing:.12em;color:var(--gold);text-decoration:none;opacity:.65;transition:opacity .2s;margin-bottom:2rem;}
+  .back:hover{opacity:1;}
+  .header{text-align:center;margin-bottom:2.5rem;}
+  .orn{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:.8rem;}
+  .orn-line{height:1px;width:55px;}
+  .orn-line.l{background:linear-gradient(90deg,transparent,var(--gold));}
+  .orn-line.r{background:linear-gradient(90deg,var(--gold),transparent);}
+  .title{font-family:var(--font-head);font-size:clamp(1.7rem,5vw,2.7rem);font-weight:400;letter-spacing:.15em;color:var(--gold2);text-shadow:0 0 40px rgba(201,168,76,.28);margin-bottom:.4rem;}
+  .subtitle{font-family:var(--font-body);font-style:italic;color:var(--muted);font-size:1rem;}
+
+  /* SKIN MOOD */
+  .skin-mood{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:2rem;}
+  .mood-card{border:1px solid var(--border);border-radius:4px;padding:.9rem 1rem;text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.02);}
+  .mood-card:hover{border-color:var(--gold);background:var(--gold-glow);}
+  .mood-card.active{background:var(--gold-dim);border-color:var(--gold);}
+  .mood-icon{font-size:1.4rem;margin-bottom:.3rem;}
+  .mood-name{font-family:var(--font-head);font-size:.58rem;letter-spacing:.12em;color:var(--gold);margin-bottom:.2rem;}
+  .mood-desc{font-family:var(--font-text);font-style:italic;font-size:.75rem;color:var(--muted);line-height:1.4;}
+  .mood-advice{display:none;padding:.8rem 1rem;border:1px solid var(--border);border-radius:3px;background:var(--gold-glow);margin-bottom:1.5rem;}
+  .mood-advice.visible{display:block;}
+  .ma-title{font-family:var(--font-head);font-size:.58rem;letter-spacing:.1em;color:var(--gold);margin-bottom:.35rem;}
+  .ma-text{font-family:var(--font-text);font-size:.9rem;color:var(--cream);line-height:1.6;}
+
+  /* TABS */
+  .tabs{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;margin-bottom:2rem;}
+  .tab-btn{font-family:var(--font-head);font-size:.58rem;letter-spacing:.12em;padding:.48rem 1.05rem;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .22s;border-radius:2px;}
+  .tab-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .tab-btn.active{background:var(--gold-dim);border-color:var(--gold);color:var(--gold2);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;animation:fadeIn .3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+  /* CARD */
+  .card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:4px;padding:1.4rem 1.5rem;margin-bottom:1.1rem;}
+  .card-title{font-family:var(--font-head);font-size:.68rem;letter-spacing:.12em;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;}
+  .card-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* ROUTINE STEPS */
+  .step-list{display:flex;flex-direction:column;gap:.55rem;}
+  .step-item{display:flex;align-items:flex-start;gap:1rem;padding:.9rem 1rem;border:1px solid var(--border);border-radius:3px;background:rgba(255,255,255,.02);cursor:pointer;transition:all .2s;}
+  .step-item:hover{border-color:var(--gold);background:var(--gold-glow);}
+  .step-item.done{background:var(--sage-dim);border-color:rgba(122,158,142,.4);}
+  .step-item.done .step-name{text-decoration:line-through;color:var(--muted);}
+  .step-check{width:20px;height:20px;min-width:20px;border:1px solid var(--border-bright);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--sage);margin-top:2px;transition:all .2s;}
+  .step-item.done .step-check{background:var(--sage-dim);border-color:var(--sage);}
+  .step-num{font-family:var(--font-head);font-size:.55rem;letter-spacing:.1em;color:var(--gold);min-width:20px;margin-top:3px;}
+  .step-body{flex:1;}
+  .step-name{font-family:var(--font-body);font-size:1.05rem;color:var(--cream);}
+  .step-product{font-family:var(--font-head);font-size:.52rem;letter-spacing:.08em;color:var(--gold2);margin-top:.2rem;}
+  .step-note{font-family:var(--font-text);font-style:italic;font-size:.82rem;color:var(--muted);margin-top:.2rem;line-height:1.5;}
+  .step-tag{font-family:var(--font-head);font-size:.44rem;letter-spacing:.1em;padding:.15rem .38rem;border-radius:2px;white-space:nowrap;margin-top:.3rem;display:inline-block;}
+  .tag-am{background:var(--gold-dim);color:var(--gold);border:1px solid var(--border);}
+  .tag-pm{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(122,158,191,.3);}
+  .tag-both{background:var(--sage-dim);color:var(--sage);border:1px solid var(--sage-bright);}
+  .tag-when{background:var(--rose-dim);color:var(--rose);border:1px solid rgba(196,116,138,.3);}
+
+  /* PRODUCT CARDS */
+  .product-card{padding:.9rem 1rem;border:1px solid var(--border);border-radius:3px;background:rgba(255,255,255,.02);margin-bottom:.6rem;transition:all .2s;}
+  .product-card:hover{border-color:var(--gold);background:var(--gold-glow);}
+  .pc-header{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;margin-bottom:.4rem;}
+  .pc-name{font-family:var(--font-body);font-size:1rem;color:var(--cream);}
+  .pc-price{font-family:var(--font-head);font-size:.62rem;letter-spacing:.06em;color:var(--gold);white-space:nowrap;}
+  .pc-brand{font-family:var(--font-head);font-size:.5rem;letter-spacing:.1em;color:var(--muted);margin-bottom:.3rem;}
+  .pc-note{font-family:var(--font-text);font-style:italic;font-size:.82rem;color:var(--muted);line-height:1.5;}
+  .pc-why{font-family:var(--font-text);font-size:.85rem;color:var(--cream);margin-top:.35rem;line-height:1.5;}
+  .pc-tags{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.4rem;}
+  .pc-tag{font-family:var(--font-head);font-size:.44rem;letter-spacing:.1em;padding:.15rem .38rem;border-radius:2px;}
+  .tag-ff{background:var(--sage-dim);color:var(--sage);border:1px solid rgba(122,158,142,.3);}
+  .tag-sf{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(122,158,191,.3);}
+  .tag-sens{background:var(--gold-dim);color:var(--gold);border:1px solid var(--border);}
+  .tag-p1{background:var(--rose-dim);color:var(--rose);border:1px solid rgba(196,116,138,.3);}
+  .tag-p2{background:rgba(201,168,76,.08);color:var(--gold);border:1px solid var(--border);}
+  .paycheck-label{font-family:var(--font-head);font-size:.52rem;letter-spacing:.14em;color:var(--muted);margin:1rem 0 .5rem;padding-bottom:.3rem;border-bottom:1px solid var(--border);}
+
+  /* HAND CARE */
+  .hand-step{padding:.85rem 1rem;border-left:2px solid var(--rose);background:var(--rose-dim);border-radius:0 3px 3px 0;margin-bottom:.6rem;}
+  .hs-name{font-family:var(--font-body);font-size:1rem;color:var(--cream);}
+  .hs-note{font-family:var(--font-text);font-style:italic;font-size:.82rem;color:var(--muted);margin-top:.2rem;line-height:1.5;}
+
+  /* BODY ROUTINE */
+  .body-step{padding:.85rem 1rem;border-left:2px solid var(--sage);background:var(--sage-dim);border-radius:0 3px 3px 0;margin-bottom:.6rem;}
+  .bs-name{font-family:var(--font-body);font-size:1rem;color:var(--cream);}
+  .bs-note{font-family:var(--font-text);font-style:italic;font-size:.82rem;color:var(--muted);margin-top:.2rem;line-height:1.5;}
+
+  /* INFO / RULE */
+  .info-block{padding:.85rem 1rem;border:1px solid var(--border);border-radius:3px;background:var(--gold-glow);margin-bottom:.6rem;}
+  .info-title{font-family:var(--font-head);font-size:.6rem;letter-spacing:.1em;color:var(--gold);margin-bottom:.35rem;}
+  .info-text{font-family:var(--font-text);font-size:.93rem;color:var(--cream);line-height:1.65;}
+  .rule-block{padding:.85rem 1rem;border-left:2px solid var(--gold);background:var(--gold-glow);border-radius:0 3px 3px 0;margin-bottom:.7rem;}
+  .rule-title{font-family:var(--font-head);font-size:.6rem;letter-spacing:.1em;color:var(--gold);margin-bottom:.35rem;}
+  .rule-text{font-family:var(--font-text);font-size:.93rem;color:var(--cream);line-height:1.65;}
+
+  /* WARNING */
+  .warning-block{padding:.85rem 1rem;border:1px solid rgba(196,116,138,.4);border-radius:3px;background:rgba(196,116,138,.06);margin-bottom:.6rem;}
+  .warning-title{font-family:var(--font-head);font-size:.6rem;letter-spacing:.1em;color:var(--rose);margin-bottom:.35rem;}
+  .warning-text{font-family:var(--font-text);font-size:.9rem;color:var(--cream);line-height:1.6;}
+
+  /* PROG */
+  .prog-wrap{background:rgba(255,255,255,.05);border-radius:4px;height:5px;margin:.5rem 0;overflow:hidden;}
+  .prog-bar{height:100%;background:linear-gradient(90deg,var(--sage),var(--gold));border-radius:4px;transition:width .4s ease;}
+  .prog-label{font-family:var(--font-head);font-size:.55rem;letter-spacing:.1em;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:.2rem;}
+
+  .reset-btn{width:100%;margin-top:.5rem;font-family:var(--font-head);font-size:.6rem;letter-spacing:.12em;padding:.7rem;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;}
+  .reset-btn:hover{border-color:var(--rose);color:var(--rose);}
+
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div class="page">
+  <a class="back" href="index.html">← Return to the Galaxy</a>
+  <header class="header">
+    <div class="orn"><div class="orn-line l"></div><span style="color:var(--gold)">✦</span><div class="orn-line r"></div></div>
+    <h1 class="title">THE RITUAL</h1>
+    <p class="subtitle">hydration · glow · pillow soft · your skin in its best phase</p>
+  </header>
+
+  <!-- SKIN MOOD SELECTOR -->
+  <div class="card">
+    <div class="card-title">HOW IS YOUR SKIN TODAY</div>
+    <div class="skin-mood">
+      <div class="mood-card" onclick="setSkinMood('glowy',this)">
+        <div class="mood-icon">✦</div>
+        <div class="mood-name">GLOWY</div>
+        <div class="mood-desc">Balanced, soft, at its best</div>
+      </div>
+      <div class="mood-card" onclick="setSkinMood('dry',this)">
+        <div class="mood-icon">◇</div>
+        <div class="mood-name">DRY & DULL</div>
+        <div class="mood-desc">Tight, flat, needs water</div>
+      </div>
+      <div class="mood-card" onclick="setSkinMood('oily',this)">
+        <div class="mood-icon">○</div>
+        <div class="mood-name">OILY</div>
+        <div class="mood-desc">Shiny, congested, heavy</div>
+      </div>
+    </div>
+    <div class="mood-advice" id="advice-glowy">
+      <div class="ma-title">GLOWY DAY · MAINTAIN</div>
+      <div class="ma-text">Your skin is doing the work. Cleanse gently, tone, moisturize lightly. Don't over-treat. This is the baseline you're building toward every day — note what you did yesterday that got you here.</div>
+    </div>
+    <div class="mood-advice" id="advice-dry">
+      <div class="ma-title">DRY & DULL DAY · FLOOD WITH WATER</div>
+      <div class="ma-text">Apply toner in two layers today — pat the first layer in, wait 30 seconds, pat a second layer. Follow immediately with moisturizer while skin is still damp. Your skin is thirsty. Give it water before anything else. Skip any actives today.</div>
+    </div>
+    <div class="mood-advice" id="advice-oily">
+      <div class="ma-title">OILY DAY · BALANCE NOT STRIP</div>
+      <div class="ma-text">Counterintuitively, oily skin still needs moisture — stripping it makes it produce more oil. Cleanse properly today, use toner once, apply moisturizer very lightly. The gel moisturizer option is better on oily days than the lotion.</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('face',this)">✦ FACE</button>
+    <button class="tab-btn" onclick="switchTab('body',this)">BODY</button>
+    <button class="tab-btn" onclick="switchTab('hands',this)">HANDS</button>
+    <button class="tab-btn" onclick="switchTab('products',this)">PRODUCTS</button>
+    <button class="tab-btn" onclick="switchTab('notes',this)">NOTES</button>
+  </div>
+
+  <!-- FACE TAB -->
+  <div class="tab-panel active" id="tab-face">
+
+    <div class="card">
+      <div class="card-title">MORNING ROUTINE · 2 MINUTES</div>
+      <p style="font-family:var(--font-text);font-style:italic;font-size:.9rem;color:var(--muted);line-height:1.7;margin-bottom:1rem;">
+        Simple and consistent. The goal is glowy and pillow soft — that comes from hydration built up over weeks, not from doing more steps. Two minutes every morning, every day.
+      </p>
+
+      <div class="prog-label" id="am-prog-label"><span>MORNING</span><span>0 of 3 done</span></div>
+      <div class="prog-wrap"><div class="prog-bar" id="am-prog-bar" style="width:0%"></div></div>
+
+      <div class="step-list" style="margin-top:.8rem">
+        <div class="step-item" onclick="toggleStep(this,'am1')" data-id="am1">
+          <div class="step-check">✦</div>
+          <div class="step-body">
+            <div class="step-name">Cleanse</div>
+            <div class="step-product">CeraVe Hydrating Cleanser</div>
+            <div class="step-note">Wet face, dispense a small amount, massage gently for 30 seconds. Rinse with lukewarm water — never hot. Pat dry with a clean towel, don't rub. Your skin barrier starts here.</div>
+            <span class="step-tag tag-both">MORNING & NIGHT</span>
+          </div>
+        </div>
+        <div class="step-item" onclick="toggleStep(this,'am2')" data-id="am2">
+          <div class="step-check">✦</div>
+          <div class="step-body">
+            <div class="step-name">Tone</div>
+            <div class="step-product">Klairs Supple Preparation Unscented Toner · or Heritage Store Rosewater</div>
+            <div class="step-note">Pour a small amount into your palm and pat gently onto skin — don't wipe or rub. Patting minimizes hand sensation and improves absorption. This is the step that creates the glow. Don't skip it.</div>
+            <span class="step-tag tag-both">MORNING & NIGHT</span>
+          </div>
+        </div>
+        <div class="step-item" onclick="toggleStep(this,'am3')" data-id="am3">
+          <div class="step-check">✦</div>
+          <div class="step-body">
+            <div class="step-name">Moisturize</div>
+            <div class="step-product">CeraVe Daily Moisturizing Lotion · or Neutrogena Hydro Boost Gel</div>
+            <div class="step-note">Apply while skin is still slightly damp from toner — this seals in the water. Small amount, pat in rather than rub. The gel formula absorbs almost instantly if residue sensation is a problem today.</div>
+            <span class="step-tag tag-both">MORNING & NIGHT</span>
+          </div>
+        </div>
+      </div>
+      <button class="reset-btn" onclick="resetAM()">↺ RESET MORNING</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">NIGHT ROUTINE · 2 MINUTES</div>
+      <p style="font-family:var(--font-text);font-style:italic;font-size:.9rem;color:var(--muted);line-height:1.7;margin-bottom:1rem;">
+        Night is when your skin repairs itself. The moisturizer you apply before sleep does more work than the morning one. Same three steps — cleanse, tone, moisturize. You can use slightly more moisturizer at night since you're not going anywhere.
+      </p>
+
+      <div class="prog-label" id="pm-prog-label"><span>EVENING</span><span>0 of 3 done</span></div>
+      <div class="prog-wrap"><div class="prog-bar" id="pm-prog-bar" style="width:0%"></div></div>
+
+      <div class="step-list" style="margin-top:.8rem">
+        <div class="step-item" onclick="toggleStep(this,'pm1')" data-id="pm1">
+          <div class="step-check">✦</div>
+          <div class="step-body">
+            <div class="step-name">Cleanse</div>
+            <div class="step-product">CeraVe Hydrating Cleanser</div>
+            <div class="step-note">Same as morning. At night you're removing the day — any product, any pollution, any oil that built up. Take 45 seconds rather than 30. Be thorough around the hairline and jawline.</div>
+            <span class="step-tag tag-pm">NIGHT</span>
+          </div>
+        </div>
+        <div class="step-item" onclick="toggleStep(this,'pm2')" data-id="pm2">
+          <div class="step-check">✦</div>
+          <div class="step-body">
+            <div class="step-name">Tone</div>
+            <div class="step-product">Klairs Supple Preparation Unscented Toner · or Heritage Store Rosewater</div>
+            <div class="step-note">On dry days tonight, do two layers. Pat first layer, wait 30 seconds, pat second layer. This is called the 7-skin method and it's the fastest way to restore glow when your skin is feeling flat.</div>
+            <span class="step-tag tag-pm">NIGHT</span>
+          </div>
+        </div>
+        <div class="step-item" onclick="toggleStep(this,'pm3')" data-id="pm3">
+          <div class="step-check">✦</div>
+          <div class="step-body">
+            <div class="step-name">Moisturize</div>
+            <div class="step-product">CeraVe Daily Moisturizing Lotion · slightly more generous than morning</div>
+            <div class="step-note">Apply while skin is still damp. You can be slightly more generous at night. This works while you sleep — you wake up to softer skin than you went to bed with when you do this consistently.</div>
+            <span class="step-tag tag-pm">NIGHT</span>
+          </div>
+        </div>
+      </div>
+      <button class="reset-btn" onclick="resetPM()">↺ RESET EVENING</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">WHEN NEEDED · HORMONAL PIMPLES</div>
+      <div class="step-item" style="cursor:default">
+        <div class="step-body">
+          <div class="step-name">Mighty Patch Original · Hero Cosmetics</div>
+          <div class="step-note">Apply directly to the pimple at night — peel and stick, no product on your hands at all. Leave overnight. The hydrocolloid patch extracts the pimple while you sleep. Remove in the morning. Works best on pimples that have surfaced. Don't use on flat under-skin bumps.</div>
+          <span class="step-tag tag-when">PERIOD WEEK · AS NEEDED</span>
+        </div>
+      </div>
+
+      <div class="info-block" style="margin-top:.8rem">
+        <div class="info-title">SHELLFISH ALLERGY · WHAT TO AVOID</div>
+        <div class="info-text">Check labels for: glucosamine, chitosan, and heavy marine-derived ingredients like carrageenan. Patch test any product containing algae or seaweed extracts on your inner arm for 24 hours before applying to your face. All products recommended here are safe.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">PHASE 2 ADDITIONS · WHEN ROUTINE IS STABLE</div>
+      <div class="info-block">
+        <div class="info-title">SPF · THE MISSING STEP</div>
+        <div class="info-text">Melanated skin still needs sun protection — hyperpigmentation (dark spots) from sun exposure is the most common skin concern for deeper skin tones and SPF is the only thing that prevents it. Add this in Phase 2 once your base routine is running consistently. Black Girl Sunscreen SPF 30 is specifically formulated for deeper skin tones — no white cast, lightweight, moisturizing.</div>
+      </div>
+      <div class="info-block">
+        <div class="info-title">VITAMIN C SERUM · FOR GLOW</div>
+        <div class="info-text">Once the base routine is stable, a Vitamin C serum in the morning will amplify the glow you're already building with the toner. TruSkin Vitamin C Serum is affordable and effective. Goes between toner and moisturizer. Phase 2 only — don't add actives until the base is working.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY TAB -->
+  <div class="tab-panel" id="tab-body">
+    <div class="card">
+      <div class="card-title">SHOWER ROUTINE · DAILY</div>
+      <p style="font-family:var(--font-text);font-style:italic;font-size:.9rem;color:var(--muted);line-height:1.7;margin-bottom:1rem;">
+        Designed around your sensory needs — minimal hand-to-skin product contact, satisfying clean feeling, fast absorption. The brush does most of the work so your hands don't have to.
+      </p>
+
+      <div class="body-step">
+        <div class="bs-name">Exfoliate with silicone brush</div>
+        <div class="bs-note">Long handle reaches your back completely. Firm bristles on the body, soft side for sensitive areas. Use in circular motions with your body wash. The satisfying deep clean that loofahs never deliver. Do this 3-4 times a week, not every day — over-exfoliating strips the skin barrier.</div>
+      </div>
+
+      <div class="body-step">
+        <div class="bs-name">Cleanse with Sol de Janeiro Body Wash</div>
+        <div class="bs-note">Apply via the brush rather than your hands — the brush distributes it and the scent does the sensory work for you. Warm sweet gourmand, cardamom amber family. Lathers well enough to feel genuinely clean. Rinse thoroughly.</div>
+      </div>
+
+      <div class="body-step">
+        <div class="bs-name">Moisturize immediately after — while still damp</div>
+        <div class="bs-note">Pat rather than rub — a lotion applicator mitt keeps your hands clean and dry during application if needed. Damp skin absorbs moisture in a fraction of the time which shortens the uncomfortable application window significantly. Jojoba or a lightweight body lotion. The faster it absorbs the easier it is.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">TOOLS · WHAT YOU NEED</div>
+      <div class="product-card">
+        <div class="pc-header">
+          <div>
+            <div class="pc-brand">ECOTOOOLS OR VANITY PLANET</div>
+            <div class="pc-name">Long Handle Silicone Exfoliating Brush</div>
+          </div>
+          <div class="pc-price">$15–25</div>
+        </div>
+        <div class="pc-note">Dual-sided — firm silicone bristles for body, soft for sensitive areas. Long handle reaches your entire back without contortion. No bacteria harboring unlike loofahs. Wash it easily. The single most useful body care purchase.</div>
+        <div class="pc-tags">
+          <span class="pc-tag tag-p1">PHASE 1 PRIORITY</span>
+          <span class="pc-tag tag-sens">SENSORY FRIENDLY</span>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="pc-header">
+          <div>
+            <div class="pc-brand">ANY BRAND</div>
+            <div class="pc-name">Lotion Applicator Mitt</div>
+          </div>
+          <div class="pc-price">$8–12</div>
+        </div>
+        <div class="pc-note">Creates a barrier between your palms and the product during body moisturizer application. Keeps your hands completely clean and dry. Designed exactly for the sensory barrier you experience. Inexpensive and genuinely useful.</div>
+        <div class="pc-tags">
+          <span class="pc-tag tag-sens">SENSORY SOLUTION</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-block">
+      <div class="info-title">SCENT PROFILE · YOUR BODY WASH WORLD</div>
+      <div class="info-text">Your scent profile is warm floral oriental — cardamom, amber, soft floral, vanilla, warm resin. Sol de Janeiro lives in this family. As the routine builds and Phase 2 opens up, this is also where your signature fragrance search begins. The body wash is the foundation of a layered scent experience — fragrance on top of scented body wash in the same family creates depth that lasts longer than either alone.</div>
+    </div>
+  </div>
+
+  <!-- HANDS TAB -->
+  <div class="tab-panel" id="tab-hands">
+
+    <div class="warning-block">
+      <div class="warning-title">CURRENT STATUS · HEALING FROM INFECTION</div>
+      <div class="warning-text">Finish the full antibiotic course even when hands feel better. No occlusive glove method until hands are completely healed and cleared. No new products on hands until antibiotics are done. Air and gentle cleansing only right now.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">HAND ROUTINE · AFTER HEALING</div>
+      <p style="font-family:var(--font-text);font-style:italic;font-size:.9rem;color:var(--muted);line-height:1.7;margin-bottom:1rem;">
+        The goal is breaking the stripping cycle — every wash strips the barrier, the eczema worsens, the sensation makes you scrub harder, repeat. The routine below interrupts that cycle without requiring you to sit with uncomfortable sensations for long.
+      </p>
+
+      <div class="hand-step">
+        <div class="hs-name">Switch to sulfate-free gentle soap</div>
+        <div class="hs-note">Vanicream Gentle Wash or CeraVe Hydrating Cleanser. No sulfates, no fragrance, glycerin-based. Doesn't lather as dramatically but cleans just as effectively without stripping. Use this every wash going forward.</div>
+      </div>
+
+      <div class="hand-step">
+        <div class="hs-name">Cold or lukewarm water only</div>
+        <div class="hs-note">You're already doing this right — keep it. Hot water is one of the biggest eczema triggers. Never hot, always cool to lukewarm.</div>
+      </div>
+
+      <div class="hand-step">
+        <div class="hs-name">Pat dry · don't scrub</div>
+        <div class="hs-note">The scrubbing dry is removing what little barrier is left after washing. Pat gently with a clean towel. The drying sensation will reduce over time as the barrier rebuilds — it feels urgent right now because the skin is compromised.</div>
+      </div>
+
+      <div class="hand-step">
+        <div class="hs-name">Apply CeraVe Healing Ointment immediately · while damp</div>
+        <div class="hs-note">Thin layer only. The damp skin means it absorbs in under a minute — shortening the uncomfortable application window as much as possible. This is the step that actually rebuilds the barrier over time. Consistency matters more than amount.</div>
+      </div>
+
+      <div class="hand-step">
+        <div class="hs-name">Overnight intensive · once fully healed</div>
+        <div class="hs-note">A slightly more generous layer of CeraVe Healing Ointment before sleep — no gloves until hands are completely healed and infection-free for at least two weeks. Let the ointment absorb naturally overnight. The repair happens while you sleep.</div>
+      </div>
+    </div>
+
+    <div class="info-block">
+      <div class="info-title">SEE A DERMATOLOGIST IF POSSIBLE</div>
+      <div class="info-text">Eczema that progressed to infection is past the over-the-counter maintenance stage. A dermatologist can prescribe a short course of topical steroids or a barrier repair prescription that will get the inflammation under control properly and faster than OTC products alone. Worth pursuing once you have the means — this is a medical issue, not just a skincare one.</div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS TAB -->
+  <div class="tab-panel" id="tab-products">
+
+    <div class="card">
+      <div class="card-title">BUILD YOUR ROUTINE · ONE PAYCHECK AT A TIME</div>
+
+      <div class="paycheck-label">PAYCHECK 1 · THE FOUNDATION</div>
+      <div class="product-card">
+        <div class="pc-header">
+          <div>
+            <div class="pc-brand">CERAVE</div>
+            <div class="pc-name">Hydrating Cleanser</div>
+          </div>
+          <div class="pc-price">$12–15</div>
+        </div>
+        <div class="pc-why">No sulfates, no fragrance, ceramides and hyaluronic acid. Works for both dry and oily days. Doesn't strip. The most universally recommended cleanser for sensitive combination skin. Also works for hand washing once hands are healed.</div>
+        <div class="pc-tags">
+          <span class="pc-tag tag-ff">FRAGRANCE FREE</span>
+          <span class="pc-tag tag-sf">SULFATE FREE</span>
+          <span class="pc-tag tag-sens">SENSITIVE SAFE</span>
+          <span class="pc-tag tag-p1">PAYCHECK 1</span>
+        </div>
+      </div>
+
+      <div class="paycheck-label">PAYCHECK 2 · THE GLOW STEP</div>
+      <div class="product-card">
+        <div class="pc-header">
+          <div>
+            <div class="pc-brand">KLAIRS</div>
+            <div class="pc-name">Supple Preparation Unscented Toner</div>
+          </div>
+          <div class="pc-price">$22</div>
+        </div>
+        <div class="pc-why">Fragrance free specifically. Deeply hydrating. Gentle enough for sensitive skin. Applied by patting rather than wiping — minimal hand sensation. This is the product most likely to give you the pillow soft glow you're chasing. The missing step in most people's routines.</div>
+        <div class="pc-tags">
+          <span class="pc-tag tag-ff">FRAGRANCE FREE</span>
+          <span class="pc-tag tag-sens">SENSITIVE SAFE</span>
+          <span class="pc-tag tag-p1">PAYCHECK 2</span>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="pc-header">
+          <div>
+            <div class="pc-brand">HERITAGE STORE · BUDGET OPTION</div>
+            <div class="pc-name">Rosewater & Glycerin Toner</div>
+          </div>
+          <div class="pc-price">$8</div>
+        </div>
+        <div class="pc-why">Two ingredients, deeply hydrating, available at most drugstores including Walmart. Not as sophisticated as Klairs but does the hydration job at a fraction of the price. Good starting point if budget is tight.</div>
+        <div class="pc-tags">
+          <span class="pc-tag tag-ff">FRAGRANCE FREE</span>
+          <span class="pc-tag tag-p1">BUDGET OPTION</span>
+        </div>
+      </div>
+
+      <div class="paycheck-label">PAYCHECK 3 · THE SEAL</div>
+      <div class="product-card">
+        <div class="pc-header">
+          <div>
+            <div class="pc-brand">CERAVE</div>
+            <div class="pc-name">Daily Moisturizing Lotion</div>
+          </div>
+          <div class="pc-price">$12–16</div>
+        </div>
+        <div class="pc-why">Lightweight enough for oily days, hydrating enough for dry days. Fragrance free, ceramide-based — repairs and maintains your skin barrier. Absorbs well which helps with the residue sensitivity. Your everyday moisturizer.</div>
+        <div class="pc-tags">
+          <span class="pc-tag tag-ff">FRAGRANCE FREE</span>
+          <span class="pc-tag tag-sens">SENSITIVE SAFE</span>
+          <span class="pc-tag tag-p1">PAYCHECK 3</span>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="pc-header">
+          <div>
+            <div class="pc-brand">NEUTROGENA · SENSORY OPTION</div>
+            <div class="pc-name">Hydro Boost Water Gel</div>
+          </div>
+          <div class="pc-price">$15–20</div>
+        </div>
+        <div class="pc-why">Gel texture absorbs almost instantly — zero residue feeling. May suit your sensory preferences better than a traditional lotion. Intensely hydrating despite the lightweight feel. Better choice on oily days or when residue sensitivity is high.</div>
+        <div class="pc-tags">
+          <span class="pc-tag tag-sens">SENSORY FRIENDLY</span>
+          <span class="pc-tag tag-p1">PAYCHECK 3 ALTERNATIVE</span>
+        </div>
+      </div>
+
+      <div class="paycheck-label">AS NEEDED · HORMONAL CARE</div>
+      <div class="product-card">
+        <div class="pc-header">
+          <div>
+            <div class="pc-brand">HERO COSMETICS</div>
+            <div class="pc-name">Mighty Patch Original</div>
+          </div>
+          <div class="pc-price">$13</div>
+        </div>
+        <div class="pc-why">Hydrocolloid patches — peel and stick directly onto pimple, no product on hands at all. Works overnight. Extracts the pimple while you sleep. Perfect for your sensory situation and genuinely effective for hormonal pimples specifically. One box lasts many cycles.</div>
+        <div class="pc-tags">
+          <span class="pc-tag tag-sens">NO HANDS NEEDED</span>
+          <span class="pc-tag tag-p1">WHEN NEEDED</span>
+        </div>
+      </div>
+
+      <div class="paycheck-label">HAND CARE · AFTER HEALING</div>
+      <div class="product-card">
+        <div class="pc-header">
+          <div>
+            <div class="pc-brand">CERAVE</div>
+            <div class="pc-name">Healing Ointment</div>
+          </div>
+          <div class="pc-price">$12–16</div>
+        </div>
+        <div class="pc-why">Barrier repair for your hands. Apply immediately after washing while still damp. Thin layer, pat not rub. Also works as an intensive overnight treatment once infection is fully cleared. The ceramides rebuild what eczema and washing strip away.</div>
+        <div class="pc-tags">
+          <span class="pc-tag tag-ff">FRAGRANCE FREE</span>
+          <span class="pc-tag tag-sens">ECZEMA SAFE</span>
+          <span class="pc-tag tag-p1">AFTER HEALING</span>
+        </div>
+      </div>
+
+      <div class="paycheck-label">PHASE 2 · WHEN ROUTINE IS STABLE</div>
+      <div class="product-card">
+        <div class="pc-header">
+          <div>
+            <div class="pc-brand">BLACK GIRL SUNSCREEN</div>
+            <div class="pc-name">SPF 30 Moisturizing Sunscreen</div>
+          </div>
+          <div class="pc-price">$15–18</div>
+        </div>
+        <div class="pc-why">Specifically formulated for deeper skin tones — no white cast, lightweight, moisturizing. Prevents hyperpigmentation which is the most common skin concern for melanated skin. Your Phase 2 morning addition, after cleanser and toner, before moisturizer.</div>
+        <div class="pc-tags">
+          <span class="pc-tag tag-p2">PHASE 2</span>
+          <span class="pc-tag tag-sens">NO WHITE CAST</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES TAB -->
+  <div class="tab-panel" id="tab-notes">
+    <div class="card">
+      <div class="card-title">SKIN JOURNAL · LOG WHAT YOU NOTICE</div>
+      <textarea id="skin-notes"
+        style="width:100%;min-height:200px;background:transparent;border:1px solid var(--border);border-radius:3px;padding:.8rem;font-family:var(--font-text);font-size:.95rem;color:var(--cream);line-height:1.7;resize:vertical;outline:none;"
+        placeholder="How is your skin today? What did you try, what worked, what didn't. Note when it's glowy and what you did the day before — that's your formula."
+        oninput="saveSkinNotes()"></textarea>
+    </div>
+    <div class="card">
+      <div class="card-title">YOUR SKIN PROFILE</div>
+      <div class="rule-block">
+        <div class="rule-title">WHAT YOUR SKIN IS</div>
+        <div class="rule-text">Combination sensitive · shifts with your cycle and phases · prone to dullness and dryness at worst · glowy and pillow soft at best · hormonal pimples around your period only · eczema on hands currently healing · shellfish allergy — avoid glucosamine and chitosan in products.</div>
+      </div>
+      <div class="rule-block">
+        <div class="rule-title">YOUR GOAL</div>
+        <div class="rule-text">Glowy and pillow soft — consistently. Not just on good days. Built through hydration layering, gentle cleansing, and a routine simple enough to do even on moon days when you have no energy for ritual.</div>
+      </div>
+      <div class="info-block" style="margin-top:.6rem">
+        <div class="info-title">THE CYCLE APPROACH</div>
+        <div class="info-text">Your skin shifts with your phases just like everything else. On Moon days — minimal routine, gentle, no new products. On Sun days — maintain and enjoy the glow. On Star days — this is when to introduce anything new, patch test new products, experiment. One new thing at a time, always in a Star phase.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){const c=document.getElementById('stars');for(let i=0;i<130;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*2+0.3;s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4.5}s;--del:${-Math.random()*6}s;--o1:${0.1+Math.random()*0.3};--o2:${0.5+Math.random()*0.5}`;c.appendChild(s);}})();
+
+function switchTab(name,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');}
+
+function setSkinMood(mood,card){
+  document.querySelectorAll('.mood-card').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.mood-advice').forEach(a=>a.classList.remove('visible'));
+  card.classList.add('active');
+  document.getElementById('advice-'+mood).classList.add('visible');
+}
+
+// ROUTINE STEPS
+const AM_KEY='ava_am_steps';const PM_KEY='ava_pm_steps';
+function loadSteps(key){try{return JSON.parse(localStorage.getItem(key)||'[]');}catch{return[];}}
+function saveSteps(key,a){localStorage.setItem(key,JSON.stringify(a));}
+
+function toggleStep(el,id){
+  const isAM=['am1','am2','am3'].includes(id);
+  const key=isAM?AM_KEY:PM_KEY;
+  let steps=loadSteps(key);
+  if(steps.includes(id)){steps=steps.filter(x=>x!==id);el.classList.remove('done');el.querySelector('.step-check').textContent='✦';}
+  else{steps.push(id);el.classList.add('done');el.querySelector('.step-check').textContent='✓';}
+  saveSteps(key,steps);
+  updateProgress();
+}
+
+function updateProgress(){
+  const am=loadSteps(AM_KEY);const pm=loadSteps(PM_KEY);
+  document.getElementById('am-prog-label').innerHTML=`<span>MORNING</span><span>${am.length} of 3 done</span>`;
+  document.getElementById('am-prog-bar').style.width=(am.length/3*100)+'%';
+  document.getElementById('pm-prog-label').innerHTML=`<span>EVENING</span><span>${pm.length} of 3 done</span>`;
+  document.getElementById('pm-prog-bar').style.width=(pm.length/3*100)+'%';
+}
+
+function resetAM(){saveSteps(AM_KEY,[]);document.querySelectorAll('[data-id^="am"]').forEach(el=>{el.classList.remove('done');el.querySelector('.step-check').textContent='✦';});updateProgress();}
+function resetPM(){saveSteps(PM_KEY,[]);document.querySelectorAll('[data-id^="pm"]').forEach(el=>{el.classList.remove('done');el.querySelector('.step-check').textContent='✦';});updateProgress();}
+
+(function(){
+  const am=loadSteps(AM_KEY);const pm=loadSteps(PM_KEY);
+  [...am,...pm].forEach(id=>{const el=document.querySelector(`[data-id="${id}"]`);if(el){el.classList.add('done');el.querySelector('.step-check').textContent='✓';}});
+  updateProgress();
+})();
+
+function saveSkinNotes(){localStorage.setItem('ava_skin_notes',document.getElementById('skin-notes').value);}
+(function(){const n=localStorage.getItem('ava_skin_notes');if(n)document.getElementById('skin-notes').value=n;})();
+</script>
+</body>
+</html>

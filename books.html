@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✦ The Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#04040c;--bg2:#08081a;--bg3:#0c0c20;
+    --gold:#c9a84c;--gold2:#e8c97a;
+    --gold-dim:rgba(201,168,76,0.15);--gold-glow:rgba(201,168,76,0.06);
+    --rose:#c4748a;--rose-dim:rgba(196,116,138,0.12);
+    --sage:#7a9e8e;--sage-dim:rgba(122,158,142,0.1);
+    --blue:#7a9ebf;--blue-dim:rgba(122,158,191,0.12);
+    --silver:#a8b8c8;--silver-dim:rgba(168,184,200,0.1);
+    --cream:#f0e8d8;--muted:rgba(240,232,216,0.42);
+    --border:rgba(168,184,200,0.14);--border-bright:rgba(168,184,200,0.32);
+    --moon:#8fa8c4;--moon-dim:rgba(143,168,196,0.12);
+    --font-head:'Cinzel',serif;--font-body:'Cormorant Garamond',serif;--font-text:'EB Garamond',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--cream);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;}
+  #stars{position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(ellipse 60% 40% at 20% 30%,rgba(143,168,196,.05) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 60% at 80% 60%,rgba(122,158,191,.04) 0%,transparent 55%),var(--bg);}
+  .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite var(--del,0s);}
+  @keyframes twinkle{0%,100%{opacity:var(--o1,.2)}50%{opacity:var(--o2,.7)}}
+  .page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+  .back{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-head);font-size:.63rem;letter-spacing:.12em;color:var(--moon);text-decoration:none;opacity:.6;transition:opacity .2s;margin-bottom:2rem;}
+  .back:hover{opacity:1;}
+  .header{text-align:center;margin-bottom:2.5rem;}
+  .orn{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:.8rem;}
+  .orn-line{height:1px;width:55px;}
+  .orn-line.l{background:linear-gradient(90deg,transparent,var(--moon));}
+  .orn-line.r{background:linear-gradient(90deg,var(--moon),transparent);}
+  .moon-phase{color:var(--moon);font-size:1.3rem;opacity:.8;}
+  .title{font-family:var(--font-head);font-size:clamp(1.7rem,5vw,2.7rem);font-weight:400;letter-spacing:.15em;color:var(--silver);text-shadow:0 0 40px rgba(143,168,196,.2);margin-bottom:.4rem;}
+  .subtitle{font-family:var(--font-body);font-style:italic;color:var(--muted);font-size:.95rem;}
+
+  /* PHILOSOPHY */
+  .philosophy{padding:1.2rem 1.5rem;border:1px solid var(--border);border-radius:4px;background:rgba(143,168,196,.04);margin-bottom:2rem;text-align:center;}
+  .phil-text{font-family:var(--font-body);font-style:italic;font-size:1.05rem;color:var(--muted);line-height:1.8;}
+  .phil-sig{font-family:var(--font-head);font-size:.52rem;letter-spacing:.12em;color:var(--moon);margin-top:.6rem;opacity:.7;}
+
+  /* TABS */
+  .tabs{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;margin-bottom:2rem;}
+  .tab-btn{font-family:var(--font-head);font-size:.58rem;letter-spacing:.12em;padding:.48rem 1.05rem;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .22s;border-radius:2px;}
+  .tab-btn:hover{border-color:var(--moon);color:var(--moon);}
+  .tab-btn.active{background:var(--moon-dim);border-color:var(--moon);color:var(--silver);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;animation:fadeIn .3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+  /* CARD */
+  .card{background:rgba(255,255,255,.015);border:1px solid var(--border);border-radius:4px;padding:1.4rem 1.5rem;margin-bottom:1.1rem;}
+  .card-title{font-family:var(--font-head);font-size:.65rem;letter-spacing:.12em;color:var(--moon);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;}
+  .card-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* FORM */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;}
+  .form-field{display:flex;flex-direction:column;gap:.3rem;}
+  .form-field.full{grid-column:1/-1;}
+  .field-label{font-family:var(--font-head);font-size:.5rem;letter-spacing:.12em;color:var(--muted);}
+  .field-input{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:3px;padding:.5rem .7rem;font-family:var(--font-body);font-size:.95rem;color:var(--cream);outline:none;transition:border-color .2s;}
+  .field-input:focus{border-color:var(--moon);}
+  .field-input::placeholder{color:rgba(240,232,216,.25);}
+  select.field-input option{background:var(--bg3);color:var(--cream);}
+  .field-textarea{min-height:100px;resize:vertical;font-family:var(--font-text);font-size:.93rem;line-height:1.7;}
+  .field-textarea.tall{min-height:160px;}
+
+  /* TAGS */
+  .tag-row{display:flex;flex-wrap:wrap;gap:.35rem;margin:.3rem 0;}
+  .tag-pill{font-family:var(--font-head);font-size:.46rem;letter-spacing:.1em;padding:.28rem .6rem;border-radius:2px;border:1px solid var(--border);color:var(--muted);background:transparent;cursor:pointer;transition:all .18s;user-select:none;}
+  .tag-pill:hover{border-color:var(--moon);color:var(--moon);}
+  .tag-pill.selected{background:var(--moon-dim);border-color:var(--moon);color:var(--silver);}
+  .tag-pill.genre.selected{background:var(--gold-dim);border-color:var(--gold);color:var(--gold2);}
+
+  /* RATING */
+  .rating-row{display:flex;align-items:center;gap:.5rem;margin:.3rem 0;}
+  .star-btn{background:transparent;border:none;cursor:pointer;font-size:1.1rem;color:var(--border);transition:color .15s;padding:.1rem;}
+  .star-btn.lit{color:var(--gold);}
+  .glimpse-btn{background:transparent;border:none;cursor:pointer;font-size:1rem;color:var(--border);transition:color .15s;padding:.1rem;}
+  .glimpse-btn.lit{color:var(--moon);}
+  .rating-label{font-family:var(--font-text);font-style:italic;font-size:.82rem;color:var(--muted);margin-left:.3rem;}
+
+  /* QUOTES */
+  .quote-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:.5rem;}
+  .quote-item{display:flex;flex-direction:column;gap:.35rem;padding:.7rem .8rem;border:1px solid var(--border);border-radius:3px;background:rgba(255,255,255,.02);position:relative;}
+  .quote-del{position:absolute;top:.5rem;right:.5rem;background:transparent;border:none;cursor:pointer;color:var(--muted);font-size:.75rem;transition:color .15s;}
+  .quote-del:hover{color:var(--rose);}
+  .add-quote-btn{font-family:var(--font-head);font-size:.5rem;letter-spacing:.1em;padding:.35rem .75rem;border:1px solid var(--border);border-radius:2px;background:transparent;color:var(--muted);cursor:pointer;transition:all .18s;}
+  .add-quote-btn:hover{border-color:var(--moon);color:var(--moon);}
+
+  /* SUBMIT */
+  .submit-btn{width:100%;font-family:var(--font-head);font-size:.6rem;letter-spacing:.12em;padding:.8rem;border:1px solid var(--border-bright);border-radius:3px;background:var(--moon-dim);color:var(--silver);cursor:pointer;transition:all .2s;margin-top:.5rem;}
+  .submit-btn:hover{background:rgba(143,168,196,.2);border-color:var(--moon);}
+
+  /* FILTERS */
+  .filter-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.8rem;}
+  .filter-btn{font-family:var(--font-head);font-size:.48rem;letter-spacing:.1em;padding:.28rem .6rem;border:1px solid var(--border);border-radius:2px;background:transparent;color:var(--muted);cursor:pointer;transition:all .18s;}
+  .filter-btn:hover{border-color:var(--moon);color:var(--moon);}
+  .filter-btn.active{background:var(--moon-dim);border-color:var(--moon);color:var(--silver);}
+
+  /* BOOK CARDS */
+  .book-grid{display:flex;flex-direction:column;gap:.8rem;}
+  .book-card{border:1px solid var(--border);border-radius:4px;padding:1.1rem 1.3rem;background:rgba(255,255,255,.015);cursor:pointer;transition:all .2s;}
+  .book-card:hover{border-color:var(--moon);background:var(--moon-dim);}
+  .bc-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.5rem;flex-wrap:wrap;}
+  .bc-title{font-family:var(--font-body);font-size:1.15rem;color:var(--cream);}
+  .bc-author{font-family:var(--font-text);font-style:italic;font-size:.85rem;color:var(--muted);margin-top:.1rem;}
+  .bc-tags{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.4rem;}
+  .bc-tag{font-family:var(--font-head);font-size:.44rem;letter-spacing:.08em;padding:.12rem .32rem;border-radius:2px;}
+  .bc-tag-genre{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,168,76,.2);}
+  .bc-tag-subject{background:var(--moon-dim);color:var(--moon);border:1px solid rgba(143,168,196,.25);}
+  .bc-stars{font-size:.85rem;margin-top:.4rem;}
+  .bc-glimpse{font-family:var(--font-head);font-size:.44rem;letter-spacing:.08em;color:var(--moon);margin-top:.2rem;}
+  .bc-excerpt{font-family:var(--font-text);font-style:italic;font-size:.88rem;color:var(--muted);margin-top:.5rem;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .bc-del{font-family:var(--font-head);font-size:.44rem;letter-spacing:.08em;padding:.18rem .4rem;border:1px solid var(--border);border-radius:2px;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
+  .bc-del:hover{border-color:var(--rose);color:var(--rose);}
+  .no-books{font-family:var(--font-text);font-style:italic;font-size:.95rem;color:var(--muted);text-align:center;padding:2rem 0;}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(4,4,12,.92);z-index:100;display:none;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--bg2);border:1px solid var(--border-bright);border-radius:6px;padding:1.8rem;max-width:700px;width:100%;position:relative;margin:auto;}
+  .modal-close{position:absolute;top:1rem;right:1rem;font-family:var(--font-head);font-size:.55rem;letter-spacing:.1em;padding:.3rem .65rem;border:1px solid var(--border);border-radius:2px;background:transparent;color:var(--muted);cursor:pointer;transition:all .18s;}
+  .modal-close:hover{border-color:var(--rose);color:var(--rose);}
+  .modal-title{font-family:var(--font-head);font-size:1.1rem;letter-spacing:.08em;color:var(--silver);margin-bottom:.2rem;}
+  .modal-author{font-family:var(--font-body);font-style:italic;font-size:1rem;color:var(--muted);margin-bottom:.8rem;}
+  .modal-section{margin-bottom:1rem;}
+  .modal-section-title{font-family:var(--font-head);font-size:.52rem;letter-spacing:.12em;color:var(--moon);margin-bottom:.4rem;padding-bottom:.2rem;border-bottom:1px solid var(--border);}
+  .modal-text{font-family:var(--font-text);font-size:.95rem;color:var(--cream);line-height:1.7;}
+  .modal-quote{font-family:var(--font-body);font-style:italic;font-size:1rem;color:var(--cream);line-height:1.8;padding:.6rem .8rem;border-left:2px solid var(--moon);background:var(--moon-dim);border-radius:0 3px 3px 0;margin-bottom:.5rem;}
+  .modal-quote-note{font-family:var(--font-text);font-size:.8rem;color:var(--muted);margin-top:.3rem;font-style:italic;}
+
+  /* STATS */
+  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem;}
+  .stat-card{border:1px solid var(--border);border-radius:3px;padding:.8rem;text-align:center;background:rgba(255,255,255,.015);}
+  .stat-num{font-family:var(--font-head);font-size:1.4rem;color:var(--silver);}
+  .stat-label{font-family:var(--font-text);font-style:italic;font-size:.75rem;color:var(--muted);margin-top:.2rem;}
+  .prog-wrap{background:rgba(255,255,255,.04);border-radius:4px;height:4px;margin:.4rem 0;overflow:hidden;}
+  .prog-bar{height:100%;background:linear-gradient(90deg,var(--moon),var(--silver));border-radius:4px;transition:width .4s ease;}
+  .prog-label{font-family:var(--font-head);font-size:.52rem;letter-spacing:.1em;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:.2rem;}
+
+  /* CURRENTLY READING */
+  .reading-banner{border:1px solid rgba(143,168,196,.3);border-radius:4px;padding:1rem 1.3rem;margin-bottom:1.5rem;background:var(--moon-dim);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+  .rb-label{font-family:var(--font-head);font-size:.55rem;letter-spacing:.15em;color:var(--moon);}
+  .rb-title{font-family:var(--font-body);font-size:1.05rem;color:var(--cream);margin-top:.2rem;}
+  .rb-author{font-family:var(--font-text);font-style:italic;font-size:.85rem;color:var(--muted);}
+
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  @media(max-width:560px){.form-grid{grid-template-columns:1fr;}.form-field.full{grid-column:1;}.stats-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div class="page">
+  <a class="back" href="index.html">← Return to the Galaxy</a>
+
+  <header class="header">
+    <div class="orn"><div class="orn-line l"></div><span class="moon-phase">☽</span><div class="orn-line r"></div></div>
+    <h1 class="title">THE LIBRARY</h1>
+    <p class="subtitle">a moon season archive · ideas · language · connection · glimpses</p>
+  </header>
+
+  <div class="philosophy">
+    <div class="phil-text">I read without images — no pictures form behind my eyes. What I have instead is something purer: the rhythm of language, the weight of an idea, the feeling of understanding something I had always known but never said. Sometimes, in the rarest sentences, a glimpse arrives. Those are the ones I keep.</div>
+    <div class="phil-sig">☽ on reading · written in a moon phase</div>
+  </div>
+
+  <!-- CURRENTLY READING -->
+  <div class="reading-banner">
+    <div style="flex:1">
+      <div class="rb-label">CURRENTLY READING</div>
+      <div id="cr-display">
+        <div class="rb-title" id="cr-title-display">All About Love · The Birth of Cool</div>
+        <div class="rb-author" id="cr-author-display">bell hooks · Carol Tulloch</div>
+      </div>
+      <div id="cr-edit" style="display:none;margin-top:.5rem">
+        <input id="cr-title-input" class="field-input" placeholder="Title(s)…" style="margin-bottom:.35rem;font-size:.9rem;padding:.4rem .6rem;"/>
+        <input id="cr-author-input" class="field-input" placeholder="Author(s)…" style="font-size:.9rem;padding:.4rem .6rem;"/>
+        <div style="display:flex;gap:.4rem;margin-top:.4rem">
+          <button onclick="saveCR()" style="font-family:var(--font-head);font-size:.48rem;letter-spacing:.1em;padding:.3rem .65rem;border:1px solid rgba(143,168,196,.4);border-radius:2px;background:var(--moon-dim);color:var(--moon);cursor:pointer;">SAVE</button>
+          <button onclick="cancelCR()" style="font-family:var(--font-head);font-size:.48rem;letter-spacing:.1em;padding:.3rem .65rem;border:1px solid var(--border);border-radius:2px;background:transparent;color:var(--muted);cursor:pointer;">CANCEL</button>
+        </div>
+      </div>
+    </div>
+    <button onclick="editCR()" id="cr-edit-btn" style="font-family:var(--font-head);font-size:.48rem;letter-spacing:.1em;padding:.3rem .65rem;border:1px solid var(--border);border-radius:2px;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .18s;" onmouseover="this.style.borderColor='var(--moon)';this.style.color='var(--moon)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">EDIT ✦</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('archive',this)">☽ ARCHIVE</button>
+    <button class="tab-btn" onclick="switchTab('add',this)">ADD REVIEW</button>
+    <button class="tab-btn" onclick="switchTab('stats',this)">COLLECTION</button>
+  </div>
+
+  <!-- ARCHIVE TAB -->
+  <div class="tab-panel active" id="tab-archive">
+    <div class="card">
+      <div class="card-title">FILTER</div>
+      <div style="margin-bottom:.6rem">
+        <div class="field-label" style="margin-bottom:.3rem">BY GENRE</div>
+        <div class="filter-row" id="genre-filters">
+          <button class="filter-btn active" onclick="setFilter('genre','all',this)">ALL</button>
+          <button class="filter-btn" onclick="setFilter('genre','Fiction',this)">FICTION</button>
+          <button class="filter-btn" onclick="setFilter('genre','Science Fiction',this)">SCI-FI</button>
+          <button class="filter-btn" onclick="setFilter('genre','Fantasy',this)">FANTASY</button>
+          <button class="filter-btn" onclick="setFilter('genre','Cozy',this)">COZY</button>
+          <button class="filter-btn" onclick="setFilter('genre','Poetry',this)">POETRY</button>
+          <button class="filter-btn" onclick="setFilter('genre','Nonfiction',this)">NONFICTION</button>
+          <button class="filter-btn" onclick="setFilter('genre','Short Stories',this)">SHORT STORIES</button>
+        </div>
+      </div>
+      <div>
+        <div class="field-label" style="margin-bottom:.3rem">BY SUBJECT</div>
+        <div class="filter-row" id="subject-filters">
+          <button class="filter-btn active" onclick="setFilter('subject','all',this)">ALL</button>
+          <button class="filter-btn" onclick="setFilter('subject','Ideas & Theory',this)">IDEAS & THEORY</button>
+          <button class="filter-btn" onclick="setFilter('subject','Love & Philosophy',this)">LOVE & PHILOSOPHY</button>
+          <button class="filter-btn" onclick="setFilter('subject','Nature Writing',this)">NATURE WRITING</button>
+          <button class="filter-btn" onclick="setFilter('subject','Cultural History',this)">CULTURAL HISTORY</button>
+          <button class="filter-btn" onclick="setFilter('subject','Fashion & Style',this)">FASHION & STYLE</button>
+          <button class="filter-btn" onclick="setFilter('subject','Art',this)">ART</button>
+          <button class="filter-btn" onclick="setFilter('subject','Science',this)">SCIENCE</button>
+          <button class="filter-btn" onclick="setFilter('subject','Indigenous Knowledge',this)">INDIGENOUS KNOWLEDGE</button>
+          <button class="filter-btn" onclick="setFilter('subject','Feminism',this)">FEMINISM</button>
+          <button class="filter-btn" onclick="setFilter('subject','Memoir',this)">MEMOIR</button>
+        </div>
+      </div>
+    </div>
+    <div class="book-grid" id="book-grid">
+      <div class="no-books">Your library is empty · add your first review to begin</div>
+    </div>
+  </div>
+
+  <!-- ADD REVIEW TAB -->
+  <div class="tab-panel" id="tab-add">
+    <div class="card">
+      <div class="card-title">NEW REVIEW</div>
+      <div class="form-grid">
+
+        <div class="form-field full">
+          <div class="field-label">TITLE</div>
+          <input class="field-input" id="b-title" placeholder="Title…"/>
+        </div>
+        <div class="form-field">
+          <div class="field-label">AUTHOR</div>
+          <input class="field-input" id="b-author" placeholder="Author…"/>
+        </div>
+        <div class="form-field">
+          <div class="field-label">YEAR</div>
+          <input class="field-input" id="b-year" type="number" placeholder="2000…"/>
+        </div>
+        <div class="form-field full">
+          <div class="field-label">PUBLISHER · optional</div>
+          <input class="field-input" id="b-publisher" placeholder="Publisher…"/>
+        </div>
+
+        <div class="form-field full">
+          <div class="field-label">GENRE</div>
+          <div class="tag-row" id="genre-tags">
+            <div class="tag-pill genre" onclick="toggleTag(this,'genre','Fiction')">FICTION</div>
+            <div class="tag-pill genre" onclick="toggleTag(this,'genre','Science Fiction')">SCI-FI</div>
+            <div class="tag-pill genre" onclick="toggleTag(this,'genre','Fantasy')">FANTASY</div>
+            <div class="tag-pill genre" onclick="toggleTag(this,'genre','Cozy')">COZY</div>
+            <div class="tag-pill genre" onclick="toggleTag(this,'genre','Poetry')">POETRY</div>
+            <div class="tag-pill genre" onclick="toggleTag(this,'genre','Nonfiction')">NONFICTION</div>
+            <div class="tag-pill genre" onclick="toggleTag(this,'genre','Short Stories')">SHORT STORIES</div>
+          </div>
+        </div>
+
+        <div class="form-field full">
+          <div class="field-label">SUBJECT TAGS · select all that apply</div>
+          <div class="tag-row" id="subject-tags">
+            <div class="tag-pill" onclick="toggleTag(this,'subject','Ideas & Theory')">IDEAS & THEORY</div>
+            <div class="tag-pill" onclick="toggleTag(this,'subject','Love & Philosophy')">LOVE & PHILOSOPHY</div>
+            <div class="tag-pill" onclick="toggleTag(this,'subject','Nature Writing')">NATURE WRITING</div>
+            <div class="tag-pill" onclick="toggleTag(this,'subject','Cultural History')">CULTURAL HISTORY</div>
+            <div class="tag-pill" onclick="toggleTag(this,'subject','Fashion & Style')">FASHION & STYLE</div>
+            <div class="tag-pill" onclick="toggleTag(this,'subject','Art')">ART</div>
+            <div class="tag-pill" onclick="toggleTag(this,'subject','Science')">SCIENCE</div>
+            <div class="tag-pill" onclick="toggleTag(this,'subject','Indigenous Knowledge')">INDIGENOUS KNOWLEDGE</div>
+            <div class="tag-pill" onclick="toggleTag(this,'subject','Feminism')">FEMINISM</div>
+            <div class="tag-pill" onclick="toggleTag(this,'subject','Memoir')">MEMOIR</div>
+          </div>
+        </div>
+
+        <div class="form-field full">
+          <div class="field-label">OVERALL RATING</div>
+          <div class="rating-row">
+            <button class="star-btn" onclick="setRating(1)">★</button>
+            <button class="star-btn" onclick="setRating(2)">★</button>
+            <button class="star-btn" onclick="setRating(3)">★</button>
+            <button class="star-btn" onclick="setRating(4)">★</button>
+            <button class="star-btn" onclick="setRating(5)">★</button>
+            <span class="rating-label" id="rating-label">Select a rating</span>
+          </div>
+        </div>
+
+        <div class="form-field full">
+          <div class="field-label">GLIMPSE RATING · did the language produce visual glimpses</div>
+          <div class="rating-row">
+            <button class="glimpse-btn" onclick="setGlimpse(1)">◈</button>
+            <button class="glimpse-btn" onclick="setGlimpse(2)">◈</button>
+            <button class="glimpse-btn" onclick="setGlimpse(3)">◈</button>
+            <button class="glimpse-btn" onclick="setGlimpse(4)">◈</button>
+            <button class="glimpse-btn" onclick="setGlimpse(5)">◈</button>
+            <span class="rating-label" id="glimpse-label">How strongly did glimpses arrive</span>
+          </div>
+        </div>
+
+        <div class="form-field full">
+          <div class="field-label">THE LANGUAGE · how the writing felt, its rhythm and texture</div>
+          <textarea class="field-input field-textarea" id="b-language" placeholder="Did it produce glimpses? Was there a rhythm you could feel? What did the prose itself do to you, independent of what it was saying…"></textarea>
+        </div>
+
+        <div class="form-field full">
+          <div class="field-label">THE IDEAS · what the book is exploring or arguing</div>
+          <textarea class="field-input field-textarea" id="b-ideas" placeholder="The core of it — what was it really about underneath the subject matter…"></textarea>
+        </div>
+
+        <div class="form-field full">
+          <div class="field-label">WHAT IT CONNECTED TO · other books, your life, something you already knew</div>
+          <textarea class="field-input field-textarea" id="b-connected" placeholder="The thread it pulled on — what else did it reach toward, what did it remind you of in your own life or other things you've read…"></textarea>
+        </div>
+
+        <div class="form-field full">
+          <div class="field-label">WHAT IT CHANGED · one thing that shifted in how you think or understand</div>
+          <textarea class="field-input field-textarea" id="b-changed" placeholder="Even a small shift counts — a word for something you felt but couldn't say, a new way of seeing something familiar…"></textarea>
+        </div>
+
+        <div class="form-field full">
+          <div class="field-label">WHO WOULD LOVE THIS · what kind of reader, not just what kind of person</div>
+          <textarea class="field-input" style="min-height:70px;resize:vertical;font-family:var(--font-text);font-size:.93rem;line-height:1.7;" id="b-recommend" placeholder="Someone who reads for ideas rather than plot… someone who needs to feel less alone in something specific… someone in a moon phase…"></textarea>
+        </div>
+
+        <div class="form-field full">
+          <div class="field-label">QUOTES & PASSAGES · language worth keeping</div>
+          <div class="quote-list" id="quote-list"></div>
+          <button class="add-quote-btn" onclick="addQuote()">+ ADD QUOTE OR PASSAGE</button>
+        </div>
+
+        <div class="form-field">
+          <div class="field-label">DATE READ</div>
+          <input class="field-input" id="b-date" type="date"/>
+        </div>
+        <div class="form-field">
+          <div class="field-label">STATUS</div>
+          <select class="field-input" id="b-status">
+            <option value="finished">Finished</option>
+            <option value="reading">Currently Reading</option>
+            <option value="abandoned">Abandoned</option>
+            <option value="want">Want to Read</option>
+          </select>
+        </div>
+
+      </div>
+      <button class="submit-btn" onclick="submitReview()">SAVE TO LIBRARY ☽</button>
+    </div>
+  </div>
+
+  <!-- STATS TAB -->
+  <div class="tab-panel" id="tab-stats">
+    <div class="card">
+      <div class="card-title">YOUR COLLECTION</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">books archived</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-authors">0</div><div class="stat-label">authors</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-glimpse">—</div><div class="stat-label">avg glimpse rating</div></div>
+      </div>
+      <div class="prog-label"><span>LIBRARY GOAL · 50 BOOKS</span><span id="lib-pct">0%</span></div>
+      <div class="prog-wrap"><div class="prog-bar" id="lib-bar" style="width:0%"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">SUBJECT MAP</div>
+      <div id="subject-breakdown"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">AUTHORS IN YOUR LIBRARY</div>
+      <div id="author-list" style="font-family:var(--font-text);font-size:.93rem;color:var(--muted);line-height:2.2;">
+        <span style="font-style:italic">No books archived yet</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">HIGHEST GLIMPSE RATINGS</div>
+      <div id="glimpse-list" style="font-family:var(--font-text);font-size:.93rem;color:var(--muted);line-height:2.2;">
+        <span style="font-style:italic">No books archived yet</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal-content">
+    <button class="modal-close" onclick="closeModal()">CLOSE ✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+(function(){const c=document.getElementById('stars');for(let i=0;i<90;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*1.6+0.2;s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${3+Math.random()*5}s;--del:${-Math.random()*8}s;--o1:${0.05+Math.random()*0.18};--o2:${0.25+Math.random()*0.45}`;c.appendChild(s);}})();
+
+function switchTab(name,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');}
+
+// TAGS
+let selectedGenres=[];let selectedSubjects=[];
+function toggleTag(el,type,val){
+  if(type==='genre'){
+    if(selectedGenres.includes(val)){selectedGenres=selectedGenres.filter(x=>x!==val);el.classList.remove('selected');}
+    else{selectedGenres.push(val);el.classList.add('selected');}
+  } else {
+    if(selectedSubjects.includes(val)){selectedSubjects=selectedSubjects.filter(x=>x!==val);el.classList.remove('selected');}
+    else{selectedSubjects.push(val);el.classList.add('selected');}
+  }
+}
+
+// RATING
+let currentRating=0;let currentGlimpse=0;
+function setRating(n){currentRating=n;document.querySelectorAll('.star-btn').forEach((b,i)=>b.classList.toggle('lit',i<n));const labels=['','One star','Two stars','Three stars','Four stars','Five stars — a book that changed something'];document.getElementById('rating-label').textContent=labels[n];}
+function setGlimpse(n){currentGlimpse=n;document.querySelectorAll('.glimpse-btn').forEach((b,i)=>b.classList.toggle('lit',i<n));const labels=['','Barely — an idea glimpse only','A few moments','Several strong glimpses','Vivid and frequent','Complete immersion — almost visual'];document.getElementById('glimpse-label').textContent=labels[n];}
+
+// QUOTES
+let quotes=[];
+function addQuote(){const id=Date.now();quotes.push({id,text:'',note:''});renderQuotes();}
+function removeQuote(id){quotes=quotes.filter(q=>q.id!==id);renderQuotes();}
+function renderQuotes(){
+  const list=document.getElementById('quote-list');
+  list.innerHTML=quotes.map(q=>`
+    <div class="quote-item">
+      <button class="quote-del" onclick="removeQuote(${q.id})">✕</button>
+      <textarea class="field-input field-textarea" style="min-height:80px" placeholder="The passage or quote…" oninput="updateQuote(${q.id},'text',this.value)">${q.text}</textarea>
+      <input class="field-input" placeholder="Why this one — what it did, what it made you feel or understand…" oninput="updateQuote(${q.id},'note',this.value)" value="${q.note}"/>
+    </div>`).join('');
+}
+function updateQuote(id,field,val){const q=quotes.find(x=>x.id===id);if(q)q[field]=val;}
+
+// BOOKS
+function loadBooks(){try{return JSON.parse(localStorage.getItem('ava_library_v1')||'[]');}catch{return[];}}
+function saveBooks(a){localStorage.setItem('ava_library_v1',JSON.stringify(a));}
+
+function submitReview(){
+  const title=document.getElementById('b-title').value.trim();
+  if(!title){alert('Add a title to save the review.');return;}
+  const book={
+    id:Date.now(),title,
+    author:document.getElementById('b-author').value.trim(),
+    year:document.getElementById('b-year').value,
+    publisher:document.getElementById('b-publisher').value.trim(),
+    genres:[...selectedGenres],
+    subjects:[...selectedSubjects],
+    rating:currentRating,
+    glimpse:currentGlimpse,
+    language:document.getElementById('b-language').value.trim(),
+    ideas:document.getElementById('b-ideas').value.trim(),
+    connected:document.getElementById('b-connected').value.trim(),
+    changed:document.getElementById('b-changed').value.trim(),
+    recommend:document.getElementById('b-recommend').value.trim(),
+    quotes:[...quotes],
+    date:document.getElementById('b-date').value||new Date().toISOString().split('T')[0],
+    status:document.getElementById('b-status').value
+  };
+  const books=loadBooks();books.unshift(book);saveBooks(books);
+  resetForm();renderArchive();renderStats();
+  document.querySelector('[onclick*="archive"]').click();
+}
+
+function resetForm(){
+  ['b-title','b-author','b-year','b-publisher','b-language','b-ideas','b-connected','b-changed','b-recommend'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('b-status').selectedIndex=0;
+  currentRating=0;currentGlimpse=0;selectedGenres=[];selectedSubjects=[];quotes=[];
+  document.querySelectorAll('.star-btn,.glimpse-btn').forEach(b=>b.classList.remove('lit'));
+  document.querySelectorAll('.tag-pill').forEach(p=>p.classList.remove('selected'));
+  document.getElementById('rating-label').textContent='Select a rating';
+  document.getElementById('glimpse-label').textContent='How strongly did glimpses arrive';
+  renderQuotes();
+}
+
+// FILTERS
+let activeFilters={genre:'all',subject:'all'};
+function setFilter(type,val,btn){
+  activeFilters[type]=val;
+  document.getElementById(type+'-filters').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderArchive();
+}
+
+function renderArchive(){
+  const books=loadBooks();
+  const filtered=books.filter(b=>{
+    if(activeFilters.genre!=='all'&&!b.genres.includes(activeFilters.genre))return false;
+    if(activeFilters.subject!=='all'&&!b.subjects.includes(activeFilters.subject))return false;
+    return true;
+  });
+  const grid=document.getElementById('book-grid');
+  if(!filtered.length){grid.innerHTML='<div class="no-books">No books match this filter · adjust or add more reviews</div>';return;}
+  grid.innerHTML=filtered.map(b=>`
+    <div class="book-card" onclick="openBook(${b.id})">
+      <div class="bc-header">
+        <div>
+          <div class="bc-title">${b.title}</div>
+          <div class="bc-author">${b.author||'—'}${b.year?' · '+b.year:''}</div>
+          <div class="bc-tags">
+            ${b.genres.map(g=>`<span class="bc-tag bc-tag-genre">${g.toUpperCase()}</span>`).join('')}
+            ${b.subjects.map(s=>`<span class="bc-tag bc-tag-subject">${s.toUpperCase()}</span>`).join('')}
+          </div>
+        </div>
+        <button class="bc-del" onclick="deleteBook(${b.id},event)">DELETE</button>
+      </div>
+      ${b.rating?`<div class="bc-stars">${'★'.repeat(b.rating)}${'☆'.repeat(5-b.rating)}</div>`:''}
+      ${b.glimpse?`<div class="bc-glimpse">GLIMPSE · ${'◈'.repeat(b.glimpse)}${'◇'.repeat(5-b.glimpse)}</div>`:''}
+      ${b.language?`<div class="bc-excerpt">${b.language}</div>`:''}
+    </div>`).join('');
+}
+
+function deleteBook(id,e){
+  e.stopPropagation();
+  if(!confirm('Delete this review?'))return;
+  saveBooks(loadBooks().filter(b=>b.id!==id));
+  renderArchive();renderStats();
+}
+
+function openBook(id){
+  const b=loadBooks().find(x=>x.id===id);if(!b)return;
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-title">${b.title}</div>
+    <div class="modal-author">${b.author||''}${b.year?' · '+b.year:''}</div>
+    <div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.8rem">
+      ${b.genres.map(g=>`<span class="bc-tag bc-tag-genre">${g.toUpperCase()}</span>`).join('')}
+      ${b.subjects.map(s=>`<span class="bc-tag bc-tag-subject">${s.toUpperCase()}</span>`).join('')}
+    </div>
+    ${b.rating?`<div style="font-size:1.1rem;margin-bottom:.3rem">${'★'.repeat(b.rating)}${'☆'.repeat(5-b.rating)}</div>`:''}
+    ${b.glimpse?`<div style="font-family:var(--font-head);font-size:.52rem;letter-spacing:.1em;color:var(--moon);margin-bottom:1rem">GLIMPSE · ${'◈'.repeat(b.glimpse)}${'◇'.repeat(5-b.glimpse)}</div>`:''}
+    ${b.language?`<div class="modal-section"><div class="modal-section-title">THE LANGUAGE</div><div class="modal-text" style="font-style:italic">${b.language}</div></div>`:''}
+    ${b.ideas?`<div class="modal-section"><div class="modal-section-title">THE IDEAS</div><div class="modal-text">${b.ideas}</div></div>`:''}
+    ${b.connected?`<div class="modal-section"><div class="modal-section-title">WHAT IT CONNECTED TO</div><div class="modal-text" style="font-style:italic">${b.connected}</div></div>`:''}
+    ${b.changed?`<div class="modal-section"><div class="modal-section-title">WHAT IT CHANGED</div><div class="modal-text">${b.changed}</div></div>`:''}
+    ${b.recommend?`<div class="modal-section"><div class="modal-section-title">WHO WOULD LOVE THIS</div><div class="modal-text" style="font-style:italic">${b.recommend}</div></div>`:''}
+    ${b.quotes&&b.quotes.length?`<div class="modal-section"><div class="modal-section-title">QUOTES & PASSAGES</div>${b.quotes.map(q=>`<div class="modal-quote">${q.text}${q.note?`<div class="modal-quote-note">${q.note}</div>`:''}</div>`).join('')}</div>`:''}
+    ${b.date?`<div style="font-family:var(--font-head);font-size:.46rem;letter-spacing:.1em;color:var(--muted);margin-top:1rem">READ · ${b.date}</div>`:''}
+  `;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function closeModalOutside(e){if(e.target===document.getElementById('modal'))closeModal();}
+
+function renderStats(){
+  const books=loadBooks();
+  document.getElementById('stat-total').textContent=books.length;
+  document.getElementById('stat-authors').textContent=new Set(books.map(b=>b.author).filter(Boolean)).size;
+  const withGlimpse=books.filter(b=>b.glimpse);
+  document.getElementById('stat-glimpse').textContent=withGlimpse.length?'◈'.repeat(Math.round(withGlimpse.reduce((a,b)=>a+b.glimpse,0)/withGlimpse.length)):'—';
+  const pct=Math.min(100,Math.round(books.length/50*100));
+  document.getElementById('lib-pct').textContent=pct+'%';
+  document.getElementById('lib-bar').style.width=pct+'%';
+
+  // Subject breakdown
+  const subjects={};
+  books.forEach(b=>b.subjects.forEach(s=>{subjects[s]=(subjects[s]||0)+1;}));
+  const sb=document.getElementById('subject-breakdown');
+  if(!Object.keys(subjects).length){sb.innerHTML='<span style="font-family:var(--font-text);font-style:italic;color:var(--muted)">No books archived yet</span>';return;}
+  sb.innerHTML=Object.entries(subjects).sort((a,b)=>b[1]-a[1]).map(([s,c])=>`
+    <div style="margin-bottom:.5rem">
+      <div class="prog-label"><span>${s.toUpperCase()}</span><span>${c}</span></div>
+      <div class="prog-wrap"><div class="prog-bar" style="width:${Math.round(c/books.length*100)}%"></div></div>
+    </div>`).join('');
+
+  // Authors
+  const authors={};
+  books.forEach(b=>{if(b.author)authors[b.author]=(authors[b.author]||0)+1;});
+  const al=document.getElementById('author-list');
+  if(!Object.keys(authors).length){al.innerHTML='<span style="font-style:italic">No books archived yet</span>';return;}
+  al.innerHTML=Object.entries(authors).sort((a,b)=>b[1]-a[1]).map(([a,c])=>`<div>${a} <span style="color:var(--moon);font-family:var(--font-head);font-size:.48rem;letter-spacing:.08em">${c} book${c>1?'s':''}</span></div>`).join('');
+
+  // Glimpse list
+  const gl=document.getElementById('glimpse-list');
+  const top=books.filter(b=>b.glimpse).sort((a,b)=>b.glimpse-a.glimpse).slice(0,5);
+  if(!top.length){gl.innerHTML='<span style="font-style:italic">No books archived yet</span>';return;}
+  gl.innerHTML=top.map(b=>`<div>${b.title} <span style="color:var(--moon)">${'◈'.repeat(b.glimpse)}</span></div>`).join('');
+}
+
+renderArchive();renderStats();
+document.getElementById('b-date').value=new Date().toISOString().split('T')[0];
+
+// CURRENTLY READING
+function loadCR(){try{return JSON.parse(localStorage.getItem('ava_cr_v1')||'null');}catch{return null;}}
+function saveCRData(t,a){localStorage.setItem('ava_cr_v1',JSON.stringify({title:t,author:a}));}
+function initCR(){const d=loadCR();if(d){document.getElementById('cr-title-display').textContent=d.title||'—';document.getElementById('cr-author-display').textContent=d.author||'';}}
+function editCR(){
+  const d=loadCR();
+  document.getElementById('cr-title-input').value=d?d.title:'All About Love · The Birth of Cool';
+  document.getElementById('cr-author-input').value=d?d.author:'bell hooks · Carol Tulloch';
+  document.getElementById('cr-display').style.display='none';
+  document.getElementById('cr-edit').style.display='block';
+  document.getElementById('cr-edit-btn').style.display='none';
+}
+function saveCR(){
+  const t=document.getElementById('cr-title-input').value.trim()||'—';
+  const a=document.getElementById('cr-author-input').value.trim();
+  saveCRData(t,a);
+  document.getElementById('cr-title-display').textContent=t;
+  document.getElementById('cr-author-display').textContent=a;
+  document.getElementById('cr-display').style.display='block';
+  document.getElementById('cr-edit').style.display='none';
+  document.getElementById('cr-edit-btn').style.display='';
+}
+function cancelCR(){
+  document.getElementById('cr-display').style.display='block';
+  document.getElementById('cr-edit').style.display='none';
+  document.getElementById('cr-edit-btn').style.display='';
+}
+initCR();
+</script>
+</body>
+</html>
