@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✦ The Treasury</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#06060f;--gold:#c9a84c;--gold2:#e8c97a;
+    --gold-dim:rgba(201,168,76,0.18);--gold-glow:rgba(201,168,76,0.07);
+    --rose:#c4748a;--rose-dim:rgba(196,116,138,0.15);
+    --sage:#7a9e8e;--sage-dim:rgba(122,158,142,0.12);--sage-bright:rgba(122,158,142,0.4);
+    --blue:#7a9ebf;--blue-dim:rgba(122,158,191,0.15);
+    --cream:#f0e8d8;--muted:rgba(240,232,216,0.48);
+    --border:rgba(201,168,76,0.18);--border-bright:rgba(201,168,76,0.42);
+    --warn:rgba(196,116,138,0.8);
+    --font-head:'Cinzel',serif;--font-body:'Cormorant Garamond',serif;--font-text:'EB Garamond',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--cream);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;}
+  #stars{position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(ellipse 70% 50% at 15% 25%,rgba(122,158,142,.07) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 65%,rgba(122,158,191,.06) 0%,transparent 55%),var(--bg);}
+  .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite var(--del,0s);}
+  @keyframes twinkle{0%,100%{opacity:var(--o1,.3)}50%{opacity:var(--o2,.9)}}
+  .page{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+  .back{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-head);font-size:.63rem;letter-spacing:.12em;color:var(--gold);text-decoration:none;opacity:.65;transition:opacity .2s;margin-bottom:2rem;}
+  .back:hover{opacity:1;}
+  .header{text-align:center;margin-bottom:2rem;}
+  .orn{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:.8rem;}
+  .orn-line{height:1px;width:55px;}
+  .orn-line.l{background:linear-gradient(90deg,transparent,var(--gold));}
+  .orn-line.r{background:linear-gradient(90deg,var(--gold),transparent);}
+  .title{font-family:var(--font-head);font-size:clamp(1.7rem,5vw,2.7rem);font-weight:400;letter-spacing:.15em;color:var(--gold2);text-shadow:0 0 40px rgba(201,168,76,.28);margin-bottom:.4rem;}
+  .subtitle{font-family:var(--font-body);font-style:italic;color:var(--muted);font-size:.95rem;}
+
+  /* MONTH SELECTOR */
+  .month-bar{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1.2rem;border:1px solid var(--border);border-radius:4px;background:var(--gold-glow);margin-bottom:1.5rem;gap:.8rem;flex-wrap:wrap;}
+  .month-name{font-family:var(--font-head);font-size:.85rem;letter-spacing:.15em;color:var(--gold2);}
+  .month-nav{display:flex;gap:.4rem;}
+  .mnav-btn{font-family:var(--font-head);font-size:.55rem;letter-spacing:.1em;padding:.3rem .65rem;border:1px solid var(--border);border-radius:2px;background:transparent;color:var(--muted);cursor:pointer;transition:all .18s;}
+  .mnav-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+  /* SUMMARY CARDS */
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.7rem;margin-bottom:1.5rem;}
+  .sum-card{border:1px solid var(--border);border-radius:4px;padding:.9rem 1rem;background:rgba(255,255,255,.02);text-align:center;}
+  .sum-card.highlight{border-color:var(--gold);background:var(--gold-glow);}
+  .sum-card.danger{border-color:var(--rose);background:var(--rose-dim);}
+  .sum-card.good{border-color:var(--sage);background:var(--sage-dim);}
+  .sum-label{font-family:var(--font-head);font-size:.5rem;letter-spacing:.12em;color:var(--muted);margin-bottom:.3rem;}
+  .sum-amount{font-family:var(--font-head);font-size:1.3rem;letter-spacing:.06em;color:var(--gold2);}
+  .sum-amount.red{color:var(--rose);}
+  .sum-amount.green{color:var(--sage);}
+  .sum-sub{font-family:var(--font-text);font-style:italic;font-size:.72rem;color:var(--muted);margin-top:.2rem;}
+
+  /* TABS */
+  .tabs{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;margin-bottom:2rem;}
+  .tab-btn{font-family:var(--font-head);font-size:.58rem;letter-spacing:.12em;padding:.48rem 1.05rem;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .22s;border-radius:2px;}
+  .tab-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .tab-btn.active{background:var(--gold-dim);border-color:var(--gold);color:var(--gold2);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;animation:fadeIn .3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+  /* CARD */
+  .card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:4px;padding:1.4rem 1.5rem;margin-bottom:1.1rem;}
+  .card-title{font-family:var(--font-head);font-size:.68rem;letter-spacing:.12em;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;}
+  .card-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* HOURS LOG */
+  .hours-form{display:flex;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap;}
+  .h-input{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:3px;padding:.45rem .7rem;font-family:var(--font-body);font-size:.95rem;color:var(--cream);outline:none;transition:border-color .2s;}
+  .h-input:focus{border-color:var(--gold);}
+  .h-input::placeholder{color:rgba(240,232,216,.25);}
+  .h-input.date{width:140px;}
+  .h-input.hours{width:80px;}
+  .h-input.note{flex:1;min-width:140px;}
+  .h-btn{font-family:var(--font-head);font-size:.52rem;letter-spacing:.1em;padding:.45rem .9rem;border:1px solid var(--border-bright);border-radius:2px;background:var(--gold-dim);color:var(--gold2);cursor:pointer;transition:all .2s;white-space:nowrap;}
+  .h-btn:hover{background:rgba(201,168,76,.28);}
+  .h-btn.danger{background:var(--rose-dim);border-color:rgba(196,116,138,.4);color:var(--rose);}
+
+  .hours-list{display:flex;flex-direction:column;gap:.3rem;max-height:280px;overflow-y:auto;padding-right:.2rem;}
+  .hour-item{display:flex;align-items:center;justify-content:space-between;padding:.5rem .7rem;border:1px solid var(--border);border-radius:3px;background:rgba(255,255,255,.02);}
+  .hour-item.holiday{background:rgba(122,158,191,.08);border-color:rgba(122,158,191,.3);}
+  .hi-date{font-family:var(--font-head);font-size:.55rem;letter-spacing:.08em;color:var(--muted);min-width:80px;}
+  .hi-hours{font-family:var(--font-head);font-size:.72rem;color:var(--gold2);min-width:50px;}
+  .hi-note{font-family:var(--font-text);font-style:italic;font-size:.82rem;color:var(--muted);flex:1;padding:0 .5rem;}
+  .hi-del{background:transparent;border:none;cursor:pointer;color:var(--muted);font-size:.75rem;transition:color .15s;padding:.1rem .3rem;}
+  .hi-del:hover{color:var(--rose);}
+  .no-hours{font-family:var(--font-text);font-style:italic;font-size:.9rem;color:var(--muted);text-align:center;padding:1rem 0;}
+
+  /* PAY PERIOD TRACKER */
+  .pay-period-bar{display:flex;align-items:center;justify-content:space-between;padding:.6rem .8rem;border:1px solid var(--border);border-radius:3px;background:var(--gold-glow);margin-bottom:.5rem;flex-wrap:wrap;gap:.4rem;}
+  .pp-label{font-family:var(--font-head);font-size:.52rem;letter-spacing:.1em;color:var(--muted);}
+  .pp-value{font-family:var(--font-head);font-size:.68rem;color:var(--gold2);}
+  .prog-wrap{background:rgba(255,255,255,.05);border-radius:4px;height:5px;margin:.4rem 0;overflow:hidden;}
+  .prog-bar{height:100%;border-radius:4px;transition:width .4s ease;}
+  .prog-income{background:linear-gradient(90deg,var(--gold),var(--gold2));}
+  .prog-expense{background:linear-gradient(90deg,var(--rose),rgba(196,116,138,.6));}
+  .prog-savings{background:linear-gradient(90deg,var(--sage),var(--sage-bright));}
+  .prog-label{font-family:var(--font-head);font-size:.5rem;letter-spacing:.1em;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:.15rem;}
+
+  /* EXPENSE ITEMS */
+  .expense-list{display:flex;flex-direction:column;gap:.35rem;}
+  .exp-item{display:flex;align-items:center;gap:.6rem;padding:.55rem .8rem;border:1px solid var(--border);border-radius:3px;background:rgba(255,255,255,.02);}
+  .exp-item.paid{background:var(--sage-dim);border-color:rgba(122,158,142,.35);}
+  .exp-check{width:16px;height:16px;min-width:16px;border:1px solid var(--border-bright);border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--sage);transition:all .18s;}
+  .exp-item.paid .exp-check{background:var(--sage-dim);border-color:var(--sage);}
+  .exp-body{flex:1;}
+  .exp-name{font-family:var(--font-body);font-size:.95rem;color:var(--cream);}
+  .exp-note{font-family:var(--font-text);font-style:italic;font-size:.75rem;color:var(--muted);}
+  .exp-amount{font-family:var(--font-head);font-size:.68rem;color:var(--rose);white-space:nowrap;}
+  .exp-item.paid .exp-amount{color:var(--sage);}
+  .exp-del{background:transparent;border:none;cursor:pointer;color:var(--muted);font-size:.72rem;transition:color .15s;padding:.1rem .2rem;}
+  .exp-del:hover{color:var(--rose);}
+  .add-exp-form{display:flex;gap:.4rem;margin-top:.6rem;flex-wrap:wrap;}
+  .cat-badge{font-family:var(--font-head);font-size:.44rem;letter-spacing:.1em;padding:.12rem .32rem;border-radius:2px;white-space:nowrap;}
+  .cat-bills{background:var(--rose-dim);color:var(--rose);border:1px solid rgba(196,116,138,.3);}
+  .cat-savings{background:var(--gold-dim);color:var(--gold);border:1px solid var(--border);}
+  .cat-needs{background:var(--sage-dim);color:var(--sage);border:1px solid rgba(122,158,142,.3);}
+  .cat-repay{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(122,158,191,.3);}
+  .cat-disc{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border);}
+
+  /* PURCHASE PLANNER */
+  .purchase-item{display:flex;align-items:flex-start;gap:.7rem;padding:.65rem .8rem;border:1px solid var(--border);border-radius:3px;background:rgba(255,255,255,.02);margin-bottom:.35rem;transition:all .18s;}
+  .purchase-item.bought{background:var(--sage-dim);border-color:rgba(122,158,142,.4);}
+  .purchase-item.bought .pi-name{text-decoration:line-through;color:var(--muted);}
+  .pi-check{width:16px;height:16px;min-width:16px;border:1px solid var(--border-bright);border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--sage);margin-top:2px;}
+  .purchase-item.bought .pi-check{background:var(--sage-dim);border-color:var(--sage);}
+  .pi-body{flex:1;}
+  .pi-name{font-family:var(--font-body);font-size:.95rem;color:var(--cream);}
+  .pi-note{font-family:var(--font-text);font-style:italic;font-size:.75rem;color:var(--muted);margin-top:.1rem;}
+  .pi-date{font-family:var(--font-head);font-size:.5rem;letter-spacing:.08em;padding:.12rem .3rem;border-radius:2px;margin-top:.25rem;display:inline-block;}
+  .date-ready{background:var(--sage-dim);color:var(--sage);border:1px solid rgba(122,158,142,.3);}
+  .date-soon{background:var(--gold-dim);color:var(--gold);border:1px solid var(--border);}
+  .date-later{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border);}
+  .pi-price{font-family:var(--font-head);font-size:.62rem;color:var(--gold);white-space:nowrap;}
+  .pi-del{background:transparent;border:none;cursor:pointer;color:var(--muted);font-size:.72rem;transition:color .15s;padding:.1rem .2rem;}
+  .pi-del:hover{color:var(--rose);}
+
+  /* SAVINGS TRACKERS */
+  .sav-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:.8rem;}
+  .sav-card{border:1px solid var(--border);border-radius:4px;padding:1rem 1.1rem;background:rgba(255,255,255,.02);}
+  .sav-title{font-family:var(--font-head);font-size:.58rem;letter-spacing:.12em;color:var(--gold);margin-bottom:.5rem;}
+  .sav-amount{font-family:var(--font-head);font-size:1.6rem;color:var(--gold2);margin-bottom:.2rem;}
+  .sav-goal{font-family:var(--font-text);font-style:italic;font-size:.78rem;color:var(--muted);}
+  .sav-input-row{display:flex;gap:.4rem;margin-top:.6rem;}
+
+  /* RULES */
+  .rule-block{padding:.85rem 1rem;border-left:2px solid var(--gold);background:var(--gold-glow);border-radius:0 3px 3px 0;margin-bottom:.7rem;}
+  .rule-title{font-family:var(--font-head);font-size:.6rem;letter-spacing:.1em;color:var(--gold);margin-bottom:.3rem;}
+  .rule-text{font-family:var(--font-text);font-size:.9rem;color:var(--cream);line-height:1.65;}
+
+  /* INFO */
+  .info-block{padding:.85rem 1rem;border:1px solid var(--border);border-radius:3px;background:var(--gold-glow);margin-bottom:.6rem;}
+  .info-title{font-family:var(--font-head);font-size:.6rem;letter-spacing:.1em;color:var(--gold);margin-bottom:.3rem;}
+  .info-text{font-family:var(--font-text);font-size:.9rem;color:var(--cream);line-height:1.65;}
+
+  /* NOTES */
+  .note-field{width:100%;min-height:120px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:3px;padding:.7rem;font-family:var(--font-text);font-size:.93rem;color:var(--cream);line-height:1.7;resize:vertical;outline:none;}
+  .note-field:focus{border-color:var(--gold);}
+
+  select.h-input option{background:var(--bg);color:var(--cream);}
+
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  @media(max-width:560px){.sav-grid{grid-template-columns:1fr;}.summary-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div class="page">
+  <a class="back" href="index.html">← Return to the Galaxy</a>
+  <header class="header">
+    <div class="orn"><div class="orn-line l"></div><span style="color:var(--gold)">✦</span><div class="orn-line r"></div></div>
+    <h1 class="title">THE TREASURY</h1>
+    <p class="subtitle">log your hours · watch your money move · spend with intention</p>
+  </header>
+
+  <!-- MONTH SELECTOR -->
+  <div class="month-bar">
+    <div class="month-nav">
+      <button class="mnav-btn" onclick="changeMonth(-1)">← PREV</button>
+      <button class="mnav-btn" onclick="changeMonth(1)">NEXT →</button>
+    </div>
+    <div class="month-name" id="month-display">—</div>
+    <div style="font-family:var(--font-text);font-style:italic;font-size:.82rem;color:var(--muted)" id="month-subtitle">—</div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-grid" id="summary-grid">
+    <div class="sum-card highlight">
+      <div class="sum-label">EARNED SO FAR</div>
+      <div class="sum-amount" id="sum-earned">$0</div>
+      <div class="sum-sub" id="sum-hours-logged">0 hours logged</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">PROJECTED MONTH</div>
+      <div class="sum-amount" id="sum-projected">$0</div>
+      <div class="sum-sub" id="sum-days-left">based on remaining workdays</div>
+    </div>
+    <div class="sum-card danger">
+      <div class="sum-label">BILLS THIS MONTH</div>
+      <div class="sum-amount red" id="sum-bills">$0</div>
+      <div class="sum-sub" id="sum-bills-sub">fixed expenses</div>
+    </div>
+    <div class="sum-card good">
+      <div class="sum-label">AVAILABLE</div>
+      <div class="sum-amount green" id="sum-available">$0</div>
+      <div class="sum-sub">after bills · before savings</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">SAVINGS TARGET</div>
+      <div class="sum-amount" id="sum-savings-target">$700</div>
+      <div class="sum-sub">per month · Phase 1</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">TRUE DISCRETIONARY</div>
+      <div class="sum-amount" id="sum-disc">$0</div>
+      <div class="sum-sub">what's left for everything else</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('hours',this)">✦ HOURS</button>
+    <button class="tab-btn" onclick="switchTab('bills',this)">BILLS</button>
+    <button class="tab-btn" onclick="switchTab('savings',this)">SAVINGS</button>
+    <button class="tab-btn" onclick="switchTab('purchases',this)">PURCHASES</button>
+    <button class="tab-btn" onclick="switchTab('rules',this)">RULES</button>
+    <button class="tab-btn" onclick="switchTab('notes',this)">NOTES</button>
+  </div>
+
+  <!-- HOURS TAB -->
+  <div class="tab-panel active" id="tab-hours">
+    <div class="card">
+      <div class="card-title">LOG YOUR HOURS · end of each workday</div>
+      <div class="hours-form">
+        <input class="h-input date" id="h-date" type="date"/>
+        <input class="h-input hours" id="h-hours" type="number" min="0" max="24" step="0.5" placeholder="Hours"/>
+        <input class="h-input note" id="h-note" placeholder="Note (optional — e.g. holiday, half day…)"/>
+        <select class="h-input" id="h-type" style="width:110px">
+          <option value="work">Work Day</option>
+          <option value="holiday">Holiday / Off</option>
+          <option value="half">Half Day</option>
+        </select>
+        <button class="h-btn" onclick="addHours()">LOG</button>
+      </div>
+      <div class="hours-list" id="hours-list">
+        <div class="no-hours">No hours logged yet · add your first entry above</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">PAY PERIOD BREAKDOWN</div>
+      <div id="pay-periods-display"></div>
+    </div>
+  </div>
+
+  <!-- BILLS TAB -->
+  <div class="tab-panel" id="tab-bills">
+    <div class="card">
+      <div class="card-title">FIXED MONTHLY EXPENSES</div>
+      <div class="expense-list" id="bills-list"></div>
+      <div class="add-exp-form">
+        <input class="h-input" id="exp-name" placeholder="Expense name…" style="flex:2;min-width:120px"/>
+        <input class="h-input" id="exp-amount" type="number" placeholder="Amount" style="width:90px"/>
+        <select class="h-input" id="exp-cat" style="width:100px">
+          <option value="bills">Bills</option>
+          <option value="needs">Needs</option>
+          <option value="repay">Repayment</option>
+          <option value="disc">Discretionary</option>
+        </select>
+        <input class="h-input" id="exp-note" placeholder="Note…" style="flex:2;min-width:100px"/>
+        <button class="h-btn" onclick="addExpense()">ADD</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVINGS TAB -->
+  <div class="tab-panel" id="tab-savings">
+    <div class="sav-grid">
+      <div class="sav-card">
+        <div class="sav-title">CAR FUND</div>
+        <div class="sav-amount" id="car-amount">$0</div>
+        <div class="sav-goal">Goal · $4,200</div>
+        <div class="prog-label" style="margin-top:.5rem"><span>PROGRESS</span><span id="car-pct">0%</span></div>
+        <div class="prog-wrap"><div class="prog-bar prog-savings" id="car-bar" style="width:0%"></div></div>
+        <div class="sav-input-row">
+          <input class="h-input" id="car-input" type="number" placeholder="Add…" style="flex:1"/>
+          <button class="h-btn" onclick="addSavings('car')">ADD</button>
+          <button class="h-btn danger" onclick="resetSavings('car')">↺</button>
+        </div>
+      </div>
+      <div class="sav-card">
+        <div class="sav-title">EMERGENCY BUFFER</div>
+        <div class="sav-amount" id="buf-amount">$0</div>
+        <div class="sav-goal">Goal · $500 · build first</div>
+        <div class="prog-label" style="margin-top:.5rem"><span>PROGRESS</span><span id="buf-pct">0%</span></div>
+        <div class="prog-wrap"><div class="prog-bar prog-savings" id="buf-bar" style="width:0%"></div></div>
+        <div class="sav-input-row">
+          <input class="h-input" id="buf-input" type="number" placeholder="Add…" style="flex:1"/>
+          <button class="h-btn" onclick="addSavings('buf')">ADD</button>
+          <button class="h-btn danger" onclick="resetSavings('buf')">↺</button>
+        </div>
+      </div>
+    </div>
+    <div class="rule-block">
+      <div class="rule-title">THE ONE RULE</div>
+      <div class="rule-text">Transfer $700 the day you get paid — before you spend anything, before you check your balance. The money that moves first is the money that actually gets saved. Buffer first ($500), then car fund.</div>
+    </div>
+  </div>
+
+  <!-- PURCHASES TAB -->
+  <div class="tab-panel" id="tab-purchases">
+    <div class="card">
+      <div class="card-title">SMART PURCHASE PLANNER</div>
+      <p style="font-family:var(--font-text);font-style:italic;font-size:.88rem;color:var(--muted);line-height:1.7;margin-bottom:1rem;">
+        Purchases are shown with a suggested date based on your projected income. Green means you can afford it now. Gold means it's coming soon. Grey means it's Phase 2.
+      </p>
+      <div id="purchases-list"></div>
+      <div style="margin-top:.8rem;border-top:1px solid var(--border);padding-top:.8rem">
+        <div class="card-title" style="margin-bottom:.6rem">ADD A PURCHASE</div>
+        <div class="add-exp-form">
+          <input class="h-input" id="pu-name" placeholder="Item name…" style="flex:2;min-width:120px"/>
+          <input class="h-input" id="pu-amount" type="number" placeholder="Cost" style="width:80px"/>
+          <input class="h-input" id="pu-note" placeholder="Note…" style="flex:2;min-width:100px"/>
+          <select class="h-input" id="pu-phase" style="width:100px">
+            <option value="now">Buy Now</option>
+            <option value="p1">Phase 1</option>
+            <option value="p2">Phase 2</option>
+          </select>
+          <button class="h-btn" onclick="addPurchase()">ADD</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULES TAB -->
+  <div class="tab-panel" id="tab-rules">
+    <div class="card">
+      <div class="card-title">YOUR FINANCIAL RULES</div>
+      <div class="rule-block"><div class="rule-title">SAVINGS LEAVE FIRST</div><div class="rule-text">$700 transferred the day you get paid. Before anything else.</div></div>
+      <div class="rule-block"><div class="rule-title">BUFFER BEFORE CAR FUND</div><div class="rule-text">Get $500 sitting untouched before the car fund builds. One unexpected expense without a buffer is a crisis. With $500 it's an inconvenience.</div></div>
+      <div class="rule-block"><div class="rule-title">48 HOURS BEFORE BUYING</div><div class="rule-text">Close the tab. If you're still thinking about it in 48 hours it's worth buying. If you forgot about it, you have your answer.</div></div>
+      <div class="rule-block"><div class="rule-title">DON'T UPGRADE WHAT WORKS</div><div class="rule-text">If it works and it's cheap, leave it alone. The upgrade instinct costs more than the upgrade is worth.</div></div>
+      <div class="rule-block"><div class="rule-title">THE PARKING LOT</div><div class="rule-text">Screenshot things you want and save them. Review once a month. Most won't feel urgent anymore. The ones that still do — those are worth buying.</div></div>
+      <div class="rule-block"><div class="rule-title">CONTRACT REALITY</div><div class="rule-text">Ask your recruiter the review timeline. Until then execute the plan. The contract decision is outside your control — your savings rate is not.</div></div>
+      <div class="rule-block"><div class="rule-title">GOAL ORIENTED ONLY</div><div class="rule-text">Before every purchase ask: does this move me toward my goals or away from them? Car, license, stability, radiology, Austin. Everything else waits.</div></div>
+    </div>
+  </div>
+
+  <!-- NOTES TAB -->
+  <div class="tab-panel" id="tab-notes">
+    <div class="card">
+      <div class="card-title">FINANCIAL NOTES</div>
+      <textarea class="note-field" id="budget-notes" placeholder="Pay period notes, things to remember, decisions you made and why…" oninput="saveNotes()"></textarea>
+    </div>
+    <div class="card">
+      <div class="card-title">MONTH NOTES</div>
+      <textarea class="note-field" id="month-notes" placeholder="How this month went, what you learned, what to do differently…" oninput="saveMonthNotes()" style="min-height:80px"></textarea>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// STARS
+(function(){const c=document.getElementById('stars');for(let i=0;i<120;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*2+0.3;s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4.5}s;--del:${-Math.random()*6}s;--o1:${0.1+Math.random()*0.3};--o2:${0.5+Math.random()*0.5}`;c.appendChild(s);}})();
+
+function switchTab(name,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');}
+
+// MONTH NAV
+let viewYear=new Date().getFullYear();
+let viewMonth=new Date().getMonth();
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function changeMonth(dir){viewMonth+=dir;if(viewMonth>11){viewMonth=0;viewYear++;}if(viewMonth<0){viewMonth=11;viewYear--;}renderAll();}
+
+function getWorkdaysInMonth(y,m){
+  const days=[];const d=new Date(y,m,1);
+  while(d.getMonth()===m){const dow=d.getDay();if(dow!==0&&dow!==6)days.push(new Date(d));d.setDate(d.getDate()+1);}
+  return days;
+}
+
+function getPayPeriods(y,m){
+  // Biweekly starting May 4 2026
+  const anchor=new Date(2026,4,4);
+  const periods=[];
+  let start=new Date(anchor);
+  // find first period that overlaps with month
+  while(start.getFullYear()<y||(start.getFullYear()===y&&start.getMonth()<m)){
+    start=new Date(start.getTime()+14*86400000);
+  }
+  // go back to find ones that start in or before this month
+  start=new Date(anchor);
+  while(true){
+    const end=new Date(start.getTime()+13*86400000);
+    const paydate=new Date(end.getTime()+5*86400000);
+    if(start.getFullYear()>y||(start.getFullYear()===y&&start.getMonth()>m))break;
+    if(end.getFullYear()>y||(end.getFullYear()===y&&end.getMonth()>=m)||
+       (start.getFullYear()===y&&start.getMonth()===m)){
+      periods.push({start:new Date(start),end:new Date(end),paydate:new Date(paydate)});
+    }
+    start=new Date(start.getTime()+14*86400000);
+    if(periods.length>4)break;
+  }
+  return periods.filter(p=>p.start.getMonth()===m||p.end.getMonth()===m);
+}
+
+// HOURS
+function loadHours(){try{return JSON.parse(localStorage.getItem('ava_hours_v2')||'[]');}catch{return[];}}
+function saveHoursData(a){localStorage.setItem('ava_hours_v2',JSON.stringify(a));}
+
+function addHours(){
+  const date=document.getElementById('h-date').value;
+  const hours=parseFloat(document.getElementById('h-hours').value)||0;
+  const note=document.getElementById('h-note').value.trim();
+  const type=document.getElementById('h-type').value;
+  if(!date)return;
+  const all=loadHours();
+  // Remove existing entry for this date
+  const filtered=all.filter(h=>h.date!==date);
+  filtered.push({date,hours:type==='holiday'?0:hours,note,type});
+  filtered.sort((a,b)=>a.date.localeCompare(b.date));
+  saveHoursData(filtered);
+  document.getElementById('h-date').value='';
+  document.getElementById('h-hours').value='';
+  document.getElementById('h-note').value='';
+  renderAll();
+}
+
+function deleteHour(date){
+  saveHoursData(loadHours().filter(h=>h.date!==date));
+  renderAll();
+}
+
+function renderHoursList(){
+  const all=loadHours();
+  const monthEntries=all.filter(h=>{const d=new Date(h.date+'T12:00:00');return d.getFullYear()===viewYear&&d.getMonth()===viewMonth;});
+  const list=document.getElementById('hours-list');
+  if(!monthEntries.length){list.innerHTML='<div class="no-hours">No hours logged for this month yet</div>';return;}
+  list.innerHTML=monthEntries.slice().reverse().map(h=>`
+    <div class="hour-item ${h.type==='holiday'?'holiday':''}">
+      <span class="hi-date">${h.date}</span>
+      <span class="hi-hours">${h.type==='holiday'?'OFF':h.hours+'h'}</span>
+      <span class="hi-note">${h.note||''}</span>
+      <button class="hi-del" onclick="deleteHour('${h.date}')">✕</button>
+    </div>`).join('');
+}
+
+function getMonthHours(){
+  return loadHours().filter(h=>{const d=new Date(h.date+'T12:00:00');return d.getFullYear()===viewYear&&d.getMonth()===viewMonth;}).reduce((a,h)=>a+h.hours,0);
+}
+
+function renderPayPeriods(){
+  const periods=getPayPeriods(viewYear,viewMonth);
+  const hours=loadHours();
+  const RATE=16;
+  const TAX=0.108; // ~10.8% effective (fed+SS+Medicare)
+  const container=document.getElementById('pay-periods-display');
+  if(!periods.length){container.innerHTML='<div class="no-hours">No pay periods found for this month</div>';return;}
+  container.innerHTML=periods.map(p=>{
+    const fmt=d=>`${MONTHS[d.getMonth()].slice(0,3)} ${d.getDate()}`;
+    const periodHours=hours.filter(h=>{const d=new Date(h.date+'T12:00:00');return d>=p.start&&d<=p.end;}).reduce((a,h)=>a+h.hours,0);
+    // Count expected workdays in period
+    let workdays=0;let d=new Date(p.start);
+    while(d<=p.end){if(d.getDay()!==0&&d.getDay()!==6)workdays++;d.setDate(d.getDate()+1);}
+    const expectedHours=workdays*8;
+    const gross=periodHours*RATE;
+    const net=gross*(1-TAX);
+    const pct=Math.min(100,Math.round(periodHours/expectedHours*100));
+    return `<div class="pay-period-bar">
+      <div><div class="pp-label">PAY PERIOD</div><div class="pp-value">${fmt(p.start)} – ${fmt(p.end)}</div></div>
+      <div><div class="pp-label">PAYDAY</div><div class="pp-value">${fmt(p.paydate)}</div></div>
+      <div><div class="pp-label">HOURS</div><div class="pp-value">${periodHours} / ${expectedHours}</div></div>
+      <div><div class="pp-label">EST. NET</div><div class="pp-value">~$${net.toFixed(0)}</div></div>
+    </div>
+    <div class="prog-label"><span>PERIOD PROGRESS</span><span>${pct}%</span></div>
+    <div class="prog-wrap" style="margin-bottom:.8rem"><div class="prog-bar prog-income" style="width:${pct}%"></div></div>`;
+  }).join('');
+}
+
+// EXPENSES
+const DEFAULT_EXPENSES=[
+  {id:'rent',name:'Rent',amount:800,cat:'bills',note:'due by 3rd',paid:false},
+  {id:'electric',name:'Electric (Reliant)',amount:100,cat:'bills',note:'transferred to your name',paid:false},
+  {id:'internet',name:'Internet (Spectrum)',amount:50,cat:'bills',note:'first bill ~30-45 days',paid:false},
+  {id:'phone',name:'Phone',amount:0,cat:'bills',note:'free for 1 year → $30 May 2027',paid:false},
+  {id:'cats',name:'Cat Food × 2',amount:40,cat:'needs',note:'Kyoshi & Kame',paid:false},
+  {id:'delivery',name:'HEB Delivery',amount:20,cat:'needs',note:'~weekly orders',paid:false},
+  {id:'grandma',name:'Grandma Repayment',amount:75,cat:'repay',note:'pay back this month',paid:false},
+  {id:'friend',name:'Friend Repayment',amount:75,cat:'repay',note:'pay back this month',paid:false},
+];
+
+function loadExpenses(){
+  try{const s=localStorage.getItem('ava_expenses_v2');return s?JSON.parse(s):DEFAULT_EXPENSES;}catch{return DEFAULT_EXPENSES;}
+}
+function saveExpenses(a){localStorage.setItem('ava_expenses_v2',JSON.stringify(a));}
+
+function toggleExpense(id){
+  const exps=loadExpenses();const e=exps.find(x=>x.id===id);if(e)e.paid=!e.paid;saveExpenses(exps);renderAll();
+}
+function deleteExpense(id){saveExpenses(loadExpenses().filter(e=>e.id!==id));renderAll();}
+
+function addExpense(){
+  const name=document.getElementById('exp-name').value.trim();
+  const amount=parseFloat(document.getElementById('exp-amount').value)||0;
+  const cat=document.getElementById('exp-cat').value;
+  const note=document.getElementById('exp-note').value.trim();
+  if(!name)return;
+  const exps=loadExpenses();
+  exps.push({id:'exp_'+Date.now(),name,amount,cat,note,paid:false});
+  saveExpenses(exps);
+  document.getElementById('exp-name').value='';document.getElementById('exp-amount').value='';document.getElementById('exp-note').value='';
+  renderAll();
+}
+
+const CAT_LABELS={bills:'BILL',needs:'NEED',repay:'REPAY',disc:'DISC'};
+
+function renderExpenses(){
+  const exps=loadExpenses();
+  const list=document.getElementById('bills-list');
+  const cats=['bills','repay','needs','disc'];
+  list.innerHTML=cats.map(cat=>{
+    const items=exps.filter(e=>e.cat===cat);
+    if(!items.length)return '';
+    return `<div style="font-family:var(--font-head);font-size:.5rem;letter-spacing:.14em;color:var(--muted);margin:.6rem 0 .3rem">${cat.toUpperCase()}</div>`+
+    items.map(e=>`
+      <div class="exp-item ${e.paid?'paid':''}">
+        <div class="exp-check" onclick="toggleExpense('${e.id}')">${e.paid?'✓':'✦'}</div>
+        <div class="exp-body">
+          <div class="exp-name">${e.name}</div>
+          ${e.note?`<div class="exp-note">${e.note}</div>`:''}
+        </div>
+        <span class="exp-amount">${e.paid?'PAID':'$'+e.amount}</span>
+        <button class="exp-del" onclick="deleteExpense('${e.id}')">✕</button>
+      </div>`).join('');
+  }).join('');
+}
+
+// SAVINGS
+function getSav(key){return parseFloat(localStorage.getItem('ava_sav_'+key)||'0');}
+function setSav(key,v){localStorage.setItem('ava_sav_'+key,v);}
+
+function addSavings(key){
+  const v=parseFloat(document.getElementById(key+'-input').value);if(!v||v<=0)return;
+  setSav(key,getSav(key)+v);document.getElementById(key+'-input').value='';renderSavings();
+}
+function resetSavings(key){if(!confirm('Reset this tracker?'))return;setSav(key,0);renderSavings();}
+
+function renderSavings(){
+  const car=getSav('car'),buf=getSav('buf');
+  document.getElementById('car-amount').textContent='$'+car.toLocaleString();
+  document.getElementById('car-pct').textContent=Math.min(100,Math.round(car/4200*100))+'%';
+  document.getElementById('car-bar').style.width=Math.min(100,car/4200*100)+'%';
+  document.getElementById('buf-amount').textContent='$'+buf.toLocaleString();
+  document.getElementById('buf-pct').textContent=Math.min(100,Math.round(buf/500*100))+'%';
+  document.getElementById('buf-bar').style.width=Math.min(100,buf/500*100)+'%';
+}
+
+// PURCHASES
+const DEFAULT_PURCHASES=[
+  {id:'pu_am1',name:'Pot and Pan Set',amount:39.99,note:'Teal · recycled materials · Amazon',phase:'now',bought:false},
+  {id:'pu_am2',name:'Ergonomic Chair (NEO)',amount:59.98,note:'WFH back support · Amazon',phase:'now',bought:false},
+  {id:'pu_am3',name:'Portable Washer (COSTWAY)',amount:76.49,note:'Drains into bathtub · Amazon',phase:'now',bought:false},
+  {id:'pu_am4',name:'Desk',amount:0,note:'Only if roommate takes hers back',phase:'now',bought:false},
+  {id:'pu_s1',name:'Silicone Exfoliating Brush',amount:20,note:'Long handle · back coverage · EcoTools',phase:'p1',bought:false},
+  {id:'pu_s2',name:'Sol de Janeiro Body Wash',amount:20,note:'Warm sweet scent · your cardamom amber profile',phase:'p1',bought:false},
+  {id:'pu_s3',name:'CeraVe Hydrating Cleanser',amount:14,note:'Face & hands · sulfate free · paycheck 1',phase:'p1',bought:false},
+  {id:'pu_s4',name:'Klairs Unscented Toner',amount:22,note:'The glow step · paycheck 2',phase:'p1',bought:false},
+  {id:'pu_s5',name:'CeraVe Healing Ointment',amount:14,note:'Hand repair · after infection clears',phase:'p1',bought:false},
+  {id:'pu_s6',name:'Mighty Patch',amount:13,note:'Hormonal pimples · no hands needed',phase:'p1',bought:false},
+  {id:'pu_w1',name:'Period Underwear × 6',amount:70,note:'Modibodi or TomboyX · PFAS-free',phase:'p1',bought:false},
+  {id:'pu_w2',name:'Cotton Bralettes × 3',amount:40,note:'GOTS certified · nude white black',phase:'p1',bought:false},
+  {id:'pu_w3',name:'Fitted Tank Tops × 3',amount:45,note:'PACT · GOTS certified',phase:'p1',bought:false},
+  {id:'pu_l1',name:'Texas Driver\'s License',amount:150,note:'Test fees + license · start process early',phase:'p1',bought:false},
+  {id:'pu_p2a',name:'Cleobella Dress',amount:90,note:'Camellia or Celestia print · Depop',phase:'p2',bought:false},
+  {id:'pu_p2b',name:'Signature Fragrance',amount:0,note:'Warm floral oriental · cardamom amber',phase:'p2',bought:false},
+  {id:'pu_p2c',name:'Corset or Corset Top',amount:60,note:'Black cream or burgundy · secondhand',phase:'p2',bought:false},
+];
+
+function loadPurchases(){try{const s=localStorage.getItem('ava_purchases_v3');return s?JSON.parse(s):DEFAULT_PURCHASES;}catch{return DEFAULT_PURCHASES;}}
+function savePurchases(a){localStorage.setItem('ava_purchases_v3',JSON.stringify(a));}
+
+function togglePurchase(id){const p=loadPurchases();const i=p.find(x=>x.id===id);if(i)i.bought=!i.bought;savePurchases(p);renderPurchases();}
+function deletePurchase(id){savePurchases(loadPurchases().filter(p=>p.id!==id));renderPurchases();}
+
+function addPurchase(){
+  const name=document.getElementById('pu-name').value.trim();
+  const amount=parseFloat(document.getElementById('pu-amount').value)||0;
+  const note=document.getElementById('pu-note').value.trim();
+  const phase=document.getElementById('pu-phase').value;
+  if(!name)return;
+  const p=loadPurchases();p.push({id:'pu_'+Date.now(),name,amount,note,phase,bought:false});
+  savePurchases(p);
+  document.getElementById('pu-name').value='';document.getElementById('pu-amount').value='';document.getElementById('pu-note').value='';
+  renderPurchases();
+}
+
+function getSuggestedDate(amount,phase){
+  if(phase==='p2')return{label:'PHASE 2',cls:'date-later'};
+  // Simple projection: next payday after you'd have enough discretionary
+  const disc=parseFloat(document.getElementById('sum-disc').textContent.replace(/[^0-9.-]/g,''))||0;
+  if(disc>=amount)return{label:'AVAILABLE NOW',cls:'date-ready'};
+  // Estimate next check
+  const today=new Date();
+  const anchor=new Date(2026,4,4);
+  let next=new Date(anchor);
+  while(next<=today)next=new Date(next.getTime()+14*86400000);
+  const fmt=d=>`${MONTHS[d.getMonth()].slice(0,3)} ${d.getDate()}`;
+  return{label:`~${fmt(next)}`,cls:'date-soon'};
+}
+
+function renderPurchases(){
+  const purchases=loadPurchases();
+  const list=document.getElementById('purchases-list');
+  const phases=['now','p1','p2'];
+  const labels={now:'BUY NOW',p1:'PHASE 1 · MONTHS 1–6',p2:'PHASE 2 · AFTER CAR GOAL'};
+  list.innerHTML=phases.map(ph=>{
+    const items=purchases.filter(p=>p.phase===ph);
+    if(!items.length)return '';
+    return `<div style="font-family:var(--font-head);font-size:.5rem;letter-spacing:.14em;color:var(--muted);margin:.6rem 0 .3rem">${labels[ph]}</div>`+
+    items.map(p=>{
+      const sd=getSuggestedDate(p.amount,p.phase);
+      return `<div class="purchase-item ${p.bought?'bought':''}">
+        <div class="pi-check" onclick="togglePurchase('${p.id}')">${p.bought?'✓':'✦'}</div>
+        <div class="pi-body">
+          <div class="pi-name">${p.name}</div>
+          ${p.note?`<div class="pi-note">${p.note}</div>`:''}
+          <span class="pi-date ${sd.cls}">${sd.label}</span>
+        </div>
+        ${p.amount?`<div class="pi-price">$${p.amount}</div>`:'<div class="pi-price">TBD</div>'}
+        <button class="pi-del" onclick="deletePurchase('${p.id}')">✕</button>
+      </div>`;
+    }).join('');
+  }).join('');
+}
+
+// SUMMARY CALCULATIONS
+function renderSummary(){
+  const RATE=16;const TAX=0.108;
+  const monthHours=getMonthHours();
+  const workdays=getWorkdaysInMonth(viewYear,viewMonth);
+  const today=new Date();
+  const passedWorkdays=workdays.filter(d=>d<=today).length;
+  const remainingWorkdays=workdays.length-passedWorkdays;
+  const avgHoursPerDay=passedWorkdays>0?monthHours/passedWorkdays:8;
+  const projectedHours=monthHours+(remainingWorkdays*avgHoursPerDay);
+  const earnedGross=monthHours*RATE;
+  const earnedNet=earnedGross*(1-TAX);
+  const projectedNet=projectedHours*RATE*(1-TAX);
+
+  // Phone plan — free until approx May 2027
+  const phoneAmount=new Date()>new Date(2027,4,1)?30:0;
+
+  const exps=loadExpenses();
+  // Update phone automatically
+  const phoneExp=exps.find(e=>e.id==='phone');
+  if(phoneExp)phoneExp.amount=phoneAmount;
+
+  const totalBills=exps.filter(e=>e.cat==='bills'||e.cat==='repay'||e.cat==='needs').reduce((a,e)=>a+e.amount,0);
+  const available=projectedNet-totalBills;
+  const savingsTarget=700;
+  const disc=available-savingsTarget;
+
+  document.getElementById('sum-earned').textContent='$'+earnedNet.toFixed(0);
+  document.getElementById('sum-hours-logged').textContent=monthHours+' hours logged';
+  document.getElementById('sum-projected').textContent='$'+projectedNet.toFixed(0);
+  document.getElementById('sum-days-left').textContent=remainingWorkdays+' workdays remaining';
+  document.getElementById('sum-bills').textContent='$'+totalBills.toFixed(0);
+  document.getElementById('sum-available').textContent='$'+Math.max(0,available).toFixed(0);
+  document.getElementById('sum-disc').textContent='$'+Math.max(0,disc).toFixed(0);
+
+  document.getElementById('month-display').textContent=MONTHS[viewMonth]+' '+viewYear;
+  document.getElementById('month-subtitle').textContent=workdays.length+' workdays · '+passedWorkdays+' passed · '+remainingWorkdays+' remaining';
+}
+
+function renderAll(){
+  renderSummary();
+  renderHoursList();
+  renderPayPeriods();
+  renderExpenses();
+  renderSavings();
+  renderPurchases();
+}
+
+// NOTES
+function saveNotes(){localStorage.setItem('ava_budget_notes',document.getElementById('budget-notes').value);}
+function saveMonthNotes(){localStorage.setItem('ava_month_notes_'+viewYear+'_'+viewMonth,document.getElementById('month-notes').value);}
+function loadNotes(){
+  const n=localStorage.getItem('ava_budget_notes');if(n)document.getElementById('budget-notes').value=n;
+  const mn=localStorage.getItem('ava_month_notes_'+viewYear+'_'+viewMonth);
+  if(mn)document.getElementById('month-notes').value=mn;
+}
+
+// SET TODAY'S DATE AS DEFAULT
+document.getElementById('h-date').value=new Date().toISOString().split('T')[0];
+
+renderAll();
+loadNotes();
+</script>
+</body>
+</html>
